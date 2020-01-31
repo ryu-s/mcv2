@@ -1,4 +1,5 @@
 ﻿using ryu_s.BrowserCookie;
+using System;
 
 namespace Common
 {
@@ -6,13 +7,13 @@ namespace Common
     {
         public override int GetHashCode()
         {
-            return Browser.GetHashCode();
+            return Id.GetHashCode();
         }
         public override bool Equals(object obj)
         {
             if(obj is BrowserViewModel vm)
             {
-                return this.Browser.Equals(vm.Browser);
+                return this.Id.Equals(vm.Id);
             }
             return false;
         }
@@ -20,21 +21,25 @@ namespace Common
         {
             get
             {
-                if (string.IsNullOrEmpty(_browser.ProfileName))
+                if (string.IsNullOrEmpty(_profileName))
                 {
-                    return $"{_browser.Type}";
+                    return _browserName;
                 }
                 else
                 {
-                    return $"{_browser.Type}({_browser.ProfileName})";
+                    return $"{_browserName}({_profileName})";
                 }
             }
         }
-        public IBrowserProfile Browser { get { return _browser; } }
-        private readonly IBrowserProfile _browser;
-        public BrowserViewModel(IBrowserProfile browser)
+        public Guid Id;
+        private readonly string _browserName;
+        private readonly string _profileName;
+
+        public BrowserViewModel(Guid profileGuid,string browserName,string profileName)
         {
-            _browser = browser;
+            Id = profileGuid;
+            _browserName = browserName;
+            _profileName = profileName;
         }
     }
 }

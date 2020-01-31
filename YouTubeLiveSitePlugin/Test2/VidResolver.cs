@@ -90,6 +90,23 @@ namespace YouTubeLiveSitePlugin.Test2
             vid = null;
             return false;
         }
+        private bool TryStudio(string input, out string vid)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                vid = null;
+                return false;
+            }
+            //https://studio.youtube.com/video/mygwBQd0WDE/livestreaming
+            var match = Regex.Match(input, "studio\\.youtube\\.com/video/" +"("+ VID_PATTERN+")");
+            if (!match.Success)
+            {
+                vid = null;
+                return false;
+            }
+            vid = match.Groups[1].Value;
+            return true;
+        }
         internal async Task<string> GetChannelIdFromUserId(IYouTubeLibeServer server, string userId)
         {
             var url = "https://www.youtube.com/user/" + userId;
@@ -155,6 +172,10 @@ namespace YouTubeLiveSitePlugin.Test2
             {
                 return new VidResult { Vid = vid };
             }
+            else if (TryStudio(input, out vid))
+            {
+                return new VidResult { Vid = vid };
+            }
             else if (IsUser(input))
             {
                 var userId = ExtractUserId(input);
@@ -173,6 +194,7 @@ namespace YouTubeLiveSitePlugin.Test2
             }
             throw new ParseException(input);
         }
+
         internal async Task<IVidResult> GetResultFromChannelId(IYouTubeLibeServer server, string channelId)
         {
             if (string.IsNullOrEmpty(channelId))

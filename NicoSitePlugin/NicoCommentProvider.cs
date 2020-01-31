@@ -13,13 +13,11 @@ using System.Collections.Concurrent;
 
 namespace NicoSitePlugin
 {
-    class NicoCommentProvider : INicoCommentProvider
+    class NicoCommentProvider2 : INicoCommentProvider2
     {
-        private readonly ICommentOptions _options;
         private readonly INicoSiteOptions _siteOptions;
         private readonly IDataSource _dataSource;
         private readonly ILogger _logger;
-        private readonly IUserStoreManager _userStoreManager;
 
         private bool _canConnect;
         public bool CanConnect
@@ -48,7 +46,7 @@ namespace NicoSitePlugin
         public event EventHandler CanConnectChanged;
         public event EventHandler CanDisconnectChanged;
         public event EventHandler<ConnectedEventArgs> Connected;
-        public event EventHandler<IMessageContext> MessageReceived;
+        public event EventHandler<IMessageContext2> MessageReceived;
 
         private void BeforeConnect()
         {
@@ -64,7 +62,7 @@ namespace NicoSitePlugin
             _internal.AfterDisconnected();
         }
 
-        protected virtual CookieContainer GetCookieContainer(IBrowserProfile browserProfile)
+        protected virtual CookieContainer GetCookieContainer(IBrowserProfile2 browserProfile)
         {
             var cc = new CookieContainer();
             try
@@ -78,24 +76,24 @@ namespace NicoSitePlugin
             catch { }
             return cc;
         }
-        static List<INicoCommentProviderInternal> GetCommentProviderInternals(ICommentOptions options, INicoSiteOptions siteOptions, IUserStoreManager userStoreManager, IDataSource dataSource, ILogger logger, ICommentProvider cp, Guid SiteContextGuid)
+        static List<INicoCommentProviderInternal2> GetCommentProviderInternals(INicoSiteOptions siteOptions, IDataSource dataSource, ILogger logger, SitePluginId SiteContextGuid)
         {
-            var list = new List<INicoCommentProviderInternal>
+            var list = new List<INicoCommentProviderInternal2>
             {
-                new CommunityCommentProvider(options, siteOptions, userStoreManager, dataSource, logger, cp)
+                new CommunityCommentProvider2(siteOptions,  dataSource, logger)
                 {
                     SiteContextGuid=SiteContextGuid,
                 },
-                new JikkyoCommentProvider(options,siteOptions,userStoreManager,dataSource,logger,cp)
+                new JikkyoCommentProvider2(siteOptions,dataSource,logger)
                 {
                     SiteContextGuid=SiteContextGuid,
                 },
             };
             return list;
         }
-        public static bool IsValidInput(ICommentOptions options, INicoSiteOptions siteOptions, IUserStoreManager userStoreManager, IDataSource dataSource, ILogger logger, ICommentProvider cp, string input, Guid siteContextGuid)
+        public static bool IsValidInput(INicoSiteOptions siteOptions, IDataSource dataSource, ILogger logger, string input, SitePluginId siteContextGuid)
         {
-            foreach (var cpin in GetCommentProviderInternals(options, siteOptions, userStoreManager, dataSource, logger, cp, siteContextGuid))
+            foreach (var cpin in GetCommentProviderInternals(siteOptions, dataSource, logger, siteContextGuid))
             {
                 if (cpin.IsValidInput(input))
                 {
@@ -104,14 +102,14 @@ namespace NicoSitePlugin
             }
             return false;
         }
-        INicoCommentProviderInternal _internal;
+        INicoCommentProviderInternal2 _internal;
         MultipleCommentsBlocker _blocker = new MultipleCommentsBlocker();
-        public async Task ConnectAsync(string input, IBrowserProfile browserProfile)
+        public async Task ConnectAsync(string input, IBrowserProfile2 browserProfile)
         {
             _blocker.Reset();
             var cc = GetCookieContainer(browserProfile);
 
-            var list = GetCommentProviderInternals(_options, _siteOptions, _userStoreManager, _dataSource, _logger, this, SiteContextGuid);
+            var list = GetCommentProviderInternals(_siteOptions, _dataSource, _logger, SiteContextGuid);
             var cu = await GetCurrentUserInfo(browserProfile);
             if (cu.IsLoggedIn)
             {
@@ -128,7 +126,7 @@ namespace NicoSitePlugin
             else
             {
                 //未ログインでもWebSocket経由なら取れる。
-                var f = new NewLiveInternalProvider(_options, _siteOptions, _userStoreManager, _logger, _dataSource)
+                var f = new NewLiveInternalProvider2(_siteOptions, _logger, _dataSource)
                 {
                     SiteContextGuid = SiteContextGuid,
                 };
@@ -177,15 +175,9 @@ namespace NicoSitePlugin
             }
         }
 
-        public IUser GetUser(string userId)
-        {
-            return _userStoreManager.GetUser(SiteType.NicoLive, userId);
-        }
-
-
         public void Disconnect()
         {
-            _internal.Disconnect();
+            _internal?.Disconnect();
         }
 
         public Task PostCommentAsync(string comment, string mail)
@@ -202,7 +194,7 @@ namespace NicoSitePlugin
             return PostCommentAsync(comment, "");
         }
 
-        public async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile browserProfile)
+        public async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile)
         {
             var cc = GetCookieContainer(browserProfile);
             string userId = null;
@@ -262,14 +254,12 @@ namespace NicoSitePlugin
             _internal.SetMessage(raw);
         }
 
-        public Guid SiteContextGuid { get; set; }
-        public NicoCommentProvider(ICommentOptions options, INicoSiteOptions siteOptions, IDataSource dataSource, ILogger logger, IUserStoreManager userStoreManager)
+        public SitePluginId SiteContextGuid { get; set; }
+        public NicoCommentProvider2(INicoSiteOptions siteOptions, IDataSource dataSource, ILogger logger)
         {
-            _options = options;
             _siteOptions = siteOptions;
             _dataSource = dataSource;
             _logger = logger;
-            _userStoreManager = userStoreManager;
 
             CanConnect = true;
             CanDisconnect = false;

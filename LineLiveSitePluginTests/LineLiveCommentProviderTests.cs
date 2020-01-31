@@ -44,7 +44,7 @@ namespace LineLiveSitePluginTests
             {
                 return new Mp();
             }
-            protected override CookieContainer GetCookieContainer(IBrowserProfile browserProfile)
+            protected override CookieContainer GetCookieContainer(IBrowserProfile2 browserProfile)
             {
                 return new CookieContainer();
             }
@@ -64,8 +64,8 @@ namespace LineLiveSitePluginTests
                 _loveIconUrlDict = new Dictionary<string, string>();
                 return Task.CompletedTask;
             }
-            public C(IDataServer server, ILogger logger, ICommentOptions options, LineLiveSiteOptions siteOptions, IUserStoreManager userStoreManager)
-                :base(server, logger, options, siteOptions, userStoreManager)
+            public C(IDataServer server, ILogger logger, LineLiveSiteOptions siteOptions)
+                : base(server, logger, siteOptions)
             {
 
             }
@@ -87,12 +87,6 @@ namespace LineLiveSitePluginTests
                 throw new NotImplementedException();
             }
         }
-        class Logger : ILogger
-        {
-            public string GetExceptions() => "";
-
-            public void LogException(Exception ex, string message = "", string detail = "") { }
-        }
         [Test]
         public async Task LiveIdを指定されたが既に終了していた場合即座に切断する()
         {
@@ -113,11 +107,9 @@ namespace LineLiveSitePluginTests
         private async Task Test(List<string> list, int expected)
         {
             var server = new Server();
-            var logger = new Logger();
-            var optionsMock = new Mock<ICommentOptions>();
+            var loggerMock = new Mock<ILogger>();
             var siteOptions = new LineLiveSiteOptions();
-            var userStoreMock = new Mock<IUserStoreManager>();
-            var provider = new C(server, logger, optionsMock.Object, siteOptions, userStoreMock.Object);
+            var provider = new C(server, loggerMock.Object, siteOptions);
             int n = 0;
             provider.BeforeGetLiveInfo += (s, e) =>
             {
@@ -155,14 +147,14 @@ namespace LineLiveSitePluginTests
                 throw new NotImplementedException();
             }
         }
-        
+
         class C : LineLiveCommentProvider
         {
             protected override IMessageProvider CreateMessageProvider()
             {
                 return new Mp();
             }
-            protected override CookieContainer GetCookieContainer(IBrowserProfile browserProfile)
+            protected override CookieContainer GetCookieContainer(IBrowserProfile2 browserProfile)
             {
                 return new CookieContainer();
             }
@@ -190,8 +182,8 @@ namespace LineLiveSitePluginTests
                 _loveIconUrlDict = new Dictionary<string, string>();
                 return Task.CompletedTask;
             }
-            public C(IDataServer server, ILogger logger, ICommentOptions options, LineLiveSiteOptions siteOptions, IUserStoreManager userStoreManager)
-                : base(server, logger, options, siteOptions, userStoreManager)
+            public C(IDataServer server, ILogger logger, LineLiveSiteOptions siteOptions)
+                : base(server, logger, siteOptions)
             {
 
             }
@@ -219,7 +211,17 @@ namespace LineLiveSitePluginTests
         {
             public string GetExceptions() => "";
 
+            public List<ILogData> GetLogData()
+            {
+                throw new NotImplementedException();
+            }
+
             public void LogException(Exception ex, string message = "", string detail = "") { }
+
+            public void LogUnknownData(string rawData, string message = "")
+            {
+                throw new NotImplementedException();
+            }
         }
         [Test]
         public async Task チャンネルURLが入力された場合は放送が終了しても一定時間毎にチャンネルを監視して放送が始まったら自動的に接続する()
@@ -246,14 +248,12 @@ namespace LineLiveSitePluginTests
             var list2 = Enumerable.Repeat(tupple, n).ToList();
             await Test(list2, list.Count);
         }
-        private async Task Test(List<(string liveId,ILiveInfo liveInfo)> list2, int expected)
+        private async Task Test(List<(string liveId, ILiveInfo liveInfo)> list2, int expected)
         {
             var server = new Server();
             var logger = new Logger();
-            var optionsMock = new Mock<ICommentOptions>();
             var siteOptions = new LineLiveSiteOptions();
-            var userStoreMock = new Mock<IUserStoreManager>();
-            var provider = new C(server, logger, optionsMock.Object, siteOptions, userStoreMock.Object);
+            var provider = new C(server, logger, siteOptions);
             provider.LiveCheckIntervalMs = 0;
             int n = 0;
             provider.BeforeGetLiveId += (s, e) =>
@@ -265,12 +265,12 @@ namespace LineLiveSitePluginTests
                 provider.LiveInfo = list2[n].liveInfo;
             };
             provider.Expired = expected;
-            
+
             var providerTask = provider.ConnectAsync("", null);
             var k = Task.Delay(5000);
             var t = await Task.WhenAny(providerTask, k);
             Assert.IsTrue(t == providerTask);
-            Assert.AreEqual(expected+1, n);
+            Assert.AreEqual(expected + 1, n);
         }
     }
 }

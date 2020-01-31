@@ -11,26 +11,16 @@ using SitePluginCommon;
 
 namespace TwitchSitePlugin
 {
-    public class TwitchSiteContext : SiteContextBase
+    public class TwitchSiteContext2 : SiteContextBase2
     {
-        public override Guid Guid => new Guid("22F7824A-EA1B-411E-85CA-6C9E6BE94E39");
-
+        public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("22F7824A-EA1B-411E-85CA-6C9E6BE94E39"));
         public override string DisplayName => "Twitch";
 
-        protected override SiteType SiteType => SiteType.Twitch;
-        public override IOptionsTabPage TabPanel
-        {
-            get
-            {
-                var panel = new TabPagePanel();
-                panel.SetViewModel(new TwitchSiteOptionsViewModel(_siteOptions));
-                return new TwitchOptionsTabPage(DisplayName, panel);
-            }
-        }
+        public override SiteType SiteType => SiteType.Twitch;
 
-        public override ICommentProvider CreateCommentProvider()
+        public override ICommentProvider2 CreateCommentProvider()
         {
-            return new TwitchCommentProvider(_server, _logger, _options, _siteOptions, _userStoreManager)
+            return new TwitchCommentProvider2(_server, _logger, _siteOptions)
             {
                 SiteContextGuid = Guid,
             };
@@ -80,29 +70,11 @@ namespace TwitchSitePlugin
             var b = Regex.IsMatch(input, "twitch\\.tv/[a-zA-Z0-9_]+");
             return b;
         }
-
-        public override UserControl GetCommentPostPanel(ICommentProvider commentProvider)
-        {
-            var twitchCommentProvider = commentProvider as TwitchCommentProvider;
-            Debug.Assert(twitchCommentProvider != null);
-            if (twitchCommentProvider == null)
-                return null;
-
-            var vm = new CommentPostPanelViewModel(twitchCommentProvider, _logger);
-            var panel = new CommentPostPanel
-            {
-                //IsEnabled = false,
-                DataContext = vm
-            };
-            return panel;
-        }
-        private readonly ICommentOptions _options;
         private readonly IDataServer _server;
         private readonly ILogger _logger;
-        public TwitchSiteContext(ICommentOptions options, IDataServer server, ILogger logger, IUserStoreManager userStoreManager)
-            : base(options, userStoreManager, logger)
+        public TwitchSiteContext2(IDataServer server, ILogger logger)
+            : base(logger)
         {
-            _options = options;
             _server = server;
             _logger = logger;
         }

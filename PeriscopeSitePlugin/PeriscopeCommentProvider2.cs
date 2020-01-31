@@ -227,7 +227,7 @@ namespace PeriscopeSitePlugin
     {
         private readonly IDataServer _server;
         private readonly IUrl _url;
-        private readonly IBrowserProfile _browserProfile;
+        private readonly IBrowserProfile2 _browserProfile;
         private readonly ILogger _logger;
         private readonly IPeriscopeSiteOptions _siteOptions;
         private readonly MessageProvider _p1;
@@ -303,7 +303,7 @@ namespace PeriscopeSitePlugin
             };
         }
 
-        public DummyImpl(IDataServer server, IUrl url, IBrowserProfile browserProfile, ILogger logger, IPeriscopeSiteOptions siteOptions, MessageProvider p1, MessageUntara messageSetter)
+        public DummyImpl(IDataServer server, IUrl url, IBrowserProfile2 browserProfile, ILogger logger, IPeriscopeSiteOptions siteOptions, MessageProvider p1, MessageUntara messageSetter)
         {
             _server = server;
             _url = url;
@@ -315,16 +315,14 @@ namespace PeriscopeSitePlugin
             //_p2 = p2;
         }
     }
-    class PeriscopeCommentProvider2 : CommentProviderBase
+    class PeriscopeCommentProvider99 : CommentProviderBase2
     {
         FirstCommentDetector _first = new FirstCommentDetector();
         private readonly IDataServer _server;
         private readonly ILogger _logger;
-        private readonly ICommentOptions _options;
         private readonly IPeriscopeSiteOptions _siteOptions;
-        private readonly IUserStoreManager _userStoreManager;
 
-        public override async Task ConnectAsync(string input, IBrowserProfile browserProfile)
+        public override async Task ConnectAsync(string input, IBrowserProfile2 browserProfile)
         {
             BeforeConnect();
             try
@@ -341,7 +339,7 @@ namespace PeriscopeSitePlugin
             }
         }
         TestAutoReconnector _autoReconnector;
-        private async Task ConnectInternalAsync(string input, IBrowserProfile browserProfile)
+        private async Task ConnectInternalAsync(string input, IBrowserProfile2 browserProfile)
         {
             var url = Tools.GetUrl(input);
             if (url is UnknownUrl)
@@ -398,11 +396,11 @@ namespace PeriscopeSitePlugin
                 var message = new PeriscopeComment(kind1Type1);
                 var userId = message.UserId;
                 var isFirstComment = _first.IsFirstComment(userId);
-                var user = GetUser(userId);
-                user.Name = MessagePartFactory.CreateMessageItems(message.Text);
-                var metadata = CreateMessageMetadata(message, user, isFirstComment);
+                //var user = GetUser(userId);
+                //user.Name = MessagePartFactory.CreateMessageItems(message.Text);
+                var metadata = CreateMessageMetadata(message, isFirstComment);
                 var methods = new MessageMethods();
-                RaiseMessageReceived(new MessageContext(message, metadata, methods));
+                RaiseMessageReceived(new MessageContext2(message, metadata, methods));
             }
             else if (e is Kind2Kind1 kind2kind1)
             {
@@ -414,11 +412,10 @@ namespace PeriscopeSitePlugin
                 var message = new PeriscopeJoin(kind2kind1);
                 var userId = message.UserId;
                 var isFirstComment = false;
-                var user = GetUser(userId);
-                user.Name = MessagePartFactory.CreateMessageItems(message.DisplayName);
-                var metadata = CreateMessageMetadata(message, user, isFirstComment);
+                //user.Name = MessagePartFactory.CreateMessageItems(message.DisplayName);
+                var metadata = CreateMessageMetadata(message, isFirstComment);
                 var methods = new MessageMethods();
-                RaiseMessageReceived(new MessageContext(message, metadata, methods));
+                RaiseMessageReceived(new MessageContext2(message, metadata, methods));
             }
             else if (e is Kind2Kind2 kind2Kind2)
             {
@@ -430,16 +427,16 @@ namespace PeriscopeSitePlugin
                 var message = new PeriscopeLeave(kind2Kind2);
                 var userId = message.UserId;
                 var isFirstComment = false;
-                var user = GetUser(userId);
-                user.Name = MessagePartFactory.CreateMessageItems(message.DisplayName);
-                var metadata = CreateMessageMetadata(message, user, isFirstComment);
+                //var user = GetUser(userId);
+                //user.Name = MessagePartFactory.CreateMessageItems(message.DisplayName);
+                var metadata = CreateMessageMetadata(message, isFirstComment);
                 var methods = new MessageMethods();
-                RaiseMessageReceived(new MessageContext(message, metadata, methods));
+                RaiseMessageReceived(new MessageContext2(message, metadata, methods));
             }
         }
-        private MessageMetadata CreateMessageMetadata(IPeriscopeMessage message, IUser user, bool isFirstComment)
+        private MessageMetadata2 CreateMessageMetadata(IPeriscopeMessage message, bool isFirstComment)
         {
-            return new MessageMetadata(message, _options, _siteOptions, user, this, isFirstComment)
+            return new MessageMetadata2(message, _siteOptions, isFirstComment)
             {
                 SiteContextGuid = SiteContextGuid,
             };
@@ -450,7 +447,7 @@ namespace PeriscopeSitePlugin
         }
 
 
-        protected virtual CookieContainer GetCookieContainer(IBrowserProfile browserProfile)
+        protected virtual CookieContainer GetCookieContainer(IBrowserProfile2 browserProfile)
         {
             var cc = new CookieContainer();
 
@@ -468,18 +465,13 @@ namespace PeriscopeSitePlugin
             }
             return cc;
         }
-        public override async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile browserProfile)
+        public override async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile)
         {
             var userInfo = new CurrentUserInfo
             {
 
             };
             return await Task.FromResult(userInfo);
-        }
-
-        public override IUser GetUser(string userId)
-        {
-            return _userStoreManager.GetUser(SiteType.Periscope, userId);
         }
 
         public override Task PostCommentAsync(string text)
@@ -492,14 +484,12 @@ namespace PeriscopeSitePlugin
             throw new NotImplementedException();
         }
 
-        public PeriscopeCommentProvider2(IDataServer server, ILogger logger, ICommentOptions options, IPeriscopeSiteOptions siteOptions, IUserStoreManager userStoreManager)
-            : base(logger, options)
+        public PeriscopeCommentProvider99(IDataServer server, ILogger logger, IPeriscopeSiteOptions siteOptions)
+            : base(logger)
         {
             _server = server;
             _logger = logger;
-            _options = options;
             _siteOptions = siteOptions;
-            _userStoreManager = userStoreManager;
         }
     }
 }

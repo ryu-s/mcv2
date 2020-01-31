@@ -1,0 +1,13 @@
+name: build
+on: [push]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: warrenbuckley/Setup-Nuget@v1
+    - run: nuget restore MultiCommentViewer.sln
+    - name: Setup MSBuild.exe
+      uses: warrenbuckley/Setup-MSBuild@v1
+    - run: MSBuild.exe MultiCommentViewer.sln /p:Configuration=Release
+      timeout-minutes: 5

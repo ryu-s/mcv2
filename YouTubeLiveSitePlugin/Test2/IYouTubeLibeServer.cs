@@ -10,6 +10,7 @@ namespace YouTubeLiveSitePlugin.Test2
     {
         Task<string> GetAsync(string url);
         Task<string> GetAsync(string url, CookieContainer cc);
+        Task<YouTubeLiveServerResponse> GetNoThrowAsync(string url, CookieContainer cc);
         Task<string> GetEnAsync(string url);
         Task<string> PostAsync(string url, Dictionary<string, string> data, CookieContainer cc);
         Task<string> PostAsync(HttpOptions options, HttpContent content);

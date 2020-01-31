@@ -208,12 +208,6 @@ namespace YouTubeLiveSitePlugin.Test2
                     SendInfo($"メタデータの取得でエラーが発生 ({ex.Message})", InfoType.Notice);
                     break;
                 }
-                catch (HttpException ex)
-                {
-                    _logger.LogException(ex);
-                    SendInfo($"メタデータの取得でエラーが発生 ({ex.Message})", InfoType.Notice);
-                    break;
-                }
                 catch (ParseException ex)
                 {
                     _logger.LogException(ex);
@@ -225,6 +219,7 @@ namespace YouTubeLiveSitePlugin.Test2
                 }
                 catch (TaskCanceledException ex)
                 {
+                    _logger.LogException(ex, "", $"vid={vid},ytCfg={ytCfg}");
                     SendInfo("メタデータの取得がキャンセルされました（" + ex.Message + "）", InfoType.Notice);
                     break;
                 }

@@ -9,51 +9,22 @@ using System.Text.RegularExpressions;
 
 namespace WhowatchSitePlugin
 {
-    public class WhowatchSiteContext : SiteContextBase
+    public class WhowatchSiteContext2 : SiteContextBase2
     {
         private IWhowatchSiteOptions _siteOptions;
-        private readonly ICommentOptions _options;
         private readonly IDataServer _server;
         private readonly ILogger _logger;
-
-        public override Guid Guid => new Guid("EA695072-BABB-4FC9-AB9F-2F87D829AE7D");
-
+        public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("EA695072-BABB-4FC9-AB9F-2F87D829AE7D"));
         public override string DisplayName => "ふわっち";
-        protected override SiteType SiteType => SiteType.Whowatch;
-        public override IOptionsTabPage TabPanel
-        {
-            get
-            {
-                var panel = new TabPagePanel();
-                panel.SetViewModel(new WhowatchSiteOptionsViewModel(_siteOptions));
-                return new WhowatchOptionsTabPage(DisplayName, panel);
-            }
-        }
+        public override SiteType SiteType => SiteType.Whowatch;
 
-        public override ICommentProvider CreateCommentProvider()
+        public override ICommentProvider2 CreateCommentProvider()
         {
-            return new WhowatchCommentProvider(_server, _options, _siteOptions, _userStoreManager, _logger)
+            return new WhowatchCommentProvider2(_server, _siteOptions, _logger)
             {
                 SiteContextGuid = Guid,
             };
         }
-
-        public override System.Windows.Controls.UserControl GetCommentPostPanel(ICommentProvider commentProvider)
-        {
-            var cp = commentProvider as WhowatchCommentProvider;
-            Debug.Assert(cp != null);
-            if (cp == null)
-                return null;
-
-            var vm = new CommentPostPanelViewModel(cp, _logger);
-            var panel = new CommentPostPanel
-            {
-                //IsEnabled = false,
-                DataContext = vm
-            };
-            return panel;
-        }
-
         public override bool IsValidInput(string input)
         {
             return Tools.IsValidUrl(input);
@@ -95,10 +66,9 @@ namespace WhowatchSitePlugin
         {
             return new DataServer();
         }
-        public WhowatchSiteContext(ICommentOptions options, ILogger logger, IUserStoreManager userStoreManager)
-            : base(options, userStoreManager, logger)
+        public WhowatchSiteContext2(ILogger logger)
+            : base(logger)
         {
-            _options = options;
             _server = CreateServer();
             _logger = logger;
         }

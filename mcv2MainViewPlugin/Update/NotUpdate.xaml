@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="mcv2MainViewPlugin.Update.NotUpdate"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:mcv2MainViewPlugin.Update"
+             mc:Ignorable="d" Height="410" Width="590">
+    <Grid>
+        <TextBlock Text="最新版を利用中なのでアップデートの必要はありません" FontSize="20" Margin="110,65,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="440" />
+        <Button x:Name="button" Content="閉じる" Command="{Binding CloseCommand}" HorizontalAlignment="Left" Margin="255,0,0,25" VerticalAlignment="Bottom" Width="75"/>
+    </Grid>
+</UserControl>

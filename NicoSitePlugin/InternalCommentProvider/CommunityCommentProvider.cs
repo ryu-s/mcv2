@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace NicoSitePlugin
 {
-    class CommunityCommentProvider : CommentProviderInternalBase
+    class CommunityCommentProvider2 : CommentProviderInternalBase2
     {
         public override void BeforeConnect()
         {
@@ -313,13 +313,9 @@ namespace NicoSitePlugin
             SetMessage(raw, testRoomName);
         }
 
-        public CommunityCommentProvider(ICommentOptions options, INicoSiteOptions siteOptions, IUserStoreManager userStoreManager, IDataSource dataSource, ILogger logger, ICommentProvider commentProvider)
-            : base(options, siteOptions, userStoreManager, dataSource, logger)
+        public CommunityCommentProvider2(INicoSiteOptions siteOptions, IDataSource dataSource, ILogger logger)
+            : base(siteOptions, dataSource, logger)
         {
-        }
-        private IUser GetUser(string userId)
-        {
-            return _userStoreManager.GetUser(SiteType.NicoLive, userId);
         }
         int? _latestCommentNo;
         public override async Task PostCommentAsync(string comment, string mail)

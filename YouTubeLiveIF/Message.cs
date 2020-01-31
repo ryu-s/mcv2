@@ -1,6 +1,7 @@
 ﻿using SitePlugin;
 using System;
 using System.Collections.Generic;
+using YouTubeLiveIF;
 
 namespace YouTubeLiveSitePlugin
 {
@@ -34,6 +35,8 @@ namespace YouTubeLiveSitePlugin
         DateTime PostedAt { get; }
         string Id { get; }
         string UserId { get; }
+        string Info { get; }
+        UserType UserType { get; }
     }
     public interface IYouTubeLiveSuperchat : IYouTubeLiveMessage
     {
@@ -44,5 +47,9 @@ namespace YouTubeLiveSitePlugin
         string Id { get; }
         string UserId { get; }
         string PurchaseAmount { get; }
+    }
+    public interface IYouTubeLiveCommentDataToPost
+    {
+        string Comment { get; }
     }
 }

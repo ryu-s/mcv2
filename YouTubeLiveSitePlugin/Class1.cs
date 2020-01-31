@@ -6,19 +6,7 @@ using System.Threading.Tasks;
 using SitePlugin;
 namespace YouTubeLiveSitePlugin
 {
-    public interface IYouTubeCommentProvider : ICommentProvider
-    {
-
-    }
-    public interface IYouTubeCommentViewModel : ICommentViewModel
-    {
-
-    }
-    public interface IYouTubeSiteContext : ISiteContext
-    {
-
-    }
-    public interface IYouTubeSiteOptions
+    public interface IYouTubeSiteContext2 : ISiteContext2
     {
 
     }

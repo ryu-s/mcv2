@@ -1,15 +1,16 @@
 ﻿using SitePlugin;
+using System;
 
 namespace MirrativSitePlugin
 {
-    internal class MirrativMessageContext : IMessageContext
+    internal class MirrativMessageContext2 : IMessageContext2
     {
         public SitePlugin.ISiteMessage Message { get; }
 
-        public IMessageMetadata Metadata { get; }
+        public IMessageMetadata2 Metadata { get; }
 
         public IMessageMethods Methods { get; }
-        public MirrativMessageContext(IMirrativMessage message, IMirrativMessageMetadata metadata, IMessageMethods methods)
+        public MirrativMessageContext2(IMirrativMessage message, IMirrativMessageMetadata2 metadata, IMessageMethods methods)
         {
             Message = message;
             Metadata = metadata;

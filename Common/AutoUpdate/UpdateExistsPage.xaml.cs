@@ -42,7 +42,7 @@ namespace Common.AutoUpdate
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
-        {            
+        {
             _service.Navigate(new DownloadPage(_service, CurrentVersion, LatestVersionInfo, _logger));
         }
     }

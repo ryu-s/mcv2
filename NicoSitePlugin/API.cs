@@ -14,7 +14,7 @@ using Codeplex.Data;
 using NicoSitePlugin.Next20181012;
 namespace NicoSitePlugin
 {
-    interface IJikkyoInfo: IXmlSocketRoomInfo
+    interface IJikkyoInfo : IXmlSocketRoomInfo
     {
         string BaseTime { get; }
         string OpenTime { get; }
@@ -22,7 +22,7 @@ namespace NicoSitePlugin
         string EndTime { get; }
 
     }
-    class JikkyoInfo: IJikkyoInfo
+    class JikkyoInfo : IJikkyoInfo
     {
         public string XmlSocketAddr { get; set; }
         public int XmlSocketPort { get; set; }
@@ -85,14 +85,14 @@ namespace NicoSitePlugin
         {
             Name = low.Data.Name;
             MessageServerUrlWss = low.Data.MessageServer.Wss;
-            foreach(var content in low.Data.ContentGroups)
+            foreach (var content in low.Data.ContentGroups)
             {
                 //content.GroupId
                 //live
                 //video
-                if(content.GroupId == "live")
+                if (content.GroupId == "live")
                 {
-                    foreach(var live in content.Items)
+                    foreach (var live in content.Items)
                     {
                         var liveInfo = new NicoCasLiveInfo(live);
                         Lives.Add(liveInfo);
@@ -321,7 +321,7 @@ namespace NicoSitePlugin
         /// <param name="dataSource"></param>
         /// <param name="communityId">co\d+</param>
         /// <returns>配信中であればその配信のID、そうでなければnull</returns>
-        internal static async Task<string> GetCurrentCommunityLiveId(IDataSource dataSource, string communityId,CookieContainer cc)
+        internal static async Task<string> GetCurrentCommunityLiveId(IDataSource dataSource, string communityId, CookieContainer cc)
         {
             //TODO:自動認証じゃないコミュニティの場合、Cookieが無いと入れない
             var url = "https://com.nicovideo.jp/community/" + communityId;
@@ -379,7 +379,7 @@ namespace NicoSitePlugin
             {
                 var json = DynamicJson.Parse(res);
 
-                if(json.nicovideo_user_response.status == "ok")
+                if (json.nicovideo_user_response.status == "ok")
                 {
                     var d_user = json.nicovideo_user_response.user;
                     var userInfo = new UserInfo
@@ -401,16 +401,7 @@ namespace NicoSitePlugin
         public static async Task<WatchDataProps> GetWatchDataProps(IDataSource server, string liveId, CookieContainer cc)
         {
             var url = "https://live2.nicovideo.jp/watch/" + liveId;
-            string res;
-            try
-            {
-                res = await server.GetAsync(url, cc);
-            }
-            catch (HttpException ex)
-            {
-                //エラーメッセージを解析する
-                throw new NotImplementedException();
-            }
+            var res = await server.GetAsync(url, cc);
             //quot;}}}}}}"></script><script src="http
             var match = Regex.Match(res, "data-props=\"({.+?})\"></script>");
             if (!match.Success)
@@ -461,7 +452,7 @@ namespace NicoSitePlugin
             AccountType = low.User.AccountType;
             IsOperator = low.User.IsOperator;
             BroadcastId = low.Program.BroadcastId;
-            WebSocketUrl=low.Site.Relive.WebSocketUrl;
+            WebSocketUrl = low.Site.Relive.WebSocketUrl;
             Locale = low.Site.Locale;
             UserId = low.User.Id;
             ServerTime = low.Site.ServerTime;

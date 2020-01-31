@@ -1,19 +1,17 @@
 ﻿using SitePlugin;
+using System;
 
 namespace TwitchSitePlugin
 {
-    internal class TwitchMessageContext : IMessageContext
+    internal class TwitchMessageContext2 : IMessageContext2
     {
         public SitePlugin.ISiteMessage Message { get; }
 
-        public IMessageMetadata Metadata { get; }
-
-        public IMessageMethods Methods { get; }
-        public TwitchMessageContext(ITwitchMessage message, MessageMetadata metadata, IMessageMethods methods)
+        public IMessageMetadata2 Metadata { get; }
+        public TwitchMessageContext2(ITwitchMessage message, MessageMetadata2 metadata)
         {
             Message = message;
             Metadata = metadata;
-            Methods = methods;
         }
     }
 }

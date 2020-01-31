@@ -7,25 +7,16 @@ using SitePluginCommon;
 
 namespace YouTubeLiveSitePlugin.Test2
 {
-    public class YouTubeLiveSiteContext : SiteContextBase, IYouTubeSiteContext
+    public class YouTubeLiveSiteContext2 : SiteContextBase2, IYouTubeSiteContext2
     {
-        public override Guid Guid => new Guid("F1631B64-6572-4530-ABAF-21707F15D893");
+        public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("F1631B64-6572-4530-ABAF-21707F15D893"));
 
         public override string DisplayName => "YouTubeLive";
-        protected override SiteType SiteType => SiteType.YouTubeLive;
-        public override IOptionsTabPage TabPanel
-        {
-            get
-            {
-                var panel = new YouTubeLiveOptionsPanel();
-                panel.SetViewModel(new YouTubeLiveOptionsViewModel(_siteOptions));
-                return new YouTubeListOptionsTabPage(DisplayName, panel);
-            }
-        }
-        public override ICommentProvider CreateCommentProvider()
+        public override SiteType SiteType => SiteType.YouTubeLive;
+        public override ICommentProvider2 CreateCommentProvider()
         {
             //return new YouTubeCommentProvider(connectionName, _options, _siteOptions);
-            return new Test2.CommentProvider(_options, _server, _siteOptions, _logger, _userStoreManager)
+            return new Test2.CommentProvider2(_server, _siteOptions, _logger)
             {
                 SiteContextGuid = Guid,
             };
@@ -66,30 +57,13 @@ namespace YouTubeLiveSitePlugin.Test2
             var resolver = new VidResolver();
             return resolver.IsValidInput(input);
         }
-        public override UserControl GetCommentPostPanel(ICommentProvider commentProvider)
-        {
-            var youtubeCommentProvider = commentProvider as CommentProvider;
-            Debug.Assert(youtubeCommentProvider != null);
-            if (youtubeCommentProvider == null)
-                return null;
 
-            var vm = new CommentPostPanelViewModel(youtubeCommentProvider, _logger);
-            var panel = new CommentPostPanel
-            {
-                //IsEnabled = false,
-                DataContext = vm
-            };
-            return panel;
-        }
-
-        private readonly ICommentOptions _options;
         private readonly IYouTubeLibeServer _server;
         private readonly ILogger _logger;
         private Test2.YouTubeLiveSiteOptions _siteOptions;
-        public YouTubeLiveSiteContext(ICommentOptions options, IYouTubeLibeServer server, ILogger logger, IUserStoreManager userStoreManager)
-            : base(options, userStoreManager, logger)
+        public YouTubeLiveSiteContext2(IYouTubeLibeServer server, ILogger logger)
+            : base(logger)
         {
-            _options = options;
             _server = server;
             _logger = logger;
         }

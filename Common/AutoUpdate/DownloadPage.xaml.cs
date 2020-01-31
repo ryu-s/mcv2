@@ -40,7 +40,7 @@ namespace Common.AutoUpdate
             try
             {
                 var list = new List<string>();
-                using(var sr = new System.IO.StreamReader(System.IO.Path.Combine(baseDir, "list.txt")))
+                using (var sr = new System.IO.StreamReader(System.IO.Path.Combine(baseDir, "list.txt")))
                 {
                     while (!sr.EndOfStream)
                     {
@@ -65,7 +65,7 @@ namespace Common.AutoUpdate
                     {
                         _logger.LogException(ex, "", $"src={srcPath}, dst={dstPath}");
                     }
-                }                
+                }
             }
             catch (System.IO.FileNotFoundException ex)
             {
@@ -79,7 +79,7 @@ namespace Common.AutoUpdate
             {
                 using (var archive = ZipFile.OpenRead(zipFilePath))
                 {
-                    foreach(var entry in archive.Entries)
+                    foreach (var entry in archive.Entries)
                     {
                         var entryPath = System.IO.Path.Combine(baseDir, entry.FullName);
                         var entryDir = System.IO.Path.GetDirectoryName(entryPath);
@@ -103,7 +103,7 @@ namespace Common.AutoUpdate
             try
             {
                 var pid = Process.GetCurrentProcess().Id;
-                System.Diagnostics.Process.Start(exeFile, "/updated " + pid);                
+                System.Diagnostics.Process.Start(exeFile, "/updated " + pid);
             }
             catch (Exception ex)
             {

@@ -101,13 +101,13 @@ namespace NicoSitePlugin
             var is184 = Tools.Is184UserId(userId);
             return !is184 && userId != "900000000";
         }
-        public static async Task<INicoComment> CreateNicoComment(IChat chat, IUser user, INicoSiteOptions _siteOptions, string roomName, Func<string, Task<IUserInfo>> f, ILogger logger)
+        public static async Task<INicoComment> CreateNicoComment2(IChat chat, INicoSiteOptions _siteOptions, string roomName, Func<string, Task<IUserInfo>> f, ILogger logger)
         {
             var userId = chat.UserId;
             var is184 = Tools.Is184UserId(userId);
             if (_siteOptions.IsAutoSetNickname)
             {
-                SitePluginCommon.Utils.SetNickname(chat.Text, user);
+                //SitePluginCommon.Utils.SetNickname(chat.Text, user);
             }
 
             string thumbnailUrl = null;
@@ -122,7 +122,7 @@ namespace NicoSitePlugin
                     if (_siteOptions.IsAutoGetUsername)
                     {
                         name = userInfo.Name;
-                        user.Name = new List<IMessagePart> { MessagePartFactory.CreateMessageText(userInfo.Name) };
+                        //user.Name = new List<IMessagePart> { MessagePartFactory.CreateMessageText(userInfo.Name) };
                     }
                 }
             }

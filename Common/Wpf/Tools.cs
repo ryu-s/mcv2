@@ -13,6 +13,7 @@ namespace Common.Wpf
     {
         public static string ToText(this IEnumerable<IMessagePart> messageParts)
         {
+            if (messageParts == null) return null;
             var s = "";
             foreach (var part in messageParts)
             {

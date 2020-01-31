@@ -10,11 +10,9 @@ using ryu_s.BrowserCookie;
 
 namespace NicoSitePlugin
 {
-    abstract class CommentProviderInternalBase : INicoCommentProviderInternal
+    abstract class CommentProviderInternalBase2 : INicoCommentProviderInternal2
     {
-        protected readonly ICommentOptions _options;
         protected readonly INicoSiteOptions _siteOptions;
-        protected readonly IUserStoreManager _userStoreManager;
         protected readonly IDataSource _dataSource;
         protected readonly ILogger _logger;
         protected readonly ConcurrentDictionary<string, int> _userCommentCountDict = new ConcurrentDictionary<string, int>();
@@ -23,24 +21,20 @@ namespace NicoSitePlugin
         /// 基本的にはアリーナがこれに該当するが、自分の部屋しか取れない場合もあるためそれを考慮してこういう形にした。
         /// </summary>
         protected string _mainRoomThreadId;
-        private IUser GetUser(string userId)
-        {
-            return _userStoreManager.GetUser(SiteType.NicoLive, userId);
-        }
         protected void SendSystemInfo(string message, InfoType type)
         {
-            var context = InfoMessageContext.Create(new InfoMessage
+            var context = InfoMessageContext2.Create(new InfoMessage
             {
                 Text = message,
                 SiteType = SiteType.NicoLive,
                 Type = type,
-            }, _options);
+            });
             MessageReceived?.Invoke(this, context);
         }
-        public async Task<NicoMessageContext> CreateMessageContextAsync(IChat chat, string roomName, bool isInitialComment)
+        public async Task<NicoMessageContext2> CreateMessageContextAsync(IChat chat, string roomName, bool isInitialComment)
         {
-            NicoMessageContext messageContext = null;
-            INicoMessageMetadata metadata;
+            NicoMessageContext2 messageContext = null;
+            INicoMessageMetadata2 metadata;
 
             var userId = chat.UserId;
 
@@ -51,8 +45,7 @@ namespace NicoSitePlugin
             {
                 case NicoMessageType.Comment:
                     {
-                        var user = GetUser(userId);
-                        var comment = await Tools.CreateNicoComment(chat, user, _siteOptions, roomName, async userid => await API.GetUserInfo(_dataSource, userid), _logger);
+                        var comment = await Tools.CreateNicoComment2(chat, _siteOptions, roomName, async userid => await API.GetUserInfo(_dataSource, userid), _logger);
 
                         bool isFirstComment;
                         if (_userCommentCountDict.ContainsKey(userId))
@@ -66,7 +59,7 @@ namespace NicoSitePlugin
                             isFirstComment = true;
                         }
                         message = comment;
-                        metadata = new CommentMessageMetadata(comment, _options, _siteOptions, user, _cp, isFirstComment)
+                        metadata = new CommentMessageMetadata2(comment, _siteOptions, isFirstComment)
                         {
                             IsInitialComment = isInitialComment,
                             SiteContextGuid = SiteContextGuid,
@@ -77,21 +70,21 @@ namespace NicoSitePlugin
                     {
                         var info = Tools.CreateNicoInfo(chat, roomName, _siteOptions);
                         message = info;
-                        metadata = new InfoMessageMetadata(info, _options, _siteOptions);
+                        metadata = new InfoMessageMetadata2(info, _siteOptions);
                     }
                     break;
                 case NicoMessageType.Ad:
                     {
                         var ad = Tools.CreateNicoAd(chat, roomName, _siteOptions);
                         message = ad;
-                        metadata = new AdMessageMetadata(ad, _options, _siteOptions);
+                        metadata = new AdMessageMetadata2(ad, _siteOptions);
                     }
                     break;
                 case NicoMessageType.Item:
                     {
                         var item = Tools.CreateNicoItem(chat, roomName, _siteOptions);
                         message = item;
-                        metadata = new ItemMessageMetadata(item, _options, _siteOptions);
+                        metadata = new ItemMessageMetadata2(item, _siteOptions);
                     }
                     break;
                 default:
@@ -106,7 +99,7 @@ namespace NicoSitePlugin
             else
             {
                 var methods = new NicoMessageMethods();
-                messageContext = new NicoMessageContext(message, metadata, methods);
+                messageContext = new NicoMessageContext2(message, metadata, methods);
                 return messageContext;
             }
         }
@@ -120,7 +113,7 @@ namespace NicoSitePlugin
         public abstract void Disconnect();
 
         public abstract bool IsValidInput(string input);
-        protected void RaiseMessageReceived(NicoMessageContext messageContext)
+        protected void RaiseMessageReceived(NicoMessageContext2 messageContext)
         {
             if (messageContext != null)
             {
@@ -139,18 +132,15 @@ namespace NicoSitePlugin
         public abstract Task PostCommentAsync(string comment, string mail);
         public abstract void SetMessage(string raw);
 
-        public CommentProviderInternalBase(ICommentOptions options, INicoSiteOptions siteOptions, IUserStoreManager userStoreManager, IDataSource dataSource, ILogger logger)
+        public CommentProviderInternalBase2(INicoSiteOptions siteOptions, IDataSource dataSource, ILogger logger)
         {
-            _options = options;
             _siteOptions = siteOptions;
-            _userStoreManager = userStoreManager;
             _dataSource = dataSource;
             _logger = logger;
         }
-        public Guid SiteContextGuid { get; set; }
-        public ICommentProvider _cp;
+        public SitePluginId SiteContextGuid { get; set; }
 
-        public event EventHandler<IMessageContext> MessageReceived;
+        public event EventHandler<IMessageContext2> MessageReceived;
         public event EventHandler<IMetadata> MetadataUpdated;
         public event EventHandler<ConnectedEventArgs> Connected;
     }

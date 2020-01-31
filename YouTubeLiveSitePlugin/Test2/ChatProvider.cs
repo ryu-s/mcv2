@@ -10,6 +10,7 @@ using SitePlugin;
 using Common;
 using System.Diagnostics;
 using System.Net.Http;
+using YouTubeLiveIF;
 
 namespace YouTubeLiveSitePlugin.Test2
 {
@@ -132,6 +133,8 @@ namespace YouTubeLiveSitePlugin.Test2
         public long TimestampUsec { get; internal set; }
         public string Id { get; internal set; }
         public IMessageImage Thumbnail { get; set; }
+        public string Info { get; set; }
+        public UserType UserType { get; internal set; }
     }
     interface IContinuation
     {

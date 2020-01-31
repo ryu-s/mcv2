@@ -9,44 +9,18 @@ using SitePluginCommon;
 
 namespace OpenrecSitePlugin
 {
-    public class OpenrecSiteContext : SiteContextBase
+    public class OpenrecSiteContext2 : SiteContextBase2
     {
-        public override Guid Guid => new Guid("F4434012-3E68-4DD9-B2A8-F2BD7D601723");
-
+        public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("F4434012-3E68-4DD9-B2A8-F2BD7D601723"));
         public override string DisplayName => "OPENREC";
-        protected override SiteType SiteType => SiteType.Openrec;
-        public override IOptionsTabPage TabPanel
-        {
-            get
-            {
-                var panel = new OpenrecOptionsPanel();
-                panel.SetViewModel(new OpenrecOptionsViewModel(_siteOptions));
-                return new OpenrecOptionsTabPage(DisplayName, panel);
-            }
-        }
+        public override SiteType SiteType => SiteType.Openrec;
 
-        public override ICommentProvider CreateCommentProvider()
+        public override ICommentProvider2 CreateCommentProvider()
         {
-            return new CommentProvider(_options, _siteOptions, _logger, _userStoreManager)
+            return new CommentProvider2(_siteOptions, _logger)
             {
                 SiteContextGuid = Guid,
             };
-        }
-
-        public override UserControl GetCommentPostPanel(ICommentProvider commentProvider)
-        {
-            var nicoCommentProvider = commentProvider as CommentProvider;
-            Debug.Assert(nicoCommentProvider != null);
-            if (nicoCommentProvider == null)
-                return null;
-
-            var vm = new CommentPostPanelViewModel(nicoCommentProvider, _logger);
-            var panel = new CommentPostPanel
-            {
-                //IsEnabled = false,
-                DataContext = vm
-            };
-            return panel;
         }
 
         public override bool IsValidInput(string input)
@@ -84,13 +58,11 @@ namespace OpenrecSitePlugin
             }
         }
         private OpenrecSiteOptions _siteOptions;
-        private ICommentOptions _options;
         private ILogger _logger;
 
-        public OpenrecSiteContext(ICommentOptions options, ILogger logger, IUserStoreManager userStoreManager)
-            : base(options,userStoreManager, logger)
+        public OpenrecSiteContext2(ILogger logger)
+            : base(logger)
         {
-            _options = options;
             _logger = logger;
         }
     }

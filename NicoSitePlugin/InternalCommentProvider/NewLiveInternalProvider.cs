@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace NicoSitePlugin
 {
-    class NewLiveInternalProvider : CommentProviderInternalBase
+    class NewLiveInternalProvider2 : CommentProviderInternalBase2
     {
         private readonly IDataSource _server;
 
@@ -114,8 +114,8 @@ namespace NicoSitePlugin
         MetaProvider _metaProvider;
         MessageProvider _messageProvider;
         public bool IsLoggedIn { get; set; }
-        public NewLiveInternalProvider(ICommentOptions options, INicoSiteOptions siteOptions, IUserStoreManager userStoreManager, ILogger logger, IDataSource server)
-            : base(options, siteOptions, userStoreManager, server, logger)
+        public NewLiveInternalProvider2(INicoSiteOptions siteOptions, ILogger logger, IDataSource server)
+            : base(siteOptions, server, logger)
         {
             _server = server;
             _metaProvider = new MetaProvider();

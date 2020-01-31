@@ -45,7 +45,12 @@ namespace YouTubeLiveSitePlugin.Test2
     [Serializable]
     public class ReloadException : Exception
     {
+        public string Details { get; }
         public ReloadException() { }
+        public ReloadException(string message, string details) : base(message)
+        {
+            Details = details;
+        }
         public ReloadException(Exception innterException) : base("", innterException) { }
     }
     [Serializable]

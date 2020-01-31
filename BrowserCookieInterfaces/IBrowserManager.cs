@@ -5,7 +5,7 @@ namespace ryu_s.BrowserCookie
     public interface IBrowserManager
     {
         BrowserType Type { get; }
-        List<IBrowserProfile> GetProfiles();
+        List<IBrowserProfile2> GetProfiles();
     }
     public interface IIEManager : IBrowserManager { }
     public interface IFirefoxManager : IBrowserManager { }

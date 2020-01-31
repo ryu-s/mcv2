@@ -18,6 +18,10 @@ namespace Common
             {
                 try
                 {
+                    if (!File.Exists(path))
+                    {
+                        return null;
+                    }
                     using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read))
                     using (var sr = new StreamReader(fs))
                     {

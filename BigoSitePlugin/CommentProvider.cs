@@ -251,7 +251,7 @@ namespace BigoSitePlugin
             }
         }
     }
-    class CommentProvider : ICommentProvider
+    class CommentProvider : ICommentProvider2
     {
         private bool _canConnect;
         public bool CanConnect
@@ -286,26 +286,24 @@ namespace BigoSitePlugin
                 return true;
             }
         }
-        public event EventHandler<IMessageContext> MessageReceived;
+        public event EventHandler<IMessageContext2> MessageReceived;
         public event EventHandler<IMetadata> MetadataUpdated;
         public event EventHandler CanConnectChanged;
         public event EventHandler CanDisconnectChanged;
         public event EventHandler<ConnectedEventArgs> Connected;
 
         CookieContainer _cc;
-        private readonly ICommentOptions _options;
         private readonly BigoSiteOptions _siteOptions;
         private readonly ILogger _logger;
-        private readonly IUserStoreManager _userStoreManager;
 
         private void SendInfo(string comment, InfoType type)
         {
-            var context = InfoMessageContext.Create(new InfoMessage
+            var context = InfoMessageContext2.Create(new InfoMessage
             {
                 Text = comment,
                 SiteType = SiteType.Bigo,
                 Type = type,
-            }, _options);
+            });
             MessageReceived?.Invoke(this, context);
         }
         private void BeforeConnect()
@@ -322,7 +320,7 @@ namespace BigoSitePlugin
             SendInfo("切断しました", InfoType.Notice);
         }
 
-        protected virtual CookieContainer CreateCookieContainer(IBrowserProfile browserProfile)
+        protected virtual CookieContainer CreateCookieContainer(IBrowserProfile2 browserProfile)
         {
             var cc = new CookieContainer();//まずCookieContainerのインスタンスを作っておく。仮にCookieの取得で失敗しても/live_chatで"YSC"と"VISITOR_INFO1_LIVE"が取得できる。これらは/service_ajaxでメタデータを取得する際に必須。
             try
@@ -339,8 +337,8 @@ namespace BigoSitePlugin
             }
             return cc;
         }
-        MessageProvider messageProvider;
-        public async Task ConnectAsync(string input, IBrowserProfile browserProfile)
+        MessageProvider _messageProvider;
+        public async Task ConnectAsync(string input, IBrowserProfile2 browserProfile)
         {
             if (string.IsNullOrEmpty(input))
             {
@@ -368,17 +366,17 @@ namespace BigoSitePlugin
                 });
             }
             var wsInfo = GetWebsocketInfo(livePageHtml);
-            messageProvider = new MessageProvider(new Websocket
+            _messageProvider = new MessageProvider(new Websocket
             {
                 EnableAutoSendPing = true,
                 AutoSendPingInterval = 1000,
                 NoDelay = true,
             }, new MessageParser());
-            messageProvider.Received += MessageProvider_Received;
+            _messageProvider.Received += MessageProvider_Received;
             try
             {
             reload:
-                await messageProvider.ReceiveAsync(wsInfo.websocketUrl);
+                await _messageProvider.ReceiveAsync(wsInfo.websocketUrl);
                 if (!_disconnectedExpected)
                 {
                     Debug.WriteLine("BIGO reload!");
@@ -391,8 +389,8 @@ namespace BigoSitePlugin
             }
             finally
             {
-                messageProvider.Received -= MessageProvider_Received;
-                messageProvider = null;
+                _messageProvider.Received -= MessageProvider_Received;
+                _messageProvider = null;
                 AfterConnect();
             }
         }
@@ -434,10 +432,9 @@ namespace BigoSitePlugin
                 case Num1 num1:
                     {
                         var siteMessage = new BigoComment(num1);
-                        var user = GetUser(num1.Name);
                         var isFirstComment = false;
-                        var metadata = new BigoMessageMetadata(siteMessage, _options, _siteOptions, user, this, isFirstComment);
-                        MessageReceived?.Invoke(this, new BigoMessageContext(siteMessage, metadata, new BigoMessageMethods()));
+                        var metadata = new BigoMessageMetadata2(siteMessage, _siteOptions, isFirstComment);
+                        MessageReceived?.Invoke(this, new BigoMessageContext2(siteMessage, metadata, new BigoMessageMethods()));
                     }
                     break;
                 case Num5 num5:
@@ -491,23 +488,19 @@ namespace BigoSitePlugin
         public void Disconnect()
         {
             _disconnectedExpected = true;
-            messageProvider?.Disconnect();
-        }
-        public IUser GetUser(string userId)
-        {
-            return _userStoreManager.GetUser(SiteType.Bigo, userId);
+            _messageProvider?.Disconnect();
         }
 
-        async Task ICommentProvider.PostCommentAsync(string text)
+        async Task ICommentProvider2.PostCommentAsync(string text)
         {
             var b = await PostCommentAsync(text);
         }
-        public async Task<bool> PostCommentAsync(string text)
+        public Task<bool> PostCommentAsync(string text)
         {
-            return false;
+            return Task.FromResult(false);
         }
 
-        public async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile browserProfile)
+        public async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile)
         {
             var currentUserInfo = new CurrentUserInfo();
             var cc = CreateCookieContainer(browserProfile);
@@ -533,14 +526,13 @@ namespace BigoSitePlugin
 
         }
 
-        public Guid SiteContextGuid { get; set; }
-        IBigoServer _server;
-        public CommentProvider(ICommentOptions options, IBigoServer server, BigoSiteOptions siteOptions, ILogger logger, IUserStoreManager userStoreManager)
+        public SitePluginId SiteContextGuid { get; set; }
+
+        readonly IBigoServer _server;
+        public CommentProvider(IBigoServer server, BigoSiteOptions siteOptions, ILogger logger)
         {
-            _options = options;
             _siteOptions = siteOptions;
             _logger = logger;
-            _userStoreManager = userStoreManager;
             _server = server;
 
             CanConnect = true;

@@ -17,7 +17,7 @@ namespace TwitchSitePluginTests
     [TestFixture]
     class TwitchCommentProviderTests
     {
-        class C : TwitchCommentProvider
+        class C : TwitchCommentProvider2
         {
             public bool IsLoggedin { get; set; }
             protected override bool IsLoggedIn()
@@ -28,7 +28,7 @@ namespace TwitchSitePluginTests
             {
                 return "";
             }
-            protected override CookieContainer GetCookieContainer(IBrowserProfile browserProfile)
+            protected override CookieContainer GetCookieContainer(IBrowserProfile2 browserProfile)
             {
                 return new CookieContainer();
             }
@@ -51,8 +51,8 @@ namespace TwitchSitePluginTests
             //{
             //    return CommentData;
             //}
-            public C(IDataServer server, ILogger logger, ICommentOptions options, TwitchSiteOptions siteOptions, IUserStoreManager userStoreManager)
-                : base(server, logger, options, siteOptions, userStoreManager)
+            public C(IDataServer server, ILogger logger, TwitchSiteOptions siteOptions)
+                : base(server, logger, siteOptions)
             {
             }
         }
@@ -105,25 +105,20 @@ namespace TwitchSitePluginTests
             var serverMock = new Mock<IDataServer>();
             serverMock.Setup(s => s.GetAsync(It.IsAny<string>(), It.IsAny<Dictionary<string, string>>())).Returns(Task.FromResult(data));
             var loggerMock = new Mock<ILogger>();
-            var optionsMock = new Mock<ICommentOptions>();
             var siteOptions = new TwitchSiteOptions
             {
                 NeedAutoSubNickname = true
             };
-            var userStoreMock = new Mock<IUserStoreManager>();
-            var userMock = new Mock<IUser>();
-            userMock.SetupGet(u => u.UserId).Returns(userid);
-            userStoreMock.Setup(s => s.GetUser(SiteType.Twitch, userid)).Returns(userMock.Object);
-            var browserProfileMock = new Mock<IBrowserProfile>();
+            var browserProfileMock = new Mock<IBrowserProfile2>();
             var messageProvider = new MessageProvider();
             var commentDataMock = new Mock<ICommentData>();
-            var commentProvider = new C(serverMock.Object, loggerMock.Object, optionsMock.Object, siteOptions, userStoreMock.Object)
+            var commentProvider = new C(serverMock.Object, loggerMock.Object, siteOptions)
             {
                 MessageProvider = messageProvider,
                 MetadataProvider = new MetadataProvider(),
                 CommentData = commentDataMock.Object,
             };
-            IMessageContext actual = null;
+            IMessageContext2 actual = null;
             commentProvider.MessageReceived += (s, e) =>
             {
                 actual = e;
@@ -146,25 +141,20 @@ namespace TwitchSitePluginTests
             var serverMock = new Mock<IDataServer>();
             serverMock.Setup(s => s.GetAsync(It.IsAny<string>(), It.IsAny<Dictionary<string, string>>())).Returns(Task.FromResult(data));
             var loggerMock = new Mock<ILogger>();
-            var optionsMock = new Mock<ICommentOptions>();
             var siteOptions = new TwitchSiteOptions
             {
                 NeedAutoSubNickname = true
             };
-            var userStoreMock = new Mock<IUserStoreManager>();
-            var user = new UserTest(userid);
-            userStoreMock.Setup(s => s.GetUser(SiteType.Twitch, userid)).Returns(user);
-            var userStoreManager = userStoreMock.Object;
-            var browserProfileMock = new Mock<IBrowserProfile>();
+            var browserProfileMock = new Mock<IBrowserProfile2>();
             var messageProvider = new MessageProvider();
             var commentDataMock = new Mock<ICommentData>();
-            var commentProvider = new C(serverMock.Object, loggerMock.Object, optionsMock.Object, siteOptions, userStoreManager)
+            var commentProvider = new C(serverMock.Object, loggerMock.Object, siteOptions)
             {
                 MessageProvider = messageProvider,
                 MetadataProvider = new MetadataProvider(),
                 CommentData = commentDataMock.Object,
             };
-            IMessageContext actual = null;
+            IMessageContext2 actual = null;
             commentProvider.MessageReceived += (s, e) =>
             {
                 actual = e;
@@ -173,8 +163,9 @@ namespace TwitchSitePluginTests
             var t = commentProvider.ConnectAsync("", browserProfileMock.Object);
             messageProvider.SetResult(raw);
             await t;
-            Assert.AreEqual("コテハン", user.Nickname);
-            return;
+            //Assert.AreEqual("コテハン", user.Nickname);
+            //2020/11/05、自動コテハン機能未実装
+            Assert.Fail();
         }
         [Test]
         public async Task GetCurrentUserInfoTest()
@@ -185,18 +176,12 @@ namespace TwitchSitePluginTests
             var loggerMock = new Mock<ILogger>();
             var logger = loggerMock.Object;
 
-            var optionsMock = new Mock<ICommentOptions>();
-            var options = optionsMock.Object;
-
-            var userStoreManagerMock = new Mock<IUserStoreManager>();
-            var userStoreManager = userStoreManagerMock.Object;
-
             var siteOptions = new TwitchSiteOptions
             {
                 NeedAutoSubNickname = true
             };
 
-            var browserMock = new Mock<IBrowserProfile>();
+            var browserMock = new Mock<IBrowserProfile2>();
             var cookies = new List<Cookie>
             {
                 new Cookie("login","abc","/","twitch.tv"),
@@ -205,7 +190,7 @@ namespace TwitchSitePluginTests
             browserMock.Setup(b => b.GetCookieCollection(It.IsAny<string>())).Returns(cookies);
             var browser = browserMock.Object;
 
-            var cp = new TwitchCommentProvider(server, logger, options, siteOptions, userStoreManager);
+            var cp = new TwitchCommentProvider2(server, logger, siteOptions);
             var info = await cp.GetCurrentUserInfo(browser);
             Assert.AreEqual("aokpz", info.Username);
             Assert.IsTrue(info.IsLoggedIn);

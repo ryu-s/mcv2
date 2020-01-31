@@ -2,6 +2,7 @@
 using SitePlugin;
 using System;
 using System.Collections.Generic;
+using YouTubeLiveIF;
 
 namespace YouTubeLiveSitePlugin
 {
@@ -68,6 +69,8 @@ namespace YouTubeLiveSitePlugin
         public string UserId { get; set; }
         public DateTime PostedAt { get; set; }
         public IMessageImage UserIcon { get; set; }
+        public string Info { get; set; }
+        public UserType UserType { get; }
         public YouTubeLiveComment(Test2.CommentData commentData) : base(commentData.Raw)
         {
             UserId = commentData.UserId;
@@ -76,6 +79,8 @@ namespace YouTubeLiveSitePlugin
             NameItems = commentData.NameItems;
             UserIcon = commentData.Thumbnail;
             PostedAt = SitePluginCommon.Utils.UnixtimeToDateTime(commentData.TimestampUsec / (1000 * 1000));
+            Info = commentData.Info;
+            UserType = commentData.UserType;
         }
     }
 }

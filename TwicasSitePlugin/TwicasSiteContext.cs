@@ -9,47 +9,15 @@ using SitePluginCommon;
 
 namespace TwicasSitePlugin
 {
-    public class TwicasOptionsTabPage : IOptionsTabPage
+    public class TwicasSiteContext2 : SiteContextBase2
     {
-        public string HeaderText { get; }
-
-        public System.Windows.Controls.UserControl TabPagePanel => _panel;
-
-        public void Apply()
-        {
-            var optionsVm = _panel.GetViewModel();
-            optionsVm.OriginOptions.Set(optionsVm.ChangedOptions);
-        }
-
-        public void Cancel()
-        {
-        }
-        private readonly TwicasOptionsPanel _panel;
-        public TwicasOptionsTabPage(string displayName, TwicasOptionsPanel panel)
-        {
-            HeaderText = displayName;
-            _panel = panel;
-        }
-    }
-    public class TwicasSiteContext : SiteContextBase
-    {
-        public override Guid Guid => new Guid("8649A30C-D9C8-4ADB-862D-E0DAAEA24CE2");
-
+        public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("8649A30C-D9C8-4ADB-862D-E0DAAEA24CE2"));
         public override string DisplayName => "Twicas";
-        protected override SiteType SiteType => SiteType.Twicas;
-        public override IOptionsTabPage TabPanel
-        {
-            get
-            {
-                var panel = new TwicasOptionsPanel();
-                panel.SetViewModel(new TwicasSiteOptionsViewModel(_siteOptions));
-                return new TwicasOptionsTabPage(DisplayName, panel);
-            }
-        }
+        public override SiteType SiteType => SiteType.Twicas;
 
-        public override ICommentProvider CreateCommentProvider()
+        public override ICommentProvider2 CreateCommentProvider()
         {
-            return new TwicasCommentProvider2(new TwicasServer(), _logger, _options, _siteOptions, _userStoreManager)
+            return new TwicasCommentProvider2(new TwicasServer(), _logger, _siteOptions)
             {
                 SiteContextGuid = Guid,
             };
@@ -107,28 +75,10 @@ namespace TwicasSitePlugin
                 _logger.LogException(ex, "", $"path={path}");
             }
         }
-        public override UserControl GetCommentPostPanel(ICommentProvider commentProvider)
-        {
-            var youtubeCommentProvider = commentProvider as TwicasCommentProvider2;
-            Debug.Assert(youtubeCommentProvider != null);
-            if (youtubeCommentProvider == null)
-                return null;
-
-            var vm = new CommentPostPanelViewModel(youtubeCommentProvider, _logger);
-            var panel = new CommentPostPanel
-            {
-                //IsEnabled = false,
-                DataContext = vm
-            };
-            return panel;
-        }
-        private readonly ICommentOptions _options;
         private readonly ILogger _logger;
-        public TwicasSiteContext(ICommentOptions options, ILogger logger, IUserStoreManager userStoreManager)
-            : base(options, userStoreManager, logger)
+        public TwicasSiteContext2(ILogger logger)
+            : base(logger)
         {
-            _options = options;
-            _logger = logger;
         }
     }
 }

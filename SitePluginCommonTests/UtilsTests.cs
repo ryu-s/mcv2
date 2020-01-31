@@ -38,17 +38,18 @@ namespace SitePluginCommonTests
         [TestCase("$|", "abc$test", null, Description = "\"|\"の前後にあいう")]
         public void SetNicknameTest(string matchStr, string text, string expected)
         {
-            var userMock = new Mock<IUser>();
-            Utils.SetNickname(text, userMock.Object, matchStr);
-            if (string.IsNullOrEmpty(expected))
-            {
-                userMock.VerifySet(u => u.Nickname = expected, Times.Never);
-            }
-            else
-            {
-                userMock.VerifySet(u => u.Nickname = expected);
-            }
+            //var userMock = new Mock<IUser>();
+            //Utils.SetNickname(text, userMock.Object, matchStr);
+            //if (string.IsNullOrEmpty(expected))
+            //{
+            //    userMock.VerifySet(u => u.Nickname = expected, Times.Never);
+            //}
+            //else
+            //{
+            //    userMock.VerifySet(u => u.Nickname = expected);
+            //}
 
+            Assert.Fail();
         }
     }
 }

@@ -1,19 +1,16 @@
 ﻿using SitePlugin;
+using System;
 
 namespace WhowatchSitePlugin
 {
-    internal class WhowatchMessageContext : IMessageContext
+    internal class WhowatchMessageContext2 : IMessageContext2
     {
         public SitePlugin.ISiteMessage Message { get; }
-
-        public IMessageMetadata Metadata { get; }
-
-        public IMessageMethods Methods { get; }
-        public WhowatchMessageContext(IWhowatchMessage message, IMessageMetadata metadata, IMessageMethods methods)
+        public IMessageMetadata2 Metadata { get; }
+        public WhowatchMessageContext2(IWhowatchMessage message, IMessageMetadata2 metadata)
         {
             Message = message;
             Metadata = metadata;
-            Methods = methods;
         }
     }
 }

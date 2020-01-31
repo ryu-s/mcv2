@@ -17,11 +17,9 @@ namespace LineLiveSitePluginTests
     {
         private LineLiveSitePlugin.LineLiveSiteContext CreateSiteContext()
         {
-            var optionsMock = new Mock<ICommentOptions>();
             var serverMock = new Mock<IDataServer>();
             var loggerMock = new Mock<ILogger>();
-            var userStoreManagerMock = new Mock<IUserStoreManager>();
-            var context = new LineLiveSitePlugin.LineLiveSiteContext(optionsMock.Object, serverMock.Object, loggerMock.Object, userStoreManagerMock.Object);
+            var context = new LineLiveSitePlugin.LineLiveSiteContext(serverMock.Object, loggerMock.Object);
             return context;
         }
         [Test]

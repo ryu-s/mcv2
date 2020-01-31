@@ -13,12 +13,13 @@ namespace ryu_s.BrowserCookie
     {
         public BrowserType Type => BrowserType.IE;
 
-        public List<IBrowserProfile> GetProfiles()
+        public List<IBrowserProfile2> GetProfiles()
         {
-            return new List<IBrowserProfile> { new IEProfile() };
+            return new List<IBrowserProfile2> { new IEProfile() };
         }
-        class IEProfile : IBrowserProfile
+        class IEProfile : IBrowserProfile2
         {
+            public Guid Id { get; } = Guid.NewGuid();
             public string Path
             {
                 get
@@ -62,7 +63,7 @@ namespace ryu_s.BrowserCookie
 
             public List<Cookie> GetCookieCollection(string domain)
             {
-                return  GetCookieCollectionInternal(domain);
+                return GetCookieCollectionInternal(domain);
             }
             /// <summary>
             /// 

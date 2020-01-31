@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace NicoSitePlugin
 {
-    internal interface INicoCommentProviderInternal
+    internal interface INicoCommentProviderInternal2
     {
         void BeforeConnect();
         void AfterDisconnected();
         Task ConnectAsync(string input, CookieContainer cc);
         void Disconnect();
-        event EventHandler<IMessageContext> MessageReceived;
+        event EventHandler<IMessageContext2> MessageReceived;
         event EventHandler<IMetadata> MetadataUpdated;
         event EventHandler<ConnectedEventArgs> Connected;
         bool IsValidInput(string input);

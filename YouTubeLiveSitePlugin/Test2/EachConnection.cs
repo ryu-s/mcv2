@@ -46,25 +46,24 @@ namespace YouTubeLiveSitePlugin.Test2
         /// サーバ側でエラーが発生
         /// </summary>
         ServerError,
+        InvalidInput,
     }
-    class EachConnection
+    class EachConnection2
     {
         private readonly ILogger _logger;
         private readonly CookieContainer _cc;
-        private readonly ICommentOptions _options;
         private readonly IYouTubeLibeServer _server;
-        private readonly YouTubeLiveSiteOptions _siteOptions;
+        private readonly IYouTubeLiveSiteOptions _siteOptions;
         private readonly Dictionary<string, int> _userCommentCountDict;
         private readonly SynchronizedCollection<string> _receivedCommentIds;
-        private readonly ICommentProvider _cp;
-        private readonly IUserStoreManager _userStoreManager;
+        private readonly ICommentProvider2 _cp;
         ChatProvider _chatProvider;
         DisconnectReason _disconnectReason;
 
-        public event EventHandler<IMessageContext> MessageReceived;
+        public event EventHandler<IMessageContext2> MessageReceived;
         public event EventHandler<IMetadata> MetadataUpdated;
         public event EventHandler Connected;
-        public Guid SiteContextGuid { get; set; }
+        public SitePluginId SiteContextGuid { get; set; }
         /// <summary>
         /// 
         /// </summary>
@@ -72,7 +71,21 @@ namespace YouTubeLiveSitePlugin.Test2
         public async Task<DisconnectReason> ReceiveAsync(string vid, BrowserType browserType)
         {
             _disconnectReason = DisconnectReason.Unknown;
-            string liveChatHtml = await GetLiveChatHtml(vid);
+            string liveChatHtml;
+            try
+            {
+                liveChatHtml = await GetLiveChatHtml(vid);
+            }
+            catch (InvalidInputException ex)
+            {
+                _logger.LogException(ex);
+                return DisconnectReason.InvalidInput;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogException(ex);
+                return DisconnectReason.ServerError;
+            }
             string ytInitialData;
             try
             {
@@ -133,20 +146,20 @@ namespace YouTubeLiveSitePlugin.Test2
             var tasks = new List<Task>();
             Task activeCounterTask = null;
             IActiveCounter<string> activeCounter = null;
-            if (_options.IsActiveCountEnabled)
-            {
-                activeCounter = new ActiveCounter<string>()
-                {
-                    CountIntervalSec = _options.ActiveCountIntervalSec,
-                    MeasureSpanMin = _options.ActiveMeasureSpanMin,
-                };
-                activeCounter.Updated += (s, e) =>
-                {
-                    MetadataUpdated?.Invoke(this, new Metadata { Active = e.ToString() });
-                };
-                activeCounterTask = activeCounter.Start();
-                tasks.Add(activeCounterTask);
-            }
+            //if (_options.IsActiveCountEnabled)
+            //{
+            //    activeCounter = new ActiveCounter<string>()
+            //    {
+            //        CountIntervalSec = _options.ActiveCountIntervalSec,
+            //        MeasureSpanMin = _options.ActiveMeasureSpanMin,
+            //    };
+            //    activeCounter.Updated += (s, e) =>
+            //    {
+            //        MetadataUpdated?.Invoke(this, new Metadata { Active = e.ToString() });
+            //    };
+            //    activeCounterTask = activeCounter.Start();
+            //    tasks.Add(activeCounterTask);
+            //}
 
             IMetadataProvider metaProvider = null;
             var metaTask = CreateMetadataReceivingTask(ref metaProvider, browserType, vid, liveChatHtml);
@@ -283,19 +296,21 @@ namespace YouTubeLiveSitePlugin.Test2
         /// <exception cref="ReloadException"></exception>
         private async Task<string> GetLiveChatHtml(string vid)
         {
-            string liveChatHtml;
-            try
+            var liveChatUrl = $"https://www.youtube.com/live_chat?v={vid}&is_popout=1";
+            //live_chatを取得する。この中にこれから必要なytInitialDataとytcfgがある
+            var res = await _server.GetNoThrowAsync(liveChatUrl, _cc);
+            switch (res.StatusCode)
             {
-                //live_chatを取得する。この中にこれから必要なytInitialDataとytcfgがある
-                var liveChatUrl = $"https://www.youtube.com/live_chat?v={vid}&is_popout=1";
-                liveChatHtml = await _server.GetAsync(liveChatUrl, _cc);
+                case HttpStatusCode.OK:
+                    return res.Content;
+                case HttpStatusCode.BadRequest:
+                    throw new InvalidInputException("", $"url={liveChatUrl}");
+                default:
+                    {
+                        var content = res.Content;
+                        throw new ReloadException("", $"statuscode={res.StatusCode}");
+                    }
             }
-            catch (Exception ex)
-            {
-                throw new ReloadException(ex);
-            }
-
-            return liveChatHtml;
         }
 
         public event EventHandler LoggedInStateChanged;
@@ -424,9 +439,9 @@ namespace YouTubeLiveSitePlugin.Test2
                 Text = v,
                 SiteType = SiteType.YouTubeLive,
             };
-            var metadata = new InfoMessageMetadata(message, _options);
+            var metadata = new InfoMessageMetadata2(message);
             var methods = new InfoMessageMethods();
-            var context = new InfoMessageContext(message, metadata, methods);
+            var context = new InfoMessageContext2(message, metadata);
             MessageReceived?.Invoke(this, context);
         }
         protected virtual Task CreateMetadataReceivingTask(ref IMetadataProvider metaProvider, BrowserType browserType, string vid, string liveChatHtml)
@@ -477,9 +492,9 @@ namespace YouTubeLiveSitePlugin.Test2
                     dynamic json = JsonConvert.DeserializeObject(serviceEndPoint);
                     PostCommentContext = new PostCommentContext
                     {
-                        ClientIdPrefix = json.sendLiveChatMessageEndpoint.clientIdPrefix,
-                        SessionToken = liveChatContext.XsrfToken,
-                        Sej = serviceEndPoint,
+                        ClientIdPrefix = (string)json.sendLiveChatMessageEndpoint.clientIdPrefix,
+                        SessionToken = (string)liveChatContext.XsrfToken,
+                        Sej = (string)serviceEndPoint,
                     };
                 }
                 catch (Exception ex)
@@ -488,7 +503,7 @@ namespace YouTubeLiveSitePlugin.Test2
                 }
             }
         }
-        private YouTubeLiveMessageContext CreateMessageContext(CommentData commentData, bool isInitialComment)
+        private YouTubeLiveMessageContext2 CreateMessageContext(CommentData commentData, bool isInitialComment)
         {
             IYouTubeLiveMessage message;
             IEnumerable<IMessagePart> commentItems;
@@ -510,18 +525,18 @@ namespace YouTubeLiveSitePlugin.Test2
             }
             var metadata = CreateMetadata(message, isInitialComment);
             var methods = new YouTubeLiveMessageMethods();
-            if (_siteOptions.IsAutoSetNickname)
-            {
-                var user = metadata.User;
-                var messageText = Common.MessagePartsTools.ToText(commentItems);
-                var nick = SitePluginCommon.Utils.ExtractNickname(messageText);
-                if (!string.IsNullOrEmpty(nick))
-                {
-                    user.Nickname = nick;
-                }
-            }
-            metadata.User.Name = nameItems;
-            return new YouTubeLiveMessageContext(message, metadata, methods);
+            //if (_siteOptions.IsAutoSetNickname)
+            //{
+            //    //var user = metadata.User;
+            //    var messageText = Common.MessagePartsTools.ToText(commentItems);
+            //    var nick = SitePluginCommon.Utils.ExtractNickname(messageText);
+            //    if (!string.IsNullOrEmpty(nick))
+            //    {
+            //        //user.Nickname = nick;
+            //    }
+            //}
+            //metadata.User.Name = nameItems;
+            return new YouTubeLiveMessageContext2(message, metadata, methods);
         }
         private IYouTubeLiveMessage CreateMessage(CommentData data)
         {
@@ -537,23 +552,27 @@ namespace YouTubeLiveSitePlugin.Test2
 
             return message;
         }
-        private IUser GetUser(string userId)
+        private YouTubeLiveMessageMetadata2 CreateMetadata(IYouTubeLiveMessage message, bool isInitialComment)
         {
-            return _userStoreManager.GetUser(SiteType.YouTubeLive, userId);
-        }
-        private YouTubeLiveMessageMetadata CreateMetadata(IYouTubeLiveMessage message, bool isInitialComment)
-        {
-            string userId = null;
+            string userId;
+            IEnumerable<IMessagePart> name;
             if (message is IYouTubeLiveComment comment)
             {
                 userId = comment.UserId;
+                name = comment.NameItems;
             }
             else if (message is IYouTubeLiveSuperchat superchat)
             {
                 userId = superchat.UserId;
+                name = superchat.NameItems;
+            }
+            else
+            {
+                userId = null;
+                name = null;
             }
             bool isFirstComment;
-            IUser user;
+            //IUser user;
             if (userId != null)
             {
                 if (_userCommentCountDict.ContainsKey(userId))
@@ -566,33 +585,33 @@ namespace YouTubeLiveSitePlugin.Test2
                     _userCommentCountDict.Add(userId, 1);
                     isFirstComment = true;
                 }
-                user = GetUser(userId);
+                //user = null;
             }
             else
             {
                 isFirstComment = false;
-                user = null;
+                //user = null;
             }
-            var metadata = new YouTubeLiveMessageMetadata(message, _options, _siteOptions, user, _cp, isFirstComment)
+            var metadata = new YouTubeLiveMessageMetadata2(message, _siteOptions, isFirstComment)
             {
                 IsInitialComment = isInitialComment,
                 SiteContextGuid = SiteContextGuid,
+                UserId = userId,
+                UserName = name,
             };
             return metadata;
         }
-        public EachConnection(ILogger logger, CookieContainer cc, ICommentOptions options, IYouTubeLibeServer server,
-            YouTubeLiveSiteOptions siteOptions, Dictionary<string, int> userCommentCountDict, SynchronizedCollection<string> receivedCommentIds,
-            ICommentProvider cp, IUserStoreManager userStoreManager)
+        public EachConnection2(ILogger logger, CookieContainer cc, IYouTubeLibeServer server,
+            IYouTubeLiveSiteOptions siteOptions, Dictionary<string, int> userCommentCountDict, SynchronizedCollection<string> receivedCommentIds,
+            ICommentProvider2 cp)
         {
             _logger = logger;
             _cc = cc;
-            _options = options;
             _server = server;
             _siteOptions = siteOptions;
             _userCommentCountDict = userCommentCountDict;
             _receivedCommentIds = receivedCommentIds;
             _cp = cp;
-            _userStoreManager = userStoreManager;
         }
     }
 }

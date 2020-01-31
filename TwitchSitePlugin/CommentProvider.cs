@@ -49,7 +49,7 @@ namespace TwitchSitePlugin
         public string UserId { get; set; }
         public bool IsLoggedIn { get; set; }
     }
-    class TwitchCommentProvider : ICommentProvider
+    class TwitchCommentProvider2 : ICommentProvider2
     {
         private bool _canConnect;
         public bool CanConnect
@@ -79,7 +79,7 @@ namespace TwitchSitePlugin
         public event EventHandler CanConnectChanged;
         public event EventHandler CanDisconnectChanged;
         public event EventHandler<ConnectedEventArgs> Connected;
-        public event EventHandler<IMessageContext> MessageReceived;
+        public event EventHandler<IMessageContext2> MessageReceived;
 
         protected virtual string GetChannelName(string input)
         {
@@ -88,7 +88,7 @@ namespace TwitchSitePlugin
         private string _channelName;
         private IMessageProvider _provider;
         //private CookieContainer _cc;
-        protected virtual CookieContainer GetCookieContainer(IBrowserProfile browserProfile)
+        protected virtual CookieContainer GetCookieContainer(IBrowserProfile2 browserProfile)
         {
             var cc = new CookieContainer();
 
@@ -119,7 +119,7 @@ namespace TwitchSitePlugin
             _commentCounter = new CommentCounter();
         }
         CommentCounter _commentCounter;
-        public async Task ConnectAsync(string input, IBrowserProfile browserProfile)
+        public async Task ConnectAsync(string input, IBrowserProfile2 browserProfile)
         {
             CanConnect = false;
             CanDisconnect = true;
@@ -337,10 +337,10 @@ namespace TwitchSitePlugin
             var userId = commentData.UserId;
             var displayName = commentData.DisplayName;
             var isFirstComment = _commentCounter.UpdateCount(userId);
-            var user = GetUser(userId);
+            //var user = GetUser(userId);
             if (_siteOptions.NeedAutoSubNickname)
             {
-                SitePluginCommon.Utils.SetNickname(commentData.Message, user, _siteOptions.NeedAutoSubNicknameStr);
+                //SitePluginCommon.Utils.SetNickname(commentData.Message, user, _siteOptions.NeedAutoSubNicknameStr);
             }
             var message = new TwitchComment(result.Raw)
             {
@@ -352,13 +352,12 @@ namespace TwitchSitePlugin
                 IsDisplayNameSame = commentData.Username == commentData.DisplayName,
                 DisplayName = commentData.DisplayName,
             };
-            var metadata = new MessageMetadata(message, _options, _siteOptions, user, this, isFirstComment)
+            var metadata = new MessageMetadata2(message, _siteOptions, this, isFirstComment)
             {
                 IsInitialComment = false,
                 SiteContextGuid = SiteContextGuid,
             };
-            var methods = new TwitchMessageMethods();
-            var messageContext = new TwitchMessageContext(message, metadata, methods);
+            var messageContext = new TwitchMessageContext2(message, metadata);
             MessageReceived?.Invoke(this, messageContext);
         }
 
@@ -404,14 +403,6 @@ namespace TwitchSitePlugin
         {
             _provider.Disconnect();
         }
-        public IUser GetUser(string userId)
-        {
-            return _userStoreManager.GetUser(SiteType.Twitch, userId);
-        }
-        public IEnumerable<ICommentViewModel> GetUserComments(IUser user)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task PostCommentAsync(string text)
         {
@@ -423,19 +414,15 @@ namespace TwitchSitePlugin
             var result = Tools.Parse(message);
             OnMessageReceived(result);
         }
-        public Guid SiteContextGuid { get; set; }
+        public SitePluginId SiteContextGuid { get; set; }
         private readonly IDataServer _server;
         private readonly ILogger _logger;
-        private readonly ICommentOptions _options;
         private readonly TwitchSiteOptions _siteOptions;
-        private readonly IUserStoreManager _userStoreManager;
-        public TwitchCommentProvider(IDataServer server, ILogger logger, ICommentOptions options, TwitchSiteOptions siteOptions, IUserStoreManager userStoreManager)
+        public TwitchCommentProvider2(IDataServer server, ILogger logger, TwitchSiteOptions siteOptions)
         {
             _server = server;
             _logger = logger;
-            _options = options;
             _siteOptions = siteOptions;
-            _userStoreManager = userStoreManager;
 
             CanConnect = true;
             CanDisconnect = false;
@@ -463,16 +450,16 @@ namespace TwitchSitePlugin
 
         private void SendSystemInfo(string message, InfoType type)
         {
-            var context = InfoMessageContext.Create(new InfoMessage
+            var context = InfoMessageContext2.Create(new InfoMessage
             {
                 Text = message,
                 SiteType = SiteType.Twitch,
                 Type = type,
-            }, _options);
+            });
             MessageReceived?.Invoke(this, context);
         }
 
-        public Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile browserProfile)
+        public Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile)
         {
             var cc = GetCookieContainer(browserProfile);
             var cookies = Tools.ExtractCookies(cc);

@@ -7,29 +7,20 @@ using System.Text.RegularExpressions;
 using System.Windows.Controls;
 namespace NicoSitePlugin
 {
-    public class NicoSiteContext : SiteContextBase, INicoSiteContext
+    public class NicoSiteContext2 : SiteContextBase2, INicoSiteContext2
     {
-        public override Guid Guid => new Guid("5A477452-FF28-4977-9064-3A4BC7C63252");
+        public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("5A477452-FF28-4977-9064-3A4BC7C63252"));
         public override string DisplayName => "ニコ生";
-        protected override SiteType SiteType => SiteType.NicoLive;
-        public override IOptionsTabPage TabPanel
-        {
-            get
-            {
-                var panel = new NicoOptionsPanel();
-                panel.SetViewModel(new NicoSiteOptionsViewModel(_siteOptions));
-                return new NicoOptionsTabPage(DisplayName, panel);
-            }
-        }
+        public override SiteType SiteType => SiteType.NicoLive;
 
-        private INicoCommentProvider GetNicoCommentProvider()
+        private INicoCommentProvider2 GetNicoCommentProvider()
         {
-            return new NicoCommentProvider(_options, _siteOptions, _server, _logger, _userStoreManager)
+            return new NicoCommentProvider2(_siteOptions, _server, _logger)
             {
                 SiteContextGuid = Guid,
             };
         }
-        public override ICommentProvider CreateCommentProvider()
+        public override ICommentProvider2 CreateCommentProvider()
         {
             return GetNicoCommentProvider();
         }
@@ -65,45 +56,23 @@ namespace NicoSitePlugin
 
         public override bool IsValidInput(string input)
         {
-            return NicoCommentProvider.IsValidInput(_options, _siteOptions, _userStoreManager, _server, _logger, null, input, Guid);
+            return NicoCommentProvider2.IsValidInput(_siteOptions, _server, _logger, input, Guid);
         }
-
-        public override UserControl GetCommentPostPanel(ICommentProvider commentProvider)
-        {
-            var nicoCommentProvider = commentProvider as INicoCommentProvider;
-            Debug.Assert(nicoCommentProvider != null);
-            if (nicoCommentProvider == null)
-                return null;
-
-            var vm = new CommentPostPanelViewModel(nicoCommentProvider, _logger);
-            var panel = new CommentPostPanel
-            {
-                //IsEnabled = false,
-                DataContext = vm
-            };
-            return panel;
-        }
-        INicoSiteOptions INicoSiteContext.GetNicoSiteOptions()
+        INicoSiteOptions INicoSiteContext2.GetNicoSiteOptions()
         {
             return _siteOptions;
         }
-        INicoCommentProvider INicoSiteContext.CreateNicoCommentProvider()
+        INicoCommentProvider2 INicoSiteContext2.CreateNicoCommentProvider()
         {
             return GetNicoCommentProvider();
         }
-        protected virtual IUserStore CreateUserStore()
-        {
-            return new SQLiteUserStore(_options.SettingsDirPath + "\\" + "users_" + DisplayName + ".db", _logger);
-        }
         private NicoSiteOptions _siteOptions;
-        private readonly ICommentOptions _options;
         private readonly IDataSource _server;
         private readonly ILogger _logger;
 
-        public NicoSiteContext(ICommentOptions options, IDataSource server, Func<string, int, int, ISplitBuffer, IStreamSocket> _, ILogger logger, IUserStoreManager userStoreManager)
-            : base(options, userStoreManager, logger)
+        public NicoSiteContext2(IDataSource server, Func<string, int, int, ISplitBuffer, IStreamSocket> _, ILogger logger)
+            : base(logger)
         {
-            _options = options;
             _server = server;
             _logger = logger;
         }

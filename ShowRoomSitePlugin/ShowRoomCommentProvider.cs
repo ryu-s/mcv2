@@ -76,12 +76,11 @@ namespace ShowRoomSitePlugin
         }
     }
 
-
-    internal class ShowRoomCommentProvider : CommentProviderBase
+    internal class ShowRoomCommentProvider2 : CommentProviderBase2
     {
-        private MessageMetadata CreateMessageMetadata(IShowRoomComment message, IUser user, bool isFirstComment)
+        private MessageMetadata2 CreateMessageMetadata(IShowRoomComment message, bool isFirstComment)
         {
-            return new MessageMetadata(message, _options, _siteOptions, user, this, isFirstComment)
+            return new MessageMetadata2(message, _siteOptions, isFirstComment)
             {
                 SiteContextGuid = SiteContextGuid,
             };
@@ -103,11 +102,11 @@ namespace ShowRoomSitePlugin
                         var message = new ShowRoomComment(t1);
                         var userId = message.UserId;
                         var isFirstComment = _first.IsFirstComment(userId);
-                        var user = GetUser(userId);
-                        user.Name = Common.MessagePartFactory.CreateMessageItems(message.Text);
-                        var metadata = CreateMessageMetadata(message, user, isFirstComment);
+                        //var user = GetUser(userId);
+                        //user.Name = Common.MessagePartFactory.CreateMessageItems(message.Text);
+                        var metadata = CreateMessageMetadata(message, isFirstComment);
                         var methods = new MessageMethods();
-                        RaiseMessageReceived(new MessageContext(message, metadata, methods));
+                        RaiseMessageReceived(new MessageContext2(message, metadata, methods));
                     }
                     break;
             }
@@ -122,7 +121,7 @@ namespace ShowRoomSitePlugin
             _autoReconnector = null;
         }
         AutoReconnector _autoReconnector;
-        private async Task ConnectInternalAsync(string input, IBrowserProfile browserProfile)
+        private async Task ConnectInternalAsync(string input, IBrowserProfile2 browserProfile)
         {
             var roomName = GetRoomNameFromInput(input);
             if (string.IsNullOrEmpty(roomName))
@@ -180,7 +179,7 @@ namespace ShowRoomSitePlugin
                 return null;
             }
         }
-        public override async Task ConnectAsync(string input, IBrowserProfile browserProfile)
+        public override async Task ConnectAsync(string input, IBrowserProfile2 browserProfile)
         {
             BeforeConnect();
             try
@@ -202,22 +201,12 @@ namespace ShowRoomSitePlugin
             _autoReconnector?.Disconnect();
         }
 
-        public IEnumerable<ICommentViewModel> GetUserComments(IUser user)
-        {
-            throw new NotImplementedException();
-        }
-
         public override async Task PostCommentAsync(string text)
         {
             await Task.FromResult<object>(null);
         }
 
-        public override IUser GetUser(string userId)
-        {
-            return _userStoreManager.GetUser(SiteType.ShowRoom, userId);
-        }
-
-        public override async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile browserProfile)
+        public override async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile)
         {
             var userInfo = new CurrentUserInfo
             {
@@ -233,17 +222,13 @@ namespace ShowRoomSitePlugin
 
         private readonly IDataServer _server;
         private readonly ILogger _logger;
-        private readonly ICommentOptions _options;
         private readonly IShowRoomSiteOptions _siteOptions;
-        private readonly IUserStoreManager _userStoreManager;
-        public ShowRoomCommentProvider(IDataServer server, ILogger logger, ICommentOptions options, IShowRoomSiteOptions siteOptions, IUserStoreManager userStoreManager)
-            : base(logger, options)
+        public ShowRoomCommentProvider2(IDataServer server, ILogger logger, IShowRoomSiteOptions siteOptions)
+            : base(logger)
         {
             _server = server;
             _logger = logger;
-            _options = options;
             _siteOptions = siteOptions;
-            _userStoreManager = userStoreManager;
         }
     }
     class CurrentUserInfo : ICurrentUserInfo

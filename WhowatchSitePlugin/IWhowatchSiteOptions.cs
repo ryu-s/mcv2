@@ -6,8 +6,6 @@ namespace WhowatchSitePlugin
     public interface IWhowatchSiteOptions : INotifyPropertyChanged
     {
         bool NeedAutoSubNickname { get; set; }
-        Color ItemBackColor { get; set; }
-        Color ItemForeColor { get; set; }
         int LiveCheckIntervalSec { get; set; }
         int LiveDataRetrieveIntervalSec { get; set; }
         string Serialize();

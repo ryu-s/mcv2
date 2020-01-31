@@ -1,17 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Common;
-using System.Text.RegularExpressions;
-using System.Windows.Media;
-using System.Windows;
+﻿using Common;
 using System;
-using System.ComponentModel;
+using System.Linq;
+using System.Windows;
+using System.Windows.Media;
 
 namespace TwicasSitePlugin
 {
-    interface ITwicasSiteOptions:INotifyPropertyChanged
+    interface ITwicasSiteOptions
     {
         int CommentRetrieveIntervalSec { get; set; }
         Color KiitosBackColor { get; set; }

@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Diagnostics;
 using System.Text;
+using YouTubeLiveIF;
 
 namespace YouTubeLiveSitePlugin.Test2
 {
@@ -334,6 +335,7 @@ namespace YouTubeLiveSitePlugin.Test2
                     {
                         if (action.ContainsKey("addChatItemAction"))
                         {
+                            Debug.WriteLine((string)action.addChatItemAction.ToString(Formatting.None));
                             var item = action.addChatItemAction.item;
                             if (item.ContainsKey("liveChatTextMessageRenderer"))
                             {
@@ -345,6 +347,16 @@ namespace YouTubeLiveSitePlugin.Test2
                                 var commentData = Parser.ParseLiveChatPaidMessageRenderer(ren);
                                 dataList.Add(commentData);
                             }
+                            else
+                            {
+                                var actionStr = action.ToString(Formatting.None);
+                                Debug.WriteLine($"YouTubeLiveSitePlugin::Test2::Tools::ParseGetLiveChat() unknown item: {actionStr}");
+                            }
+                        }
+                        else
+                        {
+                            var actionStr = action.ToString(Formatting.None);
+                            Debug.WriteLine($"YouTubeLiveSitePlugin::Test2::Tools::ParseGetLiveChat() unknown item: {actionStr}");
                         }
                     }
                 }
@@ -482,6 +494,42 @@ namespace YouTubeLiveSitePlugin.Test2
                         }
                     }
                 }
+            }
+            //info
+            {
+                UserType userType = null;
+                if (ren.ContainsKey("authorBadges"))
+                {
+                    foreach (var badge in ren.authorBadges)
+                    {
+                        if (badge.liveChatAuthorBadgeRenderer.ContainsKey("customThumbnail"))
+                        {
+                            var alt = (string)badge.liveChatAuthorBadgeRenderer.tooltip;
+                            Debug.WriteLine(alt);
+                            userType = new Member { TestInfo = alt, Long = "" };
+                            if (!alt.Contains("メンバー"))
+                            {
+
+                            }
+                        }
+                        else if (badge.liveChatAuthorBadgeRenderer.ContainsKey("icon"))
+                        {
+                            var alt = (string)badge.liveChatAuthorBadgeRenderer.tooltip;
+                            //"モデレーター"
+                            Debug.WriteLine(alt);
+                            userType = new Moderator { TestInfo = alt };
+                        }
+                        else
+                        {
+                            throw new ParseException();
+                        }
+                    }
+                }
+                if (userType == null)
+                {
+                    userType = new NormalUser();
+                }
+                commentData.UserType = userType;
             }
             return commentData;
         }

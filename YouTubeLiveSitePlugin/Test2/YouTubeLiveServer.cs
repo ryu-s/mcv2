@@ -9,13 +9,18 @@ using SitePluginCommon;
 
 namespace YouTubeLiveSitePlugin.Test2
 {
+    public class YouTubeLiveServerResponse
+    {
+        public HttpStatusCode StatusCode { get; set; }
+        public string Content { get; set; }
+    }
     public class YouTubeLiveServer : ServerBase, IYouTubeLibeServer
     {
         public async Task<string> GetAsync(HttpOptions options)
         {
             var ret = await GetInternalAsync(options);
             return await ret.Content.ReadAsStringAsync();
-            
+
         }
         public Task<string> GetAsync(string url, CookieContainer cc)
         {
@@ -26,6 +31,22 @@ namespace YouTubeLiveSitePlugin.Test2
                 UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0",
             };
             return GetAsync(options);
+        }
+        public async Task<YouTubeLiveServerResponse> GetNoThrowAsync(string url, CookieContainer cc)
+        {
+            var options = new HttpOptions
+            {
+                Url = url,
+                Cc = cc,
+                UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0",
+            };
+            var ret = await GetInternalAsync(options, false);
+            var res = new YouTubeLiveServerResponse
+            {
+                StatusCode = ret.StatusCode,
+                Content = await ret.Content.ReadAsStringAsync(),
+            };
+            return res;
         }
         public Task<string> GetAsync(string url)
         {

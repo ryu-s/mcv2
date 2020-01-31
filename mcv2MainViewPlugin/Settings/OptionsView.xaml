@@ -1,0 +1,53 @@
+﻿<Window x:Class="mcv2.MainViewPlugin.OptionsView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:mcv2.MainViewPlugin"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance local:OptionsViewModel, IsDesignTimeCreatable=True}"
+        Title="オプション" Height="517" Width="449">
+    <Grid>
+        <TabControl x:Name="tabControl" Margin="0,0,0,33">
+            <TabItem Header="基本">
+                <local:MainOptionsPanel DataContext="{Binding MainPanelViewModel}" />
+            </TabItem>
+            <TabItem Header="YouTube">
+                <local:YouTubeLiveOptionsPanel DataContext="{Binding YouTubeViewModel}" />
+            </TabItem>
+            <TabItem Header="OPENREC">
+                <local:OpenrecOptionsPanel DataContext="{Binding OpenrecViewModel}" />
+            </TabItem>
+            <TabItem Header="Twitch">
+                <local:TwitchOptionsPanel DataContext="{Binding TwitchViewModel}" />
+            </TabItem>
+            <TabItem Header="ニコ生">
+                <local:NicoOptionsPanel DataContext="{Binding NicoLiveViewModel}" />
+            </TabItem>
+            <TabItem Header="Twicas">
+                <local:TwicasOptionsPanel DataContext="{Binding TwicasViewModel}" />
+            </TabItem>
+            <TabItem Header="LINELIVE">
+                <local:LineLiveOptionsPanel DataContext="{Binding LineLiveViewModel}" />
+            </TabItem>
+            <TabItem Header="ふわっち">
+                <local:WhowatchOptionsPanel DataContext="{Binding WhowatchViewModel}" />
+            </TabItem>
+            <TabItem Header="Mirrativ">
+                <local:MirrativTabPagePanel DataContext="{Binding MirrativSiteOptionsViewModel}" />
+            </TabItem>
+            <TabItem Header="Periscope">
+                <local:PeriscopeOptionsPanel DataContext="{Binding PeriscopeViewModel}" />
+            </TabItem>
+            <TabItem Header="SHOWROOM">
+                <local:ShowRoomOptionsPanel DataContext="{Binding ShowroomViewModel}" />
+            </TabItem>
+            <TabItem Header="Mildom">
+                <local:MildomSiteOptionsPanel DataContext="{Binding MildomViewModel}" />
+            </TabItem>
+        </TabControl>
+        <Button Content="OK" Command="{Binding OkCommand}" HorizontalAlignment="Left" Margin="70,0,0,8" VerticalAlignment="Bottom" Width="75" />
+        <Button Content="キャンセル" Command="{Binding CancelCommand}" HorizontalAlignment="Left" Margin="265,0,0,8" VerticalAlignment="Bottom" Width="75" />
+
+    </Grid>
+</Window>

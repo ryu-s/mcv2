@@ -8,16 +8,14 @@ using System.Threading.Tasks;
 using SitePluginCommon.AutoReconnection;
 namespace MirrativSitePlugin
 {
-    class MirrativCommentProvider2 : CommentProviderBase
+    class MirrativCommentProvider33 : CommentProviderBase2
     {
         FirstCommentDetector _first = new FirstCommentDetector();
         private readonly IDataServer _server;
         private readonly ILogger _logger;
-        private readonly ICommentOptions _options;
         private readonly IMirrativSiteOptions _siteOptions;
-        private readonly IUserStoreManager _userStoreManager;
 
-        public override async Task ConnectAsync(string input, IBrowserProfile browserProfile)
+        public override async Task ConnectAsync(string input, IBrowserProfile2 browserProfile)
         {
             BeforeConnect();
             try
@@ -72,7 +70,7 @@ namespace MirrativSitePlugin
             p2.Master = p1;
             _p2 = p2;
         }
-        private async Task ConnectInternalAsync(string input, IBrowserProfile browserProfile)
+        private async Task ConnectInternalAsync(string input, IBrowserProfile2 browserProfile)
         {
             await InitAsync();
             //var p1 = new MessageProvider2(new WebSocket("wss://online.mirrativ.com/"), _logger);
@@ -96,7 +94,6 @@ namespace MirrativSitePlugin
                     {
                         var userId = c.UserId;
                         var isFirstComment = _first.IsFirstComment(userId);
-                        var user = GetUser(userId);
                         var context = CreateMessageContext(c, true, "");
                         RaiseMessageReceived(context);
                     }
@@ -141,13 +138,12 @@ namespace MirrativSitePlugin
                 RaiseMessageReceived(messageContext);
             }
         }
-        private MirrativMessageContext CreateMessageContext(Message message, bool isInitialComment, string raw)
+        private MirrativMessageContext2 CreateMessageContext(Message message, bool isInitialComment, string raw)
         {
             var userId = message.UserId;
             var isFirst = _first.IsFirstComment(userId);
-            var user = GetUser(userId);
             var comment = new MirrativComment(message, raw);//InitialCommentにギフトが含まれている場合があったらバグ。
-            var metadata = new CommentMessageMetadata(comment, _options, _siteOptions, user, this, isFirst)
+            var metadata = new CommentMessageMetadata2(comment, _siteOptions, isFirst)
             {
                 IsInitialComment = isInitialComment,
                 SiteContextGuid = SiteContextGuid,
@@ -159,20 +155,19 @@ namespace MirrativSitePlugin
                 var nick = SitePluginCommon.Utils.ExtractNickname(messageText);
                 if (!string.IsNullOrEmpty(nick))
                 {
-                    user.Nickname = nick;
+                    //user.Nickname = nick;
                 }
             }
-            return new MirrativMessageContext(comment, metadata, methods);
+            return new MirrativMessageContext2(comment, metadata, methods);
         }
-        private MirrativMessageContext CreateMessageContext(IMirrativMessage message)
+        private MirrativMessageContext2 CreateMessageContext(IMirrativMessage message)
         {
             if (message is IMirrativComment comment)
             {
                 var userId = comment.UserId;
                 var isFirst = _first.IsFirstComment(userId);
-                var user = GetUser(userId);
                 //var comment = new MirrativComment(message, raw);
-                var metadata = new CommentMessageMetadata(comment, _options, _siteOptions, user, this, isFirst)
+                var metadata = new CommentMessageMetadata2(comment, _siteOptions, isFirst)
                 {
                     IsInitialComment = false,
                     SiteContextGuid = SiteContextGuid,
@@ -184,29 +179,27 @@ namespace MirrativSitePlugin
                     var nick = SitePluginCommon.Utils.ExtractNickname(messageText);
                     if (!string.IsNullOrEmpty(nick))
                     {
-                        user.Nickname = nick;
+                        //user.Nickname = nick;
                     }
                 }
-                return new MirrativMessageContext(comment, metadata, methods);
+                return new MirrativMessageContext2(comment, metadata, methods);
             }
             else if (message is IMirrativJoinRoom join && _siteOptions.IsShowJoinMessage)
             {
                 var userId = join.UserId;
-                var user = GetUser(userId);
-                var metadata = new JoinMessageMetadata(join, _options, _siteOptions, user, this)
+                var metadata = new JoinMessageMetadata2(join, _siteOptions)
                 {
                     IsInitialComment = false,
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new MirrativMessageMethods();
-                return new MirrativMessageContext(join, metadata, methods);
+                return new MirrativMessageContext2(join, metadata, methods);
             }
             else if (message is IMirrativItem item)
             {
                 var userId = item.UserId;
                 var isFirst = _first.IsFirstComment(userId);
-                var user = GetUser(userId);
-                var metadata = new ItemMessageMetadata(item, _options, _siteOptions, user, this)
+                var metadata = new ItemMessageMetadata2(item, _siteOptions)
                 {
                     IsInitialComment = false,
                     SiteContextGuid = SiteContextGuid,
@@ -218,30 +211,30 @@ namespace MirrativSitePlugin
                     var nick = SitePluginCommon.Utils.ExtractNickname(messageText);
                     if (!string.IsNullOrEmpty(nick))
                     {
-                        user.Nickname = nick;
+                        //user.Nickname = nick;
                     }
                 }
-                return new MirrativMessageContext(item, metadata, methods);
+                return new MirrativMessageContext2(item, metadata, methods);
             }
             else if (message is IMirrativConnected connected)
             {
-                var metadata = new ConnectedMessageMetadata(connected, _options, _siteOptions)
+                var metadata = new ConnectedMessageMetadata2(connected, _siteOptions)
                 {
                     IsInitialComment = false,
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new MirrativMessageMethods();
-                return new MirrativMessageContext(connected, metadata, methods);
+                return new MirrativMessageContext2(connected, metadata, methods);
             }
             else if (message is IMirrativDisconnected disconnected)
             {
-                var metadata = new DisconnectedMessageMetadata(disconnected, _options, _siteOptions)
+                var metadata = new DisconnectedMessageMetadata2(disconnected, _siteOptions)
                 {
                     IsInitialComment = false,
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new MirrativMessageMethods();
-                return new MirrativMessageContext(disconnected, metadata, methods);
+                return new MirrativMessageContext2(disconnected, metadata, methods);
             }
             else
             {
@@ -252,7 +245,7 @@ namespace MirrativSitePlugin
         {
             _autoReconnector?.Disconnect();
         }
-        protected virtual CookieContainer GetCookieContainer(IBrowserProfile browserProfile)
+        protected virtual CookieContainer GetCookieContainer(IBrowserProfile2 browserProfile)
         {
             var cc = new CookieContainer();
 
@@ -270,7 +263,7 @@ namespace MirrativSitePlugin
             }
             return cc;
         }
-        public override async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile browserProfile)
+        public override async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile)
         {
             var cc = GetCookieContainer(browserProfile);
             var currentUser = await Api.GetCurrentUserAsync(_server, cc);
@@ -281,11 +274,6 @@ namespace MirrativSitePlugin
                 UserId = currentUser.UserId,
                 Username = currentUser.Name,
             };
-        }
-
-        public override IUser GetUser(string userId)
-        {
-            return _userStoreManager.GetUser(SiteType.Mirrativ, userId);
         }
 
         public override Task PostCommentAsync(string text)
@@ -299,14 +287,12 @@ namespace MirrativSitePlugin
             _p1.SetMessage(raw);
         }
 
-        public MirrativCommentProvider2(IDataServer server, ILogger logger, ICommentOptions options, IMirrativSiteOptions siteOptions, IUserStoreManager userStoreManager)
-            : base(logger, options)
+        public MirrativCommentProvider33(IDataServer server, ILogger logger, IMirrativSiteOptions siteOptions)
+            : base(logger)
         {
             _server = server;
             _logger = logger;
-            _options = options;
             _siteOptions = siteOptions;
-            _userStoreManager = userStoreManager;
         }
     }
 }

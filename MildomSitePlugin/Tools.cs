@@ -6,13 +6,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Xceed.Wpf.Toolkit.Core.Converters;
 
 namespace MildomSitePlugin
 {
     static class Tools
     {
-        public static IMyUserInfo GetUserInfoFromCookie(IBrowserProfile browserProfile)
+        public static IMyUserInfo GetUserInfoFromCookie(IBrowserProfile2 browserProfile)
         {
             var cookies = browserProfile.GetCookieCollection("mildom.com");
             if (cookies.Exists(item => item.Name == "user"))

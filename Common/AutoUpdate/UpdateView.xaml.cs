@@ -33,7 +33,7 @@ namespace Common.AutoUpdate
             if (_isShown)
                 return;
             _isShown = true;
-            
+
             if (IsUpdateExists)
             {
                 myFrame.Visibility = Visibility.Visible;
@@ -46,7 +46,7 @@ namespace Common.AutoUpdate
                 notUpdateFrame.Visibility = Visibility.Visible;
                 notUpdateFrame.NavigationService.Navigate(new UpdateNotExistsPage());
             }
-            
+
             base.OnContentRendered(e);
         }
     }
