@@ -35,9 +35,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YouTubeLiveSitePluginTests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WhowatchSitePlugin", "WhowatchSitePlugin\WhowatchSitePlugin.csproj", "{92BDC986-1D50-48A3-9A94-5A94A285C53D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrowserCookieImplementations", "BrowserCookieImplementations\BrowserCookieImplementations.csproj", "{DFE01D83-BDBF-4B5C-95D5-9F1034597EDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrowserCookieImplementations", "BrowserCookieImplementations\BrowserCookieImplementations.csproj", "{DFE01D83-BDBF-4B5C-95D5-9F1034597EDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrowserCookieInterfaces", "BrowserCookieInterfaces\BrowserCookieInterfaces.csproj", "{CDBBBF25-AD0C-4EAF-B673-EB0BB198585A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrowserCookieInterfaces", "BrowserCookieInterfaces\BrowserCookieInterfaces.csproj", "{CDBBBF25-AD0C-4EAF-B673-EB0BB198585A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{66D18DE1-4D66-41A5-B0E2-47DF9975495A}"
 EndProject
@@ -130,6 +130,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mcv2MainViewPlugin", "mcv2MainViewPlugin\mcv2MainViewPlugin.csproj", "{5A8067BD-9B11-4E16-A25B-BE0D09804DC5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mcv2YoyakuPluginTests", "mcv2YoyakuPluginTests\mcv2YoyakuPluginTests.csproj", "{20A5A751-5E24-47BB-B965-180F003F65DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentGeneratorPlugin", "CommentGeneratorPlugin\CommentGeneratorPlugin.csproj", "{3FBF980C-79F1-473D-B39C-F52F02D1CDB3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -619,6 +621,14 @@ Global
 		{20A5A751-5E24-47BB-B965-180F003F65DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20A5A751-5E24-47BB-B965-180F003F65DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20A5A751-5E24-47BB-B965-180F003F65DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FBF980C-79F1-473D-B39C-F52F02D1CDB3}.Alpha|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FBF980C-79F1-473D-B39C-F52F02D1CDB3}.Alpha|Any CPU.Build.0 = Debug|Any CPU
+		{3FBF980C-79F1-473D-B39C-F52F02D1CDB3}.Beta|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FBF980C-79F1-473D-B39C-F52F02D1CDB3}.Beta|Any CPU.Build.0 = Debug|Any CPU
+		{3FBF980C-79F1-473D-B39C-F52F02D1CDB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FBF980C-79F1-473D-B39C-F52F02D1CDB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FBF980C-79F1-473D-B39C-F52F02D1CDB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FBF980C-79F1-473D-B39C-F52F02D1CDB3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

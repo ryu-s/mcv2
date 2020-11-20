@@ -20,8 +20,8 @@ namespace mcv2
         public ConnectionId ConnectionId { get; set; }
         public ISiteMessage Message { get; set; }
         public IMessageMetadata2 Metadata { get; set; }
-        public IMcvUser User { get; set; }
-        public NotifyMessageReceived(ConnectionId connectionId, ISiteMessage message, IMessageMetadata2 metadata, IMcvUser user)
+        public IMcvUser? User { get; set; }
+        public NotifyMessageReceived(ConnectionId connectionId, ISiteMessage message, IMessageMetadata2 metadata, IMcvUser? user)
         {
             ConnectionId = connectionId;
             Message = message;
