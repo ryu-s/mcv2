@@ -19,6 +19,7 @@ namespace WhowatchSitePlugin
         public SitePluginId SiteContextGuid { get; set; }
         public string UserId { get; set; }
         public IEnumerable<IMessagePart> UserName { get; set; }
+        public SiteType SiteType => SiteType.Whowatch;
 
         /// <summary>
         /// 

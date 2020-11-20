@@ -19,6 +19,7 @@ namespace TestSitePlugin
         public IEnumerable<IMessagePart> UserName { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
+        public SiteType SiteType => SiteType.Unknown;
         public TestMetadata2(string userId)
         {
             UserId = userId;

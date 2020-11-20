@@ -30,6 +30,7 @@ namespace BigoSitePlugin
         public SitePluginId SiteContextGuid { get; set; }
         public string UserId { get; }
         public IEnumerable<IMessagePart> UserName { get; }
+        public SiteType SiteType => SiteType.Bigo;
 
         public BigoMessageMetadata2(IBigoMessage message, IBigoSiteOptions siteOptions, bool isFirstComment)
         {

@@ -133,6 +133,7 @@ namespace mcv2TestPlugin
         public SitePluginId SiteContextGuid { get; set; }
         public string UserId { get; set; }
         public IEnumerable<IMessagePart> UserName { get; set; }
+        public SiteType SiteType => SiteType.Unknown;
 
         public event PropertyChangedEventHandler PropertyChanged;
     }

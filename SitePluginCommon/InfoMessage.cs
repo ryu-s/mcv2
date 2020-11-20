@@ -38,7 +38,7 @@ namespace SitePluginCommon
         public IEnumerable<IMessagePart> UserName { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
+        public SiteType SiteType => SiteType.Unknown;//発生元のサイトにするべき？
         public InfoMessageMetadata2(IInfoMessage infoMessage)
         {
             _infoMessage = infoMessage;

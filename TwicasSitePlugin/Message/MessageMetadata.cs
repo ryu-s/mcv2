@@ -19,7 +19,7 @@ namespace TwicasSitePlugin
         public SitePluginId SiteContextGuid { get; set; }
         public string UserId { get; }
         public IEnumerable<IMessagePart> UserName { get; }
-
+        public SiteType SiteType => SiteType.Twicas;
         public MessageMetadata2(ITwicasMessage message, ITwicasSiteOptions siteOptions, bool isFirstComment)
         {
             _message = message;

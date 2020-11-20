@@ -35,6 +35,7 @@ namespace NicoSitePlugin
         public SitePluginId SiteContextGuid { get; set; }
         public string UserId { get; }
         public IEnumerable<IMessagePart> UserName { get; }
+        public SiteType SiteType => SiteType.NicoLive;
 
         protected MessageMetadataBase2(INicoSiteOptions siteOptions)
         {

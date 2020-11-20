@@ -20,7 +20,7 @@ namespace TwitchSitePlugin
         public SitePluginId SiteContextGuid { get; set; }
         public string UserId { get; set; }
         public IEnumerable<IMessagePart> UserName { get; set; }
-
+        public SiteType SiteType => SiteType.Twitch;
         public MessageMetadata2(ITwitchMessage message, ITwitchSiteOptions siteOptions, ICommentProvider2 cp, bool isFirstComment)
         {
             _message = message;

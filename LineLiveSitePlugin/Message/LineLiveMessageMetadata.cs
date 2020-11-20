@@ -30,6 +30,7 @@ namespace LineLiveSitePlugin
         public bool IsInitialComment { get; set; }
         public string UserId { get; }
         public IEnumerable<IMessagePart> UserName { get; }
+        public SiteType SiteType => SiteType.LineLive;
 
         public MessageMetadata2(ILineLiveMessage message, ILineLiveSiteOptions siteOptions, bool isFirstComment)
         {
