@@ -76,6 +76,10 @@ namespace mcv2.Model
                 _model.SetError(ex);
             }
         }
+        public SitePluginId GetValidSite(string input)
+        {
+            return _sitePluginManager.GetValidSite(input);
+        }
 
         public void SetNotify(INotify notify)
         {
@@ -94,6 +98,7 @@ namespace mcv2.Model
         void Disconnect(ConnectionId connectionId);
         void GetLoggedInUserName(ConnectionId connectionId, SitePluginId sitePluginId, Guid? browserProfile);
         void SetNotify(INotify notify);
+        SitePluginId GetValidSite(string input);
     }
     //Connectionはデータ保持クラスにする。
     //プロパティの変更通知をしたい。
@@ -112,9 +117,10 @@ namespace mcv2.Model
 
         private void Host_UserInfoRetrieved(object? sender, ICurrentUserInfo e)
         {
+            LoggedInUserName = e.Username ?? "";
             _host.SetNotify(new NotifyConnectionStatusChanged(new ConnectionStatusDiff(ConnectionId)
             {
-                LoggedInUserName = e.Username ?? "",//nullを返したら変更無しと判定されてしまう
+                LoggedInUserName = LoggedInUserName,
             }));
         }
 
@@ -132,6 +138,8 @@ namespace mcv2.Model
             if (input != null && input != Input)
             {
                 diff.Input = Input = input;
+                var s = _host.GetValidSite(input);
+                site = s;
             }
             if (site != null && site != Site)
             {
@@ -170,6 +178,10 @@ namespace mcv2.Model
             }
             await _host.ConnectAsync(ConnectionId, Input, Site, Browser);
             IsConnected = false;
+            _host.SetNotify(new NotifyConnectionStatusChanged(new ConnectionStatusDiff(ConnectionId)
+            {
+                IsConnected = IsConnected,
+            }));
         }
         private void Disconnect()
         {

@@ -75,7 +75,8 @@ namespace mcv2.Model
         Task ConnectAsync(ConnectionId connectionId, string input, SitePluginId sitePluginId, IBrowserProfile2? browserProfile);
         void Disconnect(ConnectionId connectionId);
         List<SitePluginId> Sites();
-        Task<ICurrentUserInfo> GetLoggedInUserName(ConnectionId connectionId,SitePluginId sitePluginId, IBrowserProfile2? browserProfile);
+        Task<ICurrentUserInfo> GetLoggedInUserName(ConnectionId connectionId, SitePluginId sitePluginId, IBrowserProfile2? browserProfile);
+        SitePluginId? GetValidSite(string input);
     }
     class SitePluginManager : ISitePluginManager
     {
@@ -211,6 +212,21 @@ namespace mcv2.Model
         {
             var cp = GetOrCreateCommentProvider(connectionId, sitePluginId);
             return cp.GetCurrentUserInfo(browserProfile);
+        }
+        public SitePluginId? GetValidSite(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return null;
+            }
+            foreach (var (id, site) in _siteDict)
+            {
+                if (site.IsValidInput(input))
+                {
+                    return id;
+                }
+            }
+            return null;
         }
     }
 }
