@@ -18,7 +18,7 @@ namespace mcv2.MainViewPlugin
     /// </summary>
     public partial class MildomSiteOptionsPanel : UserControl
     {
-        internal MildomSiteOptionsPanel()
+        public MildomSiteOptionsPanel()
         {
             InitializeComponent();
         }
