@@ -117,7 +117,7 @@ namespace mcv2.MainViewPlugin
         public void UpdateSelectedSite(SiteViewModel newSite)
         {
             _selectedSite = newSite;
-            RaisePropertyChanged();
+            RaisePropertyChanged(nameof(SelectedSite));
         }
         private readonly IModel _host;
         private readonly IConnectionModel _connHost;
@@ -149,7 +149,7 @@ namespace mcv2.MainViewPlugin
         public void UpdateSelectedBrowser(BrowserViewModel newBrowser)
         {
             _selectedBrowser = newBrowser;
-            RaisePropertyChanged();
+            RaisePropertyChanged(nameof(SelectedBrowser));
         }
         public ICommand ConnectCommand { get; }
         public ICommand DisconnectCommand { get; }
@@ -170,7 +170,7 @@ namespace mcv2.MainViewPlugin
         public void UpdateInput(string newInput)
         {
             _input = newInput;
-            RaisePropertyChanged();
+            RaisePropertyChanged(nameof(Input));
         }
         public string Name
         {
@@ -189,7 +189,7 @@ namespace mcv2.MainViewPlugin
         public void UpdateName(string newName)
         {
             _name = newName;
-            RaisePropertyChanged();
+            RaisePropertyChanged(nameof(Name));
         }
 
         public ConnectionId Id { get; }
