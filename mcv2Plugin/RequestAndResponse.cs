@@ -52,6 +52,19 @@ namespace mcv2
             Metadata = metadata;
         }
     }
+    public class RequestUpdateMetadata : IRequest
+    {
+        public RequestId Id { get; } = new RequestId();
+        public ConnectionId ConnectionId { get; }
+        public string? Name { get; }
+        public IMetadata? Metadata { get; }
+        public RequestUpdateMetadata(ConnectionId connectionId, string? name, IMetadata? metadata)
+        {
+            ConnectionId = connectionId;
+            Name = name;
+            Metadata = metadata;
+        }
+    }
     public class RequestConnectionStatus : IRequest
     {
         public ConnectionId ConnectionId { get; }
@@ -311,8 +324,8 @@ namespace mcv2
         public ConnectionId ConnectionId { get; }
         public string Name { get; }
         public string Input { get; }
-        public SitePluginId? Site { get; }
-        public Guid? Browser { get; }
+        public SitePluginId Site { get; }
+        public Guid Browser { get; }
         public bool IsConnected { get; }
         public string LoggedInUserName { get; }
 
@@ -487,12 +500,15 @@ namespace mcv2
         public SiteType SiteType { get; }
         public RequestId RequestId { get; }
     }
+    /// <summary>
+    /// BrowserIdからBrowserProfileを取得する
+    /// </summary>
     public class RequestBrowser : IRequest
     {
         public RequestId Id { get; } = new RequestId();
-        public Guid? BrowserId { get; }
+        public Guid BrowserId { get; }
 
-        public RequestBrowser(Guid? browserId)
+        public RequestBrowser(Guid browserId)
         {
             BrowserId = browserId;
         }
@@ -500,12 +516,44 @@ namespace mcv2
     public class ResponseBrowser : IResponse
     {
         public RequestId RequestId { get; }
-        public IBrowserProfile2? BrowserProfile { get; }
+        public IBrowserProfile2 BrowserProfile { get; }
 
-        public ResponseBrowser(RequestId reqId, ryu_s.BrowserCookie.IBrowserProfile2? browserProfile)
+        public ResponseBrowser(RequestId reqId, ryu_s.BrowserCookie.IBrowserProfile2 browserProfile)
         {
             RequestId = reqId;
             BrowserProfile = browserProfile;
+        }
+    }
+    /// <summary>
+    /// 読み込み済みのブラウザを全て取得する
+    /// </summary>
+    public class RequestBrowsers : IRequest
+    {
+        public RequestId Id { get; } = new RequestId();
+    }
+    public class ResponseBrowsers : IResponse
+    {
+        public RequestId RequestId { get; }
+        public IEnumerable<IBrowserProfile2> BrowserProfiles { get; }
+
+        public ResponseBrowsers(RequestId reqId, IEnumerable<IBrowserProfile2> browserProfiles)
+        {
+            RequestId = reqId;
+            BrowserProfiles = browserProfiles;
+        }
+    }
+    public class RequestSites : IRequest
+    {
+        public RequestId Id { get; } = new RequestId();
+    }
+    public class ResponseSites : IResponse
+    {
+        public RequestId RequestId { get; }
+        public IEnumerable<(SitePluginId, string)> Sites { get; }
+        public ResponseSites(RequestId reqId, IEnumerable<(SitePluginId, string)> sites)
+        {
+            RequestId = reqId;
+            Sites = sites;
         }
     }
 }

@@ -21,13 +21,16 @@ namespace mcv2.Model
             _model = model;
             _sitePluginManager = sitePluginManager;
         }
-        private IBrowserProfile2? Convert(Guid? browserProfileId)
+        private IBrowserProfile2 Convert(Guid browserProfileId)
         {
             var res = _model.GetData(new RequestBrowser(browserProfileId)) as ResponseBrowser;
-            if (res == null) return null;
+            if (res == null)
+            {
+                throw new BugException("RequestBrowserのレスポンスがResponseBrowserではない");
+            }
             return res.BrowserProfile;
         }
-        public Task ConnectAsync(ConnectionId connectionId, string input, SitePluginId sitePluginId, Guid? browserProfileId)
+        public Task ConnectAsync(ConnectionId connectionId, string input, SitePluginId sitePluginId, Guid browserProfileId)
         {
             var browserProfile = Convert(browserProfileId);
             return _sitePluginManager.ConnectAsync(connectionId, input, sitePluginId, browserProfile);
@@ -63,7 +66,7 @@ namespace mcv2.Model
                 }
             }
         }
-        public async void GetLoggedInUserName(ConnectionId connectionId, SitePluginId sitePluginId, Guid? browserProfileId)
+        public async void GetLoggedInUserName(ConnectionId connectionId, SitePluginId sitePluginId, Guid browserProfileId)
         {
             try
             {
@@ -92,11 +95,11 @@ namespace mcv2.Model
     interface IConnectionHost
     {
         event EventHandler<ICurrentUserInfo> UserInfoRetrieved;
-        Task ConnectAsync(ConnectionId connectionId, string input, SitePluginId sitePluginId, Guid? browserProfile);
+        Task ConnectAsync(ConnectionId connectionId, string input, SitePluginId sitePluginId, Guid browserProfile);
         //void ConnectionStatusChanged();
         string GetDefaultName(ConnectionId connectionId);
         void Disconnect(ConnectionId connectionId);
-        void GetLoggedInUserName(ConnectionId connectionId, SitePluginId sitePluginId, Guid? browserProfile);
+        void GetLoggedInUserName(ConnectionId connectionId, SitePluginId sitePluginId, Guid browserProfile);
         void SetNotify(INotify notify);
         SitePluginId GetValidSite(string input);
     }
@@ -106,13 +109,17 @@ namespace mcv2.Model
     //Set()で渡されたデータによって変化があったプロパティの値をhostに通知する
     class Connection2 : IConnectionStatus
     {
-        public Connection2(IConnectionHost host)
+        public Connection2(IConnectionHost host, SitePluginId emptySiteId, Guid emptyBrowserId)
         {
             _host = host;
+            _emptySiteId = emptySiteId;
+            _emptyBrowserId = emptyBrowserId;
             host.UserInfoRetrieved += Host_UserInfoRetrieved;
             Name = host.GetDefaultName(ConnectionId);
             Input = "";
             LoggedInUserName = "";
+            Site = emptySiteId;
+            Browser = emptyBrowserId;
         }
 
         private void Host_UserInfoRetrieved(object? sender, ICurrentUserInfo e)
@@ -146,13 +153,13 @@ namespace mcv2.Model
                 diff.Site = Site = site;
                 _host.GetLoggedInUserName(ConnectionId, site, browser ?? Browser);
             }
-            if (browser != null && browser != Browser)
+            if (browser.HasValue && browser.Value != Browser)
             {
-                diff.Browser = Browser = browser;
-                if (Site != null)
+                diff.Browser = Browser = browser.Value;
+                if (Site != _emptySiteId)
                 {
                     //TODO:これだとBrowserがnull（未選択状態）になったタイミングでは発動しない
-                    _host.GetLoggedInUserName(ConnectionId, Site, browser);
+                    _host.GetLoggedInUserName(ConnectionId, Site, browser.Value);
                 }
             }
             if (connect != null && connect != IsConnected)
@@ -188,12 +195,15 @@ namespace mcv2.Model
             _host.Disconnect(ConnectionId);
         }
         private readonly IConnectionHost _host;
+        private readonly SitePluginId _emptySiteId;
+        private readonly Guid _emptyBrowserId;
+
         public ConnectionId ConnectionId { get; } = new ConnectionId();
         public string Name { get; private set; }
         public string Input { get; private set; }
         public bool IsConnected { get; private set; }
-        public SitePluginId? Site { get; private set; }//SitePluginが無い状況を許容するか？
-        public Guid? Browser { get; private set; }//ログインせずにコメントを取れるサイトもあるからブラウザは無い状況はあり得る。
+        public SitePluginId Site { get; private set; }//SitePluginが無い状況を許容するか？
+        public Guid Browser { get; private set; }//ログインせずにコメントを取れるサイトもあるからブラウザは無い状況はあり得る。
         public string LoggedInUserName { get; private set; }
     }
 }

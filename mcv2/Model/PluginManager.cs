@@ -105,6 +105,33 @@ namespace mcv2.Model
             _plugins.Add(plugin);
             _pluginDict.Add(plugin.Id, plugin);
             plugin.OnLoaded();
+
+            //読み込み済みのブラウザを共有する
+            var resBrowser = host.GetData(new RequestBrowsers()) as ResponseBrowsers;
+            foreach (var browser in resBrowser.BrowserProfiles)
+            {
+                plugin.SetNotify(new NotifyBrowserAdded
+                {
+                    BrowserId = browser.Id,
+                    BrowserName = browser.Type.ToString(),
+                    ProfileName = browser.ProfileName,
+                });
+            }
+            //読み込み済みのサイトを共有する
+            var resSites = host.GetData(new RequestSites()) as ResponseSites;
+            if (resSites == null)
+            {
+                throw new BugException();
+            }
+            foreach (var (siteId, displayName) in resSites.Sites)
+            {
+                plugin.SetNotify(new NotifySiteAdded
+                {
+                    SiteId = siteId,
+                    SiteName = displayName,
+                });
+            }
+
             PluginAdded?.Invoke(this, plugin);
         }
 

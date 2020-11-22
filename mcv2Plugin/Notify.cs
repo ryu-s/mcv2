@@ -96,7 +96,7 @@ namespace mcv2
     }
     public class NotifyAddConnection : INotify, IConnectionStatus
     {
-        public NotifyAddConnection(ConnectionId connectionId, string input, string name, SitePluginId? selectedSite, Guid? selectedBrowser, bool connect, string loggedInUserName)
+        public NotifyAddConnection(ConnectionId connectionId, string input, string name, SitePluginId selectedSite, Guid selectedBrowser, bool connect, string loggedInUserName)
         {
             ConnectionId = connectionId;
             Input = input;
@@ -109,12 +109,12 @@ namespace mcv2
         public ConnectionId ConnectionId { get; }
         public string Input { get; }
         public string Name { get; }
-        public SitePluginId? SelectedSite { get; }
-        public Guid? SelectedBrowser { get; }
+        public SitePluginId SelectedSite { get; }
+        public Guid SelectedBrowser { get; }
         public bool Connect { get; }
 
-        SitePluginId? IConnectionStatus.Site => SelectedSite;
-        Guid? IConnectionStatus.Browser => SelectedBrowser;
+        SitePluginId IConnectionStatus.Site => SelectedSite;
+        Guid IConnectionStatus.Browser => SelectedBrowser;
         bool IConnectionStatus.IsConnected => Connect;
         public string LoggedInUserName { get; }
     }

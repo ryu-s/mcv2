@@ -74,7 +74,7 @@ namespace mcv2.Model
         SiteType GetSiteType(SitePluginId siteId);
         Task ConnectAsync(ConnectionId connectionId, string input, SitePluginId sitePluginId, IBrowserProfile2? browserProfile);
         void Disconnect(ConnectionId connectionId);
-        List<SitePluginId> Sites();
+        List<(SitePluginId, string displayName)> Sites();
         Task<ICurrentUserInfo> GetLoggedInUserName(ConnectionId connectionId, SitePluginId sitePluginId, IBrowserProfile2? browserProfile);
         SitePluginId? GetValidSite(string input);
     }
@@ -198,9 +198,9 @@ namespace mcv2.Model
             cp?.Disconnect();
         }
 
-        public List<SitePluginId> Sites()
+        public List<(SitePluginId, string)> Sites()
         {
-            return _siteDict.Keys.ToList();
+            return _siteDict.Select(kv => (kv.Key, kv.Value.DisplayName)).ToList();
         }
 
         public SitePluginManager(ILogger logger, IIo io)

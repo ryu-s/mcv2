@@ -17,6 +17,23 @@ using System.Threading.Tasks;
 
 namespace mcv2.Model
 {
+    class EmptyBrowserProfile : IBrowserProfile2
+    {
+        public Guid Id { get; } = new Guid("0F63097E-0226-447E-B009-AF1DBB40C98C");
+        public string Path { get; } = "";
+        public string ProfileName { get; } = "";
+        public BrowserType Type { get; }
+
+        public Cookie GetCookie(string domain, string name)
+        {
+            return new Cookie();
+        }
+
+        public List<Cookie> GetCookieCollection(string domain)
+        {
+            return new List<Cookie>();
+        }
+    }
     public interface IBrowserLoader
     {
         IEnumerable<IBrowserProfile2> LoadBrowsers();
@@ -118,8 +135,15 @@ namespace mcv2.Model
         private readonly ISitePluginManager _sitePluginManager;
         private readonly IUserStore _userStore;
         private readonly Dictionary<ConnectionId, Metadata> _metaDict = new Dictionary<ConnectionId, Metadata>();
-
-
+        readonly Dictionary<Guid, IBrowserProfile2> _browserDict = new Dictionary<Guid, IBrowserProfile2>();
+        private readonly ILogger _logger;
+        private readonly IIo _io;
+        private readonly ICoreOptions _coreOptions;
+        readonly Dictionary<ConnectionId, Connection2> _connectionDict = new Dictionary<ConnectionId, Connection2>();
+        readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        const string SettingsDirName = "settings";
+        private readonly SitePluginId EmptySiteId = new SitePluginId(Guid.NewGuid());
+        private readonly Guid EmptyBrowserId;
         public void SetRequest(PluginId pluginId, IRequest req)
         {
             Debug.WriteLine($"Model::SetRequest req={req}");
@@ -129,16 +153,17 @@ namespace mcv2.Model
                     {
                         //サイト一覧とブラウザ一覧はConnectionの管轄外とする。
                         //Connectionは状態保持クラス。
-                        var conn = new Connection2(new ConnectionHost(this, _sitePluginManager));
+                        var conn = new Connection2(new ConnectionHost(this, _sitePluginManager), EmptySiteId, EmptyBrowserId);
                         _connectionDict.Add(conn.ConnectionId, conn);
                         _metaDict.Add(conn.ConnectionId, new Metadata());
 
                         //SelectedSiteの初期値を設定
                         if (_sitePluginManager.Sites().Count > 0)
                         {
+                            var (siteId, displayName) = _sitePluginManager.Sites()[0];
                             conn.Set(new ConnectionStatusDiff(conn.ConnectionId)
                             {
-                                Site = _sitePluginManager.Sites()[0],
+                                Site = siteId,
                             });
                         }
                         //SelectedBrowserの初期値を設定
@@ -170,67 +195,7 @@ namespace mcv2.Model
                             return;
                         }
                         var diff = current.Set(changeConnStatus);
-                        //var diff = new ConnectionStatusDiff(current.ConnectionId);
-                        //if (changeConnStatus.Name != null && changeConnStatus.Name != current.Name)
-                        //{
-                        //    var newName = changeConnStatus.Name;
-                        //    current.Name = newName;
-                        //    diff.Name = newName;
-                        //}
-                        //if (changeConnStatus.Input != null && changeConnStatus.Input != current.Input)
-                        //{
-                        //    var newInput = changeConnStatus.Input;
-                        //    current.Input = newInput;
-                        //    diff.Input = newInput;
-                        //    //URLを解析して適宜SelectedSiteを変更する必要がある。
-                        //    foreach (var site in _siteDict.Values)
-                        //    {
-                        //        if (site.IsValidInput(newInput))
-                        //        {
-                        //            var newSite = site.Guid;
-                        //            current.Site = newSite;
-                        //            diff.Site = newSite;
-                        //            break;
-                        //        }
-                        //    }
-                        //}
-                        //if (changeConnStatus.Browser.HasValue)
-                        //{
-                        //    var browserId = changeConnStatus.Browser.Value;
-                        //    //var browser = _browserDict[browserId];
-                        //    current.Browser = browserId;
-                        //    //connection.SetBrowser(browser);
-                        //    diff.Browser = browserId;
-                        //}
-                        //if (changeConnStatus.Site.HasValue)
-                        //{
-                        //    var siteId = changeConnStatus.Site.Value;
-                        //    //var site = _siteDict[siteId];
-                        //    //connection.SetSite(site);
-                        //    current.Site = siteId;
-                        //    diff.Site = siteId;
-                        //}
-                        //if (changeConnStatus.Connect == true)
-                        //{
-                        //    var t = current.Connect();
-                        //    Task.Run(() =>
-                        //    {
-                        //        t.Wait();
-                        //        _pluginManager.SetNotify(new NotifyConnectionStatusChanged(new ConnectionStatusDiff(current.ConnectionId)
-                        //        {
-                        //            Connect = true,
-                        //            Disconnect = false,
-                        //        }));
-                        //    });
-                        //    diff.Connect = false;
-                        //    diff.Disconnect = true;
-                        //}
-                        //if (changeConnStatus.Disconnect == true)
-                        //{
-                        //    current.Disconnect();
-                        //    diff.Connect = true;
-                        //    diff.Disconnect = false;
-                        //}
+
                         //まずリクエストを送ってきたプラグインに対して結果を返す
                         _pluginManager.SetResponse(pluginId, new ResponseConnectionStatusChanged(changeConnStatus.Id, diff));
                         if (diff.HasChanged())
@@ -494,16 +459,12 @@ namespace mcv2.Model
             }
             _pluginManager.SetNotify(new NotifyMessageReceived(connectionId, message, metadata, user));
         }
-
-        private void Conn_MessageReceived(object? sender, IMessageContext2 e)
+        private void OnMetadataUpdated(ConnectionId connectionId, string? name, IMetadata? metadata)
         {
-            var message = e;
-            if (!(sender is Connection2 conn)) return;
-
-            OnMessageReceived(conn.ConnectionId, message.Message, message.Metadata);
+            var current = _metaDict[connectionId];
+            _pluginManager.SetNotify(new NotifyMetadataUpdated(connectionId, name, metadata));
         }
-        readonly CancellationTokenSource _cts = new CancellationTokenSource();
-        const string SettingsDirName = "settings";
+
         public async Task Run()
         {
             //適切に実行できる環境であるかを確認する
@@ -558,7 +519,7 @@ namespace mcv2.Model
         }
 
         //readonly Dictionary<SitePluginId, ISiteContext2> _siteDict = new Dictionary<SitePluginId, ISiteContext2>();
-        readonly Dictionary<Guid, IBrowserProfile2> _browserDict = new Dictionary<Guid, IBrowserProfile2>();
+
         //public void AddSite(ISiteContext2 site)
         //{
         //    //_siteDict.Add(site.Guid, site);
@@ -665,16 +626,22 @@ namespace mcv2.Model
                     res = new ResponseSiteType(reqSiteType.Id, siteType);
                     break;
                 case RequestBrowser reqBrowser:
-                    IBrowserProfile2? browserProfile;
-                    if (reqBrowser.BrowserId.HasValue)
+                    IBrowserProfile2 browserProfile;
+                    if (_browserDict.ContainsKey(reqBrowser.BrowserId))
                     {
-                        browserProfile = _browserDict[reqBrowser.BrowserId.Value];
+                        browserProfile = _browserDict[reqBrowser.BrowserId];
+                        res = new ResponseBrowser(reqBrowser.Id, browserProfile);
                     }
                     else
                     {
-                        browserProfile = null;
+                        res = new Error(reqBrowser.Id);
                     }
-                    res = new ResponseBrowser(reqBrowser.Id, browserProfile);
+                    break;
+                case RequestBrowsers reqBrowsers://読み込み済みのブラウザを全て取得する
+                    res = new ResponseBrowsers(reqBrowsers.Id, _browserDict.Values);
+                    break;
+                case RequestSites reqSites:
+                    res = new ResponseSites(reqSites.Id, _sitePluginManager.Sites());
                     break;
                 default:
                     Debug.WriteLine($"Model::GetData() 未対応Reqest:{req}");
@@ -768,11 +735,6 @@ namespace mcv2.Model
             return _connectionDict.Keys.ToArray();
         }
 
-        private readonly ILogger _logger;
-        private readonly IIo _io;
-        private readonly ICoreOptions _coreOptions;
-        readonly Dictionary<ConnectionId, Connection2> _connectionDict = new Dictionary<ConnectionId, Connection2>();
-
         public string SettingsDirPath => _coreOptions.SettingsDirPath;
 
         public Model(PluginManager pluginManager, ISitePluginManager sitePluginManager, IUserStore userStore, ILogger logger, IIo io, ICoreOptions coreOptions)
@@ -789,6 +751,10 @@ namespace mcv2.Model
             _io = io;
             _coreOptions = coreOptions;
             userStore.UserAdded += UserStore_UserAdded;
+
+            var emptyBrowser = new EmptyBrowserProfile();
+            _browserDict.Add(emptyBrowser.Id, emptyBrowser);
+            EmptyBrowserId = emptyBrowser.Id;
         }
 
         private void SitePluginManager_SiteAdded(object? sender, SiteAddedEventArgs e)
@@ -814,7 +780,7 @@ namespace mcv2.Model
 
         public void SetError(Exception ex)
         {
-            throw new NotImplementedException();
+
         }
 
         public void SetError(string msg, [CallerMemberName] string callingMethod = "", [CallerFilePath] string callingFilePath = "", [CallerLineNumber] int callingFileLineNumber = 0)

@@ -9,8 +9,8 @@ namespace mcv2
         ConnectionId ConnectionId { get; }
         string Name { get; }
         string Input { get; }
-        SitePluginId? Site { get; }
-        Guid? Browser { get; }
+        SitePluginId Site { get; }
+        Guid Browser { get; }
         bool IsConnected { get; }
         string LoggedInUserName { get; }
     }
