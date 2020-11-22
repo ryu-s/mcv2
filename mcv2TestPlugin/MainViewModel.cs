@@ -45,6 +45,7 @@ namespace mcv2TestPlugin
             Id = id;
             UserId = userId;
             Info = "";
+            UserType = new Member();
         }
     }
     class YouTubeLiveSuperChat : IYouTubeLiveSuperchat
