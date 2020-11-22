@@ -433,6 +433,13 @@ namespace PeriscopeSitePlugin
                 var methods = new MessageMethods();
                 RaiseMessageReceived(new MessageContext2(message, metadata, methods));
             }
+            else if(e is Kind2Kind4 kind2Kind4)
+            {
+                RaiseMetadataUpdated(new Metadata
+                {
+                     CurrentViewers = kind2Kind4.Occupancy.ToString(),
+                });
+            }
         }
         private MessageMetadata2 CreateMessageMetadata(IPeriscopeMessage message, bool isFirstComment)
         {
