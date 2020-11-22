@@ -94,7 +94,7 @@ namespace MirrativSitePlugin
                     {
                         var userId = c.UserId;
                         var isFirstComment = _first.IsFirstComment(userId);
-                        var context = CreateMessageContext(c, true, "");
+                        var context = CreateMessageContext(new MirrativComment(c, ""), true);
                         RaiseMessageReceived(context);
                     }
                 }
@@ -132,45 +132,24 @@ namespace MirrativSitePlugin
         private void P1_MessageReceived(object sender, IMirrativMessage e)
         {
             var message = e;
-            var messageContext = CreateMessageContext(message);
+            var messageContext = CreateMessageContext(message, false);
             if (messageContext != null)
             {
                 RaiseMessageReceived(messageContext);
             }
         }
-        private MirrativMessageContext2 CreateMessageContext(Message message, bool isInitialComment, string raw)
-        {
-            var userId = message.UserId;
-            var isFirst = _first.IsFirstComment(userId);
-            var comment = new MirrativComment(message, raw);//InitialCommentにギフトが含まれている場合があったらバグ。
-            var metadata = new CommentMessageMetadata2(comment, _siteOptions, isFirst)
-            {
-                IsInitialComment = isInitialComment,
-                SiteContextGuid = SiteContextGuid,
-            };
-            var methods = new MirrativMessageMethods();
-            if (_siteOptions.NeedAutoSubNickname)
-            {
-                var messageText = message.Comment;
-                var nick = SitePluginCommon.Utils.ExtractNickname(messageText);
-                if (!string.IsNullOrEmpty(nick))
-                {
-                    //user.Nickname = nick;
-                }
-            }
-            return new MirrativMessageContext2(comment, metadata, methods);
-        }
-        private MirrativMessageContext2 CreateMessageContext(IMirrativMessage message)
+        private MirrativMessageContext2 CreateMessageContext(IMirrativMessage message, bool isInitialComment)
         {
             if (message is IMirrativComment comment)
             {
                 var userId = comment.UserId;
                 var isFirst = _first.IsFirstComment(userId);
-                //var comment = new MirrativComment(message, raw);
                 var metadata = new CommentMessageMetadata2(comment, _siteOptions, isFirst)
                 {
-                    IsInitialComment = false,
+                    IsInitialComment = isInitialComment,
                     SiteContextGuid = SiteContextGuid,
+                    UserId = userId,
+                    UserName = MessagePartFactory.CreateMessageItems(comment.UserName),
                 };
                 var methods = new MirrativMessageMethods();
                 if (_siteOptions.NeedAutoSubNickname)
@@ -189,8 +168,10 @@ namespace MirrativSitePlugin
                 var userId = join.UserId;
                 var metadata = new JoinMessageMetadata2(join, _siteOptions)
                 {
-                    IsInitialComment = false,
+                    IsInitialComment = isInitialComment,
                     SiteContextGuid = SiteContextGuid,
+                    UserId = userId,
+                    UserName = MessagePartFactory.CreateMessageItems(join.UserName),
                 };
                 var methods = new MirrativMessageMethods();
                 return new MirrativMessageContext2(join, metadata, methods);
@@ -201,8 +182,10 @@ namespace MirrativSitePlugin
                 var isFirst = _first.IsFirstComment(userId);
                 var metadata = new ItemMessageMetadata2(item, _siteOptions)
                 {
-                    IsInitialComment = false,
+                    IsInitialComment = isInitialComment,
                     SiteContextGuid = SiteContextGuid,
+                    UserId = userId,
+                    UserName = MessagePartFactory.CreateMessageItems(item.UserName),
                 };
                 var methods = new MirrativMessageMethods();
                 if (_siteOptions.NeedAutoSubNickname)
@@ -220,7 +203,7 @@ namespace MirrativSitePlugin
             {
                 var metadata = new ConnectedMessageMetadata2(connected, _siteOptions)
                 {
-                    IsInitialComment = false,
+                    IsInitialComment = isInitialComment,
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new MirrativMessageMethods();
@@ -230,7 +213,7 @@ namespace MirrativSitePlugin
             {
                 var metadata = new DisconnectedMessageMetadata2(disconnected, _siteOptions)
                 {
-                    IsInitialComment = false,
+                    IsInitialComment = isInitialComment,
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new MirrativMessageMethods();

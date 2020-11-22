@@ -22,8 +22,8 @@ namespace MirrativSitePlugin
         public bool Is184 { get; }
         public bool IsInitialComment { get; set; }
         public SitePluginId SiteContextGuid { get; set; }
-        public string UserId { get; }
-        public IEnumerable<IMessagePart> UserName { get; }
+        public string UserId { get; set; }
+        public IEnumerable<IMessagePart> UserName { get; set; }
         public SiteType SiteType => SiteType.Mirrativ;
 
         protected MessageMetadataBase2(IMirrativSiteOptions siteOptions)

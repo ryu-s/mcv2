@@ -1,4 +1,5 @@
 ﻿using SitePlugin;
+using System;
 using System.Collections.Generic;
 
 namespace MirrativSitePlugin
@@ -11,7 +12,7 @@ namespace MirrativSitePlugin
         public string Id { get; set; }
         public string UserName { get; set; }
         public string UserId { get; set; }
-        public string PostTime { get; set; }
+        public DateTime PostedAt { get; }
         public IMessageImage UserIcon { get; set; }
         public int OnlineViewerNum { get; set; }
         public MirrativJoinRoom(Message commentData, string raw) : base(raw)
@@ -21,7 +22,7 @@ namespace MirrativSitePlugin
             Text = commentData.Comment;
             UserName = commentData.Username;
             UserIcon = null;
-            PostTime = SitePluginCommon.Utils.UnixtimeToDateTime(commentData.CreatedAt).ToString("HH:mm:ss");
+            PostedAt = SitePluginCommon.Utils.UnixtimeToDateTime(commentData.CreatedAt);
         }
     }
 }
