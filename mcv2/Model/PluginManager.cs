@@ -5,6 +5,7 @@ using System.ComponentModel.Composition.Primitives;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace mcv2.Model
 {
@@ -58,7 +59,8 @@ namespace mcv2.Model
                             continue;
                         }
                         var con = new CompositionContainer(catalog);
-                        var plugin = con.GetExport<IPlugin2>().Value;
+                        var plugin = con.GetExport<IPlugin2>()?.Value;
+                        if (plugin == null) continue;
                         AddPlugin(host, plugin);
                     }
                     catch (Exception ex)

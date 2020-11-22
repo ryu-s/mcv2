@@ -138,9 +138,9 @@ namespace Common
             /// 文字列をDeserializerに通した後の値の妥当性を評価する。
             /// 文字列に形式上の問題がある場合はDeserializerで例外が投げられるだろうからcatchしてDefaultValueを入れる
             /// </summary>
-            public Predicate<dynamic> Predicate { get; set; }
-            public dynamic DefaultValue { get; set; }
-            public dynamic Value { get; set; }
+            public Predicate<dynamic?> Predicate { get; set; }
+            public dynamic? DefaultValue { get; set; }
+            public dynamic? Value { get; set; }
             public Func<dynamic, string> Serializer { get; set; }
             public Func<string, dynamic> Deserializer { get; set; }
 
