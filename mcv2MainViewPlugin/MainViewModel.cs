@@ -30,7 +30,7 @@ namespace mcv2.MainViewPlugin
         public ICommand AddNewConnectionCommand { get; }
         public ICommand ShowUserInfoCommand { get; }
         public ICommand CheckUpdateCommand { get; }
-        public ICommand ShowDeveloppersTwitterCommand { get; }
+        public ICommand ShowDevelopersTwitterCommand { get; }
         public ICommand RemoveSelectedConnectionCommand { get; }
         public ICommand ClearAllCommentsCommand { get; }
         public ICommand ExitCommand { get; }
@@ -60,7 +60,7 @@ namespace mcv2.MainViewPlugin
             CheckUpdateCommand = new RelayCommand(CheckUpdate);
             YouTubeCommentPostPanelViewModel = new YouTubeCommentPostPanelViewModel(host);
 
-            ShowDeveloppersTwitterCommand = new RelayCommand(ShowDeveloppersTwitter);
+            ShowDevelopersTwitterCommand = new RelayCommand(ShowDevelopersTwitter);
             RemoveSelectedConnectionCommand = new RelayCommand(RemoveSelectedConnection);
             ClearAllCommentsCommand = new RelayCommand(ClearAllComments);
             ExitCommand = new RelayCommand(Exit);
@@ -311,12 +311,12 @@ namespace mcv2.MainViewPlugin
 
 
 
-        private void ShowDeveloppersTwitter()
+        private void ShowDevelopersTwitter()
         {
             var url = "https://twitter.com/kv510k";
             try
             {
-                System.Diagnostics.Process.Start(url);
+                Tools.OpenBrowser(url);
             }
             catch (Exception ex)
             {
@@ -341,9 +341,10 @@ namespace mcv2.MainViewPlugin
         }
         private void ShowWebSite()
         {
+            var url = "https://ryu-s.github.io/app/multicommentviewer";
             try
             {
-                System.Diagnostics.Process.Start("https://ryu-s.github.io/app/multicommentviewer");
+                Tools.OpenBrowser(url);
             }
             catch (Exception ex)
             {
