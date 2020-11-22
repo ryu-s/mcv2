@@ -32,7 +32,7 @@ namespace mcv2.MainViewPlugin
         bool GetIsSiteNgUser(SitePluginId siteContextGuid, string userId);
         void SetIsSiteNgUser(SitePluginId siteContextGuid, string userId, bool value);
         string GetNickname(SitePluginId siteContextGuid, string userId);
-        void SetNickname(SitePluginId siteContextGuid, string userId, string value);
+        void SetNickname(SitePluginId siteContextGuid, string userId, string? value);
     }
     public class ConnectionData
     {
@@ -343,8 +343,9 @@ namespace mcv2.MainViewPlugin
             return user.Nickname;
         }
 
-        void IUserHost.SetNickname(SitePluginId siteContextGuid, string userId, string value)
+        void IUserHost.SetNickname(SitePluginId siteContextGuid, string userId, string? value)
         {
+            if (value == null) return;
             Host.SetRequest(Id, new RequestChangeUserStatus(siteContextGuid, userId)
             {
                 Nickname = value,
