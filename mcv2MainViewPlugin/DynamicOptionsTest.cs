@@ -140,6 +140,8 @@ namespace mcv2.MainViewPlugin
         public Color PeriscopeForeColor { get; set; }
         public Color ShowRoomBackColor { get; set; }
         public Color ShowRoomForeColor { get; set; }
+        public Color BigoBackColor { get; set; }
+        public Color BigoForeColor { get; set; }
         public InfoType ShowingInfoLevel { get; set; }
         public int ConnectionsViewSelectionDisplayIndex { get; set; }
         public double ConnectionsViewSelectionWidth { get; set; }
@@ -428,6 +430,8 @@ namespace mcv2.MainViewPlugin
         public Color PeriscopeForeColor { get => GetValue(); set => SetValue(value); }
         public Color ShowRoomBackColor { get => GetValue(); set => SetValue(value); }
         public Color ShowRoomForeColor { get => GetValue(); set => SetValue(value); }
+        public Color BigoBackColor { get => GetValue(); set => SetValue(value); }
+        public Color BigoForeColor { get => GetValue(); set => SetValue(value); }
 
         protected override void Init()
         {
@@ -646,6 +650,8 @@ namespace mcv2.MainViewPlugin
             Dict.Add(nameof(PeriscopeForeColor), new Item { DefaultValue = ColorFromArgb("#FF008080"), Predicate = c => true, Serializer = c => ColorToArgb(c), Deserializer = s => ColorFromArgb(s) });
             Dict.Add(nameof(ShowRoomBackColor), new Item { DefaultValue = ColorFromArgb("#FFFA8072"), Predicate = c => true, Serializer = c => ColorToArgb(c), Deserializer = s => ColorFromArgb(s) });
             Dict.Add(nameof(ShowRoomForeColor), new Item { DefaultValue = ColorFromArgb("#FF008080"), Predicate = c => true, Serializer = c => ColorToArgb(c), Deserializer = s => ColorFromArgb(s) });
+            Dict.Add(nameof(BigoBackColor), new Item { DefaultValue = ColorFromArgb("#FFFA8072"), Predicate = c => true, Serializer = c => ColorToArgb(c), Deserializer = s => ColorFromArgb(s) });
+            Dict.Add(nameof(BigoForeColor), new Item { DefaultValue = ColorFromArgb("#FF008080"), Predicate = c => true, Serializer = c => ColorToArgb(c), Deserializer = s => ColorFromArgb(s) });
         }
         public IOptions Clone()
         {

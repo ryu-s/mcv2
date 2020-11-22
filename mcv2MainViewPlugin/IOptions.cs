@@ -159,6 +159,8 @@ namespace mcv2.MainViewPlugin
         Color PeriscopeForeColor { get; set; }
         Color ShowRoomBackColor { get; set; }
         Color ShowRoomForeColor { get; set; }
+        Color BigoBackColor { get; set; }
+        Color BigoForeColor { get; set; }
 
         InfoType ShowingInfoLevel { get; set; }
 

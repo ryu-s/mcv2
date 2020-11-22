@@ -58,9 +58,9 @@ namespace mcv2
     public class NotifyMetadataUpdated : INotify
     {
         public ConnectionId ConnectionId { get; }
-        public string Name { get; }
-        public IMetadata Metadata { get; }
-        public NotifyMetadataUpdated(ConnectionId Id, string name, IMetadata metadata)
+        public string? Name { get; }
+        public IMetadata? Metadata { get; }
+        public NotifyMetadataUpdated(ConnectionId Id, string? name, IMetadata? metadata)
         {
             ConnectionId = Id;
             Name = name;

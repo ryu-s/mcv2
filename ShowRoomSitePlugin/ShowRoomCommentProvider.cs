@@ -83,6 +83,8 @@ namespace ShowRoomSitePlugin
             return new MessageMetadata2(message, _siteOptions, isFirstComment)
             {
                 SiteContextGuid = SiteContextGuid,
+                UserId = message.UserId,
+                UserName = Common.MessagePartFactory.CreateMessageItems(message.UserName),
             };
         }
         private void MessageProvider_Received(object sender, IInternalMessage e)

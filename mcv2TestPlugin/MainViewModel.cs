@@ -104,7 +104,7 @@ namespace mcv2TestPlugin
         public string UserPath { get; }
         public string UserId { get; }
         public string Id { get; }
-        public string PostTime { get; }
+        public DateTime PostedAt { get; }
         public IMessageImage UserIcon { get; }
         public string AccountName { get; }
         public WhowatchMessageType WhowatchMessageType { get; } = WhowatchMessageType.Comment;
@@ -118,7 +118,7 @@ namespace mcv2TestPlugin
             UserPath = name;
 
             Comment = comment;
-            PostTime = postedAt.ToString("HH:mm:ss");
+            PostedAt = postedAt;
             Id = id;
             UserId = userId;
         }
@@ -201,9 +201,9 @@ namespace mcv2TestPlugin
     class MainViewModel : ViewModelBase
     {
         private readonly IPluginMain _pluginMain;
-        private ConnectionViewModel _selectedConnection;
+        private ConnectionViewModel? _selectedConnection;
 
-        public ConnectionViewModel SelectedConnection
+        public ConnectionViewModel? SelectedConnection
         {
             get
             {
@@ -353,7 +353,10 @@ namespace mcv2TestPlugin
             {
                 conn.DisplayName = newDisplayName;
             }
-            conn.SiteGuid = siteGuid;
+            if (siteGuid != null)
+            {
+                conn.SiteGuid = siteGuid;
+            }
         }
     }
 }

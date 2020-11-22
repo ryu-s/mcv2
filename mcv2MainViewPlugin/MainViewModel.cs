@@ -1,5 +1,6 @@
 ﻿using Common.Wpf;
 using GalaSoft.MvvmLight.CommandWpf;
+using MirrativSitePlugin;
 using SitePlugin;
 using SitePluginCommon;
 using System;
@@ -538,9 +539,77 @@ namespace mcv2.MainViewPlugin
             {
                 vm = new McvWhowatchCommentViewModel(wwComment, connVm, user, _options, _whowatchOptions, metadata.SiteContextGuid);
             }
+            else if (message is WhowatchSitePlugin.IWhowatchItem wwItem)
+            {
+                vm = new McvWhowatchItemViewModel(wwItem, connVm, user, _options, _whowatchOptions, metadata.SiteContextGuid);
+            }
             else if (message is TwicasSitePlugin.ITwicasComment casComment)
             {
                 vm = new McvTwicasCommentViewModel(casComment, connVm, user, _options, _twicasOptions, metadata.SiteContextGuid);
+            }
+            else if (message is BigoSitePlugin.IBigoComment bigoComment)
+            {
+                vm = new McvBigoCommentViewModel(bigoComment, connVm, user, _options, _bigoLiveSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is LineLiveSitePlugin.ILineLiveComment llComment)
+            {
+                vm = new McvLiveLiveCommentViewModel(llComment, connVm, user, _options, _lineLiveSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is LineLiveSitePlugin.ILineLiveItem llItem)
+            {
+                vm = new McvLiveLiveItemViewModel(llItem, connVm, user, _options, _lineLiveSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is MildomSitePlugin.IMildomComment milComment)
+            {
+                vm = new McvMildomCommentViewModel(milComment, connVm, user, _options, _mildomSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is MildomSitePlugin.IMildomGift milGift)
+            {
+                vm = new McvMildomGiftViewModel(milGift, connVm, user, _options, _mildomSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is MildomSitePlugin.IMildomJoinRoom milJoin)
+            {
+                vm = new McvMildomJoinViewModel(milJoin, connVm, user, _options, _mildomSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is MirrativSitePlugin.IMirrativComment mirComment)
+            {
+                vm = new McvMirrativCommentViewModel(mirComment, connVm, user!, _options, _mirrativSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is MirrativSitePlugin.IMirrativJoinRoom mirJoin)
+            {
+                vm = new McvMirrativJoinViewModel(mirJoin, connVm, user!, _options, _mirrativSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is MirrativSitePlugin.IMirrativItem mirItem)
+            {
+                vm = new McvMirrativItemViewModel(mirItem, connVm, user!, _options, _mirrativSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is NicoSitePlugin.INicoComment nicoComment)
+            {
+                vm = new McvNicoCommentViewModel(nicoComment, connVm, user!, _options, _nicoSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is OpenrecSitePlugin.IOpenrecComment orComment)
+            {
+                vm = new McvOpenrecCommentViewModel(orComment, connVm, user!, _options, _openrecSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is OpenrecSitePlugin.IOpenrecStamp orStamp)
+            {
+                vm = new McvOpenrecStampViewModel(orStamp, connVm, user!, _options, _openrecSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is OpenrecSitePlugin.IOpenrecYell orYell)
+            {
+                vm = new McvOpenrecYellViewModel(orYell, connVm, user!, _options, _openrecSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is ShowRoomSitePlugin.IShowRoomComment srComment)
+            {
+                vm = new McvShowRoomCommentViewModel(srComment, connVm, user!, _options, _showroomSiteOptions, metadata.SiteContextGuid);
+            }
+            else if (message is PeriscopeSitePlugin.IPeriscopeComment psComment)
+            {
+                vm = new McvPeriscopeCommentViewModel(psComment, connVm, user!, _options, _periscopeSiteOptions, metadata.SiteContextGuid);
+            }
+            else
+            {
+                Debug.WriteLine($"未対応:{message}");
             }
             if (vm != null)
             {
@@ -568,33 +637,13 @@ namespace mcv2.MainViewPlugin
         {
             _host.SendRequest(req);
         }
-        private SiteViewModel? GetSiteViewModel(SitePluginId? siteGuid)
+        private SiteViewModel GetSiteViewModel(SitePluginId siteGuid)
         {
-            SiteViewModel? site;
-            if (siteGuid != null)
-            {
-                site = _siteDict[siteGuid];
-            }
-            else
-            {
-                //selectedSiteがnullの時は_sitesもnullであるはず。
-                site = null;
-            }
-            return site;
+            return _siteDict[siteGuid];
         }
-        private BrowserViewModel GetBrowserViewModel(Guid? browserGuid)
+        private BrowserViewModel GetBrowserViewModel(Guid browserGuid)
         {
-            BrowserViewModel browser;
-            if (browserGuid.HasValue)
-            {
-                browser = _browserDict[browserGuid.Value];
-            }
-            else
-            {
-                //selectedSiteがnullの時は_sitesもnullであるはず。
-                browser = null;
-            }
-            return browser;
+            return _browserDict[browserGuid];
         }
         internal void AddNewConnection(ConnectionData conn)
         {

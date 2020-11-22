@@ -38,10 +38,10 @@ namespace mcv2.MainViewPlugin
     {
         public ConnectionId Id { get; }
         public bool IsSelected { get; set; }
-        public SitePluginId? SelectedSite { get; set; }
+        public SitePluginId SelectedSite { get; set; }
         public string Input { get; set; }
         public string Name { get; set; }
-        public Guid? SelectedBrowser { get; set; }
+        public Guid SelectedBrowser { get; set; }
         public bool NeedSave { get; set; }
         public string LoggedInUserName { get; set; }
 
@@ -63,6 +63,7 @@ namespace mcv2.MainViewPlugin
 
         DynamicOptionsTest _options;
         UserStore _userStore;
+        Dispatcher _dispatcher;
         public void OnLoaded()
         {
             var optionsStr = Host.LoadOptions(GetSettingsFilePath());
@@ -70,6 +71,8 @@ namespace mcv2.MainViewPlugin
             _options.Deserialize(optionsStr);
 
             _userStore = new UserStore(_options, this);
+
+            _dispatcher = Dispatcher.CurrentDispatcher;
 
             _vm = new MainViewModel(this, this, _options);
             if (Host.GetData(new RequestLoadedPlugins()) is ResponseLoadedPlugins resPlugins)
@@ -159,7 +162,11 @@ namespace mcv2.MainViewPlugin
                             user.Nickname = messageReceived.User.Nickname;
                             user.UsernameItems = messageReceived.User.Name;
                         }
-                        _vm.AddMessage(messageReceived.ConnectionId, messageReceived.Message, messageReceived.Metadata, user);
+                        _dispatcher.Invoke(() =>
+                        {
+                            _vm.AddMessage(messageReceived.ConnectionId, messageReceived.Message, messageReceived.Metadata, user);
+                        });
+
                     }
                     catch (Exception _ex)
                     {

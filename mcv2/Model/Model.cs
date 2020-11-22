@@ -212,6 +212,9 @@ namespace mcv2.Model
                 case RequestAddComment reqAddComment:
                     OnMessageReceived(reqAddComment.ConnectionId, reqAddComment.Message, reqAddComment.Metadata);
                     break;
+                case RequestUpdateMetadata reqUpdateMetadata:
+                    OnMetadataUpdated(reqUpdateMetadata.ConnectionId, reqUpdateMetadata.Name, reqUpdateMetadata.Metadata);
+                    break;
                 case RequestChangeUserStatus reqChangeUserStatus:
                     {
                         var user = GetUser(reqChangeUserStatus.SiteContextGuid, reqChangeUserStatus.UserId);
@@ -404,16 +407,6 @@ namespace mcv2.Model
         private void Wc_DownloadProgressChanged(object? sender, DownloadProgressChangedEventArgs e)
         {
             _pluginManager.SetNotify(new NotifyDownloadCoreProgress(e.BytesReceived, e.TotalBytesToReceive, e.ProgressPercentage));
-        }
-
-
-        private void Conn_MetadataUpdated(object? sender, IMetadata e)
-        {
-            if (!(sender is Connection2 conn)) throw new InvalidOperationException();
-            var current = _metaDict[conn.ConnectionId];
-
-
-            _pluginManager.SetNotify(new NotifyMetadataUpdated(conn.ConnectionId, conn.Name, e));
         }
         /// <summary>
         /// 指定したユーザーIDを持つユーザーを取得する
@@ -744,6 +737,8 @@ namespace mcv2.Model
 
             _sitePluginManager = sitePluginManager;
             sitePluginManager.SiteAdded += SitePluginManager_SiteAdded;
+            sitePluginManager.MetadataUpdated += SitePluginManager_MetadataUpdated;
+            sitePluginManager.MessageReceived += SitePluginManager_MessageReceived;
 
             _userStore = userStore;
 
@@ -755,6 +750,16 @@ namespace mcv2.Model
             var emptyBrowser = new EmptyBrowserProfile();
             _browserDict.Add(emptyBrowser.Id, emptyBrowser);
             EmptyBrowserId = emptyBrowser.Id;
+        }
+
+        private void SitePluginManager_MessageReceived(object? sender, RequestAddComment e)
+        {
+            OnMessageReceived(e.ConnectionId, e.Message, e.Metadata);
+        }
+
+        private void SitePluginManager_MetadataUpdated(object? sender, RequestUpdateMetadata e)
+        {
+            OnMetadataUpdated(e.ConnectionId, e.Name, e.Metadata);
         }
 
         private void SitePluginManager_SiteAdded(object? sender, SiteAddedEventArgs e)
@@ -788,6 +793,4 @@ namespace mcv2.Model
             throw new NotImplementedException();
         }
     }
-
-
 }

@@ -70,8 +70,7 @@ namespace mcv2.MainViewPlugin
             if (ret is ResponseConnectionStatusAdded status)
             {
                 var browserGuid = status.Browser;
-                if (!browserGuid.HasValue) return null;
-                var browser = _browserDict[browserGuid.Value];
+                var browser = _browserDict[browserGuid];
                 return browser;
             }
             else

@@ -29,8 +29,8 @@ namespace ShowRoomSitePlugin
         }
         public bool IsInitialComment { get; set; }
         public SitePluginId SiteContextGuid { get; set; }
-        public string UserId { get; }
-        public IEnumerable<IMessagePart> UserName { get; }
+        public string UserId { get; set; }
+        public IEnumerable<IMessagePart> UserName { get; set; }
         public SiteType SiteType => SiteType.ShowRoom;
         public MessageMetadata2(IShowRoomMessage message, IShowRoomSiteOptions siteOptions, bool isFirstComment)
         {

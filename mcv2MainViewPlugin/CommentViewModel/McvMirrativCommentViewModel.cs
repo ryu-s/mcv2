@@ -1,14 +1,11 @@
-﻿using SitePlugin;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SitePlugin;
 using System.Windows.Media;
-using WhowatchSitePlugin;
-
 namespace mcv2.MainViewPlugin
 {
-    class McvWhowatchViewModelBase : McvCommentViewModelBase
+    class McvMirrativViewModelBase : McvCommentViewModelBase
     {
-        private readonly WhowatchSiteOptions _ytOptions;
+        private readonly MirrativSiteOptions _ytOptions;
 
         public override SolidColorBrush Background
         {
@@ -16,7 +13,7 @@ namespace mcv2.MainViewPlugin
             {
                 if (Options.IsEnabledSiteConnectionColor && Options.SiteConnectionColorType == SiteConnectionColorType.Site)
                 {
-                    return new SolidColorBrush(Options.WhowatchBackColor);
+                    return new SolidColorBrush(Options.MirrativBackColor);
                 }
                 else if (Options.IsEnabledSiteConnectionColor && Options.SiteConnectionColorType == SiteConnectionColorType.Connection)
                 {
@@ -34,7 +31,7 @@ namespace mcv2.MainViewPlugin
             {
                 if (Options.IsEnabledSiteConnectionColor && Options.SiteConnectionColorType == SiteConnectionColorType.Site)
                 {
-                    return new SolidColorBrush(Options.WhowatchForeColor);
+                    return new SolidColorBrush(Options.MirrativForeColor);
                 }
                 else if (Options.IsEnabledSiteConnectionColor && Options.SiteConnectionColorType == SiteConnectionColorType.Connection)
                 {
@@ -62,7 +59,7 @@ namespace mcv2.MainViewPlugin
         }
         protected IEnumerable<IMessagePart> ProtectedMessageItems { get; set; }
         public override IEnumerable<IMessagePart> MessageItems => ProtectedMessageItems;
-        public McvWhowatchViewModelBase(IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, WhowatchSiteOptions ytOptions, SitePluginId siteContextGuid)
+        public McvMirrativViewModelBase(IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, MirrativSiteOptions ytOptions, SitePluginId siteContextGuid)
             : base(options, user, connVm, siteContextGuid)
         {
             _ytOptions = ytOptions;
@@ -77,46 +74,40 @@ namespace mcv2.MainViewPlugin
             };
         }
     }
-    internal class McvWhowatchCommentViewModel : McvWhowatchViewModelBase
+    class McvMirrativCommentViewModel : McvMirrativViewModelBase
     {
-        public McvWhowatchCommentViewModel(WhowatchSitePlugin.IWhowatchComment comment,
-            IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, WhowatchSiteOptions ytOptions, SitePluginId siteContextGuid)
+        public McvMirrativCommentViewModel(MirrativSitePlugin.IMirrativComment comment,
+            IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, MirrativSiteOptions ytOptions, SitePluginId siteContextGuid)
             : base(connVm, user, options, ytOptions, siteContextGuid)
         {
-            ProtectedMessageItems = Common.MessagePartFactory.CreateMessageItems(comment.Comment);
+            ProtectedMessageItems = Common.MessagePartFactory.CreateMessageItems(comment.Text);
             UserId = comment.UserId;
             Id = comment.Id;
             PostTime = comment.PostedAt.ToString("HH:mm:ss");
         }
     }
-    internal class McvWhowatchItemViewModel : McvWhowatchViewModelBase
+    class McvMirrativJoinViewModel : McvMirrativViewModelBase
     {
-        private readonly WhowatchSiteOptions _ytOptions;
-
-        public override SolidColorBrush Background
+        public McvMirrativJoinViewModel(MirrativSitePlugin.IMirrativJoinRoom comment,
+    IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, MirrativSiteOptions ytOptions, SitePluginId siteContextGuid)
+    : base(connVm, user, options, ytOptions, siteContextGuid)
         {
-            get
-            {
-                return new SolidColorBrush(_ytOptions.ItemBackColor);
-            }
-        }
-        public override SolidColorBrush Foreground
-        {
-            get
-            {
-                return new SolidColorBrush(_ytOptions.ItemForeColor);
-            }
-        }
-        public McvWhowatchItemViewModel(WhowatchSitePlugin.IWhowatchItem comment,
-            IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, WhowatchSiteOptions ytOptions, SitePluginId siteContextGuid)
-            : base(connVm, user, options, ytOptions, siteContextGuid)
-        {
-            ProtectedMessageItems = Common.MessagePartFactory.CreateMessageItems(comment.Comment);
-            UserId = comment.UserId.ToString();
-            Id = comment.Id.ToString();
+            ProtectedMessageItems = Common.MessagePartFactory.CreateMessageItems(comment.Text);
+            UserId = comment.UserId;
+            Id = comment.Id;
             PostTime = comment.PostedAt.ToString("HH:mm:ss");
-            Info = $"{comment.ItemName}×{comment.ItemCount}";
-            _ytOptions = ytOptions;
+        }
+    }
+    class McvMirrativItemViewModel : McvMirrativViewModelBase
+    {
+        public McvMirrativItemViewModel(MirrativSitePlugin.IMirrativItem mirItem,
+            IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, MirrativSiteOptions mirrativSiteOptions, SitePluginId siteContextGuid)
+              : base(connVm, user, options, mirrativSiteOptions, siteContextGuid)
+        {
+            ProtectedMessageItems = Common.MessagePartFactory.CreateMessageItems(mirItem.Text);
+            UserId = mirItem.UserId;
+            Id = mirItem.Id;
+            PostTime = mirItem.PostedAt.ToString("HH:mm:ss");
         }
     }
 }

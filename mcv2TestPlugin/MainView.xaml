@@ -30,6 +30,27 @@
                     <TabItem Header="ふわっち">
                         <local:WhowatchCommentPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                     </TabItem>
+                    <TabItem Header="Twicas">
+                    </TabItem>
+                    <TabItem Header="Bigo">
+                    </TabItem>
+                    <TabItem Header="LINELIVE">
+                    </TabItem>
+                    <TabItem Header="Mildom">
+                    </TabItem>
+                    <TabItem Header="Mirrativ">
+                    </TabItem>
+                    <TabItem Header="ニコ生">
+                    </TabItem>
+                    <TabItem Header="OPENREC">
+                    </TabItem>
+                    <TabItem Header="SHOWROOM">
+                    </TabItem>
+                    <TabItem Header="Periscope">
+                    </TabItem>
+                    <TabItem Header="Test">
+                    </TabItem>
+
                 </TabControl>
                 <Button Content="接続を追加" Command="{Binding AddNewConnectionCommand}" HorizontalAlignment="Left" Margin="387,10,0,0" VerticalAlignment="Top" Width="75"/>
 

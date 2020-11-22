@@ -13,7 +13,7 @@ namespace PeriscopeSitePlugin
         public PeriscopeMessageType PeriscopeMessageType { get; } = PeriscopeMessageType.Comment;
         public string Id { get; set; }
         public string UserId { get; set; }
-        public DateTime? PostedAt { get; set; }
+        public DateTime PostedAt { get; set; }
         public string Text { get; }
         public string DisplayName { get; }
         public PeriscopeComment(Kind1Type1 kind1Type1) : base(kind1Type1.Raw)

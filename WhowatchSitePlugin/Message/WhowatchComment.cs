@@ -1,4 +1,5 @@
 ﻿using SitePlugin;
+using System;
 
 namespace WhowatchSitePlugin
 {
@@ -12,7 +13,7 @@ namespace WhowatchSitePlugin
         public string UserPath { get; set; }
         public string UserId { get; set; }
         public string AccountName { get; set; }
-        public string PostTime { get; set; }
+        public DateTime PostedAt { get; set; }
         public IMessageImage UserIcon { get; set; }
         public WhowatchComment(string raw) : base(raw)
         {

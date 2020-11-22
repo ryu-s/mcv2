@@ -1,14 +1,12 @@
 ﻿using SitePlugin;
-using System;
 using System.Collections.Generic;
 using System.Windows.Media;
-using WhowatchSitePlugin;
 
 namespace mcv2.MainViewPlugin
 {
-    class McvWhowatchViewModelBase : McvCommentViewModelBase
+    class McvOpenrecViewModelBase : McvCommentViewModelBase
     {
-        private readonly WhowatchSiteOptions _ytOptions;
+        private readonly OpenrecSiteOptions _ytOptions;
 
         public override SolidColorBrush Background
         {
@@ -16,7 +14,7 @@ namespace mcv2.MainViewPlugin
             {
                 if (Options.IsEnabledSiteConnectionColor && Options.SiteConnectionColorType == SiteConnectionColorType.Site)
                 {
-                    return new SolidColorBrush(Options.WhowatchBackColor);
+                    return new SolidColorBrush(Options.OpenrecBackColor);
                 }
                 else if (Options.IsEnabledSiteConnectionColor && Options.SiteConnectionColorType == SiteConnectionColorType.Connection)
                 {
@@ -34,7 +32,7 @@ namespace mcv2.MainViewPlugin
             {
                 if (Options.IsEnabledSiteConnectionColor && Options.SiteConnectionColorType == SiteConnectionColorType.Site)
                 {
-                    return new SolidColorBrush(Options.WhowatchForeColor);
+                    return new SolidColorBrush(Options.OpenrecForeColor);
                 }
                 else if (Options.IsEnabledSiteConnectionColor && Options.SiteConnectionColorType == SiteConnectionColorType.Connection)
                 {
@@ -62,7 +60,7 @@ namespace mcv2.MainViewPlugin
         }
         protected IEnumerable<IMessagePart> ProtectedMessageItems { get; set; }
         public override IEnumerable<IMessagePart> MessageItems => ProtectedMessageItems;
-        public McvWhowatchViewModelBase(IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, WhowatchSiteOptions ytOptions, SitePluginId siteContextGuid)
+        public McvOpenrecViewModelBase(IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, OpenrecSiteOptions ytOptions, SitePluginId siteContextGuid)
             : base(options, user, connVm, siteContextGuid)
         {
             _ytOptions = ytOptions;
@@ -77,46 +75,50 @@ namespace mcv2.MainViewPlugin
             };
         }
     }
-    internal class McvWhowatchCommentViewModel : McvWhowatchViewModelBase
+    class McvOpenrecCommentViewModel : McvOpenrecViewModelBase
     {
-        public McvWhowatchCommentViewModel(WhowatchSitePlugin.IWhowatchComment comment,
-            IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, WhowatchSiteOptions ytOptions, SitePluginId siteContextGuid)
+        public McvOpenrecCommentViewModel(OpenrecSitePlugin.IOpenrecComment comment,
+            IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, OpenrecSiteOptions ytOptions, SitePluginId siteContextGuid)
             : base(connVm, user, options, ytOptions, siteContextGuid)
         {
-            ProtectedMessageItems = Common.MessagePartFactory.CreateMessageItems(comment.Comment);
-            UserId = comment.UserId;
-            Id = comment.Id;
-            PostTime = comment.PostedAt.ToString("HH:mm:ss");
+            ProtectedMessageItems = comment.MessageItems;
+            //UserId = comment.UserId;
+            //Id = comment.Id;
+            PostTime = comment.PostTime.ToString("HH:mm:ss");
         }
     }
-    internal class McvWhowatchItemViewModel : McvWhowatchViewModelBase
+    class McvOpenrecStampViewModel : McvOpenrecViewModelBase
     {
-        private readonly WhowatchSiteOptions _ytOptions;
-
-        public override SolidColorBrush Background
-        {
-            get
-            {
-                return new SolidColorBrush(_ytOptions.ItemBackColor);
-            }
-        }
-        public override SolidColorBrush Foreground
-        {
-            get
-            {
-                return new SolidColorBrush(_ytOptions.ItemForeColor);
-            }
-        }
-        public McvWhowatchItemViewModel(WhowatchSitePlugin.IWhowatchItem comment,
-            IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, WhowatchSiteOptions ytOptions, SitePluginId siteContextGuid)
+        public McvOpenrecStampViewModel(OpenrecSitePlugin.IOpenrecStamp comment,
+            IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, OpenrecSiteOptions ytOptions, SitePluginId siteContextGuid)
             : base(connVm, user, options, ytOptions, siteContextGuid)
         {
-            ProtectedMessageItems = Common.MessagePartFactory.CreateMessageItems(comment.Comment);
-            UserId = comment.UserId.ToString();
-            Id = comment.Id.ToString();
-            PostTime = comment.PostedAt.ToString("HH:mm:ss");
-            Info = $"{comment.ItemName}×{comment.ItemCount}";
-            _ytOptions = ytOptions;
+            var list = new List<IMessagePart>
+            {
+                 Common.MessagePartFactory.CreateMessageText(comment.Message),
+                 comment.Stamp,
+            };
+            ProtectedMessageItems = list;
+            //UserId = comment.UserId;
+            //Id = comment.Id;
+            PostTime = comment.PostTime.ToString("HH:mm:ss");
+        }
+    }
+    class McvOpenrecYellViewModel : McvOpenrecViewModelBase
+    {
+        public McvOpenrecYellViewModel(OpenrecSitePlugin.IOpenrecYell comment,
+            IMainViewConnectionStatus connVm, IUserViewModel user, IOptions options, OpenrecSiteOptions ytOptions, SitePluginId siteContextGuid)
+            : base(connVm, user, options, ytOptions, siteContextGuid)
+        {
+            var list = new List<IMessagePart>
+            {
+                Common.MessagePartFactory.CreateMessageText("エールポイント：" + comment.YellPoints + System.Environment.NewLine),
+                Common.MessagePartFactory.CreateMessageText(comment.Message),
+            };
+            ProtectedMessageItems = list;
+            //UserId = comment.UserId;
+            Id = comment.Id;
+            PostTime = comment.PostTime.ToString("HH:mm:ss");
         }
     }
 }

@@ -17,9 +17,11 @@
     <PackageReference Include="WebSocket4Net" Version="0.15.2" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BigoIF\BigoIF.csproj" />
     <ProjectReference Include="..\BrowserCookieImplementations\BrowserCookieImplementations.csproj" />
     <ProjectReference Include="..\BrowserCookieInterfaces\BrowserCookieInterfaces.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\LineLiveIF\LineLiveIF.csproj" />
     <ProjectReference Include="..\SitePlugin\SitePlugin.csproj" />
     <ProjectReference Include="..\mcv2Plugin\mcv2Plugin.csproj" />
     <ProjectReference Include="..\MildomIF\MildomIF.csproj" />

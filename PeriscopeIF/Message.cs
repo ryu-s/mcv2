@@ -30,7 +30,7 @@ namespace PeriscopeSitePlugin
     {
         string Id { get; }
         string UserId { get; }
-        DateTime? PostedAt { get; }
+        DateTime PostedAt { get; }
         string Text { get; }
         string DisplayName { get; }
     }

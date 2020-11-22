@@ -70,6 +70,8 @@ namespace mcv2.Model
     interface ISitePluginManager
     {
         event EventHandler<SiteAddedEventArgs> SiteAdded;
+        event EventHandler<RequestUpdateMetadata> MetadataUpdated;
+        event EventHandler<RequestAddComment> MessageReceived;
         void Load();
         SiteType GetSiteType(SitePluginId siteId);
         Task ConnectAsync(ConnectionId connectionId, string input, SitePluginId sitePluginId, IBrowserProfile2? browserProfile);
@@ -82,6 +84,8 @@ namespace mcv2.Model
     {
         public event EventHandler<SitePluginManagerExceptionEventArgs>? ExceptionOccurred;
         public event EventHandler<SiteAddedEventArgs> SiteAdded;
+        public event EventHandler<RequestUpdateMetadata> MetadataUpdated;
+        public event EventHandler<RequestAddComment> MessageReceived;
 
         private readonly List<IMcvSitePlugin> _sitePlugins = new List<IMcvSitePlugin>();
         //private readonly Dictionary<SitePluginId, IMcvCommentProvider> _cpDict = new Dictionary<SitePluginId, IMcvCommentProvider>();
@@ -172,10 +176,13 @@ namespace mcv2.Model
             var site = _siteDict[sitePluginId];
             return site.CreateCommentProvider();
         }
-
+        private Dictionary<ICommentProvider2, ConnectionId> _cpIdDict = new Dictionary<ICommentProvider2, ConnectionId>();
         public async Task ConnectAsync(ConnectionId connectionId, string input, SitePluginId sitePluginId, IBrowserProfile2? browserProfile)
         {
             var cp = GetOrCreateCommentProvider(connectionId, sitePluginId);
+            _cpIdDict.Add(cp, connectionId);
+            cp.MessageReceived += Cp_MessageReceived;
+            cp.MetadataUpdated += Cp_MetadataUpdated;
             try
             {
                 await cp.ConnectAsync(input, browserProfile);
@@ -184,6 +191,30 @@ namespace mcv2.Model
             {
                 _logger.LogException(ex);
             }
+            finally
+            {
+                _cpIdDict.Remove(cp);
+                cp.MessageReceived -= Cp_MessageReceived;
+                cp.MetadataUpdated -= Cp_MetadataUpdated;
+            }
+        }
+
+        private void Cp_MetadataUpdated(object? sender, IMetadata e)
+        {
+            var cp = sender as ICommentProvider2;
+            if (cp == null) return;
+            var connectionId = _cpIdDict[cp];
+            var req = new RequestUpdateMetadata(connectionId, null, e);
+            MetadataUpdated?.Invoke(this, req);
+        }
+
+        private void Cp_MessageReceived(object? sender, IMessageContext2 e)
+        {
+            var cp = sender as ICommentProvider2;
+            if (cp == null) return;
+            var connectionId = _cpIdDict[cp];
+            var req = new RequestAddComment(connectionId, e.Message, e.Metadata);
+            MessageReceived?.Invoke(this, req);
         }
 
         public SiteType GetSiteType(SitePluginId siteId)
