@@ -7,8 +7,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TextBlock HorizontalAlignment="Left" Margin="105,340,0,0" TextWrapping="Wrap" Text="インストールが完了しました。コメビュを自動的に再起動します" VerticalAlignment="Top"/>
-        <Button Content="OK" Command="{Binding CloseCommand}" HorizontalAlignment="Left" Margin="120,380,0,0" VerticalAlignment="Top" Width="75"/>
+        <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="インストールが完了しました。コメビュを自動的に再起動します" VerticalAlignment="Center" FontSize="20" />
+        <Button Content="OK" Command="{Binding CloseCommand}" HorizontalAlignment="Center" Margin="0,0,0,5" VerticalAlignment="Bottom" Width="75"/>
 
     </Grid>
 </UserControl>

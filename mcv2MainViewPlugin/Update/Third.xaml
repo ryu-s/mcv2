@@ -7,8 +7,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TextBlock HorizontalAlignment="Left" Margin="80,59,0,0" TextWrapping="Wrap" Text="最新版をインストールしています..." FontSize="20" VerticalAlignment="Top"/>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="80,120,0,0" TextWrapping="Wrap" Text="完了次第コメビュを自動的に再起動します" FontSize="20" VerticalAlignment="Top"/>
-        <ProgressBar Maximum="100" Minimum="0" Value="{Binding ProgressPercentage}" Margin="80,190,190,235" />
+        <TextBlock HorizontalAlignment="Center" Margin="80,59,0,0" TextWrapping="Wrap" Text="最新版をインストールしています..." FontSize="20" VerticalAlignment="Top"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Center" Margin="80,120,0,0" TextWrapping="Wrap" Text="完了次第コメビュを自動的に再起動します" FontSize="20" VerticalAlignment="Top"/>
+        <ProgressBar Maximum="100" Minimum="0" Value="{Binding ProgressPercentage}" HorizontalAlignment="Center" Width="500" Height="30" />
     </Grid>
 </UserControl>

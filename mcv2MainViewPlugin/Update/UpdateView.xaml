@@ -18,11 +18,11 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
-        <local:First Visibility="{Binding IsShowPageFirst, Converter={StaticResource booleanToVisibilityConverter}}"  Background="Aqua" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-        <local:Second Visibility="{Binding IsShowPageSecond, Converter={StaticResource booleanToVisibilityConverter}}" CurrentVersion="{Binding CurrentVersion}" LatestVersion="{Binding LatestVersion}" Background="Lime" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-        <local:Third Visibility="{Binding IsShowPageThird, Converter={StaticResource booleanToVisibilityConverter}}" Background="Purple" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-        <local:Forth Visibility="{Binding IsShowPageForth, Converter={StaticResource booleanToVisibilityConverter}}" Background="LemonChiffon" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-        <local:NotUpdate Visibility="{Binding IsShowPageNotUpdate, Converter={StaticResource booleanToVisibilityConverter}}" Background="LemonChiffon" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <local:First Visibility="{Binding IsShowPageFirst, Converter={StaticResource booleanToVisibilityConverter}}"  Background="#FFEFEFEF" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <local:Second Visibility="{Binding IsShowPageSecond, Converter={StaticResource booleanToVisibilityConverter}}" CurrentVersion="{Binding CurrentVersion}" LatestVersion="{Binding LatestVersion}" Background="#FFEFEFEF" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <local:Third Visibility="{Binding IsShowPageThird, Converter={StaticResource booleanToVisibilityConverter}}" Background="#FFEFEFEF" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <local:Forth Visibility="{Binding IsShowPageForth, Converter={StaticResource booleanToVisibilityConverter}}" Background="#FFEFEFEF" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <local:NotUpdate Visibility="{Binding IsShowPageNotUpdate, Converter={StaticResource booleanToVisibilityConverter}}" Background="#FFEFEFEF" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 
 
     </Grid>
