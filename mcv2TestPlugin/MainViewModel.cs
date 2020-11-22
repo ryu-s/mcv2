@@ -346,10 +346,13 @@ namespace mcv2TestPlugin
             Connections.Remove(conn);
             _connDict.Remove(connectionId);
         }
-        public void ChangeConnectionName(ConnectionId connectionId, string newDisplayName, SitePluginId? siteGuid)
+        public void ChangeConnectionName(ConnectionId connectionId, string? newDisplayName, SitePluginId? siteGuid)
         {
             var conn = _connDict[connectionId];
-            conn.DisplayName = newDisplayName;
+            if (newDisplayName != null)
+            {
+                conn.DisplayName = newDisplayName;
+            }
             conn.SiteGuid = siteGuid;
         }
     }
