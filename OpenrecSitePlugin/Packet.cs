@@ -127,6 +127,11 @@ namespace OpenrecSitePlugin
                                         //"42[\"message\",\"{\\\"type\\\":\\\"9\\\",\\\"data\\\":{\\\"owner_to_moderator_user_id\\\":\\\"42978100\\\"}}\"]"
                                         ret = new PacketMessageEventMessageModeratorDelete();
                                     }
+                                    else if (type == 10)
+                                    {
+                                        //42["message","{\"type\":10,\"room\":\"2040790\",\"data\":{\"need_refresh\":null,\"cache_key\":null,\"public_type\":\"all\",\"chat_public_type\":\"all\",\"is_viewers_hidden\":0,\"permissions\":[]}}"]
+                                        ret = null;
+                                    }
                                 }
                                 break;
                             case '3':

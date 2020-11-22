@@ -28,8 +28,8 @@ namespace OpenrecSitePlugin
         }
         public bool IsInitialComment { get; set; }
         public SitePluginId SiteContextGuid { get; set; }
-        public string UserId { get; }
-        public IEnumerable<IMessagePart> UserName { get; }
+        public string UserId { get; set; }
+        public IEnumerable<IMessagePart> UserName { get; set; }
         public SiteType SiteType => SiteType.Openrec;
         public MessageMetadata2(IOpenrecMessage message, IOpenrecSiteOptions siteOptions, bool isFirstComment)
         {

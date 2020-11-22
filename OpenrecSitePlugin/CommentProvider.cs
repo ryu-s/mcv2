@@ -356,6 +356,8 @@ namespace OpenrecSitePlugin
             {
                 IsInitialComment = isInitialComment,
                 SiteContextGuid = SiteContextGuid,
+                UserId = commentData.UserId,
+                UserName = Common.MessagePartFactory.CreateMessageItems(commentData.Name),
             };
             var methods = new OpenrecMessageMethods();
             messageContext = new OpenrecMessageContext2(message, metadata, methods);
