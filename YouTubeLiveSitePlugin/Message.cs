@@ -42,15 +42,7 @@ namespace YouTubeLiveSitePlugin
         {
             UserId = commentData.UserId;
             Id = commentData.Id;
-
-            var list = new List<IMessagePart>();
-            var s = commentData.PurchaseAmount;
-            if (commentData.MessageItems.Count > 0)
-                s += Environment.NewLine;
-            list.Add(MessagePartFactory.CreateMessageText(s));
-            list.AddRange(commentData.MessageItems);
-            CommentItems = list;
-
+            CommentItems = commentData.MessageItems;
             NameItems = commentData.NameItems;
             PurchaseAmount = commentData.PurchaseAmount;
             UserIcon = commentData.Thumbnail;
