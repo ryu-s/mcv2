@@ -654,10 +654,10 @@ namespace mcv2.MainViewPlugin
             //_connDict.Add()する前にconnVmのプロパティを弄ってはいけない。_connDictに登録されておらず、例外が投げられてしまう。
             Connections.Add(connVm);
             _connDict.Add(conn.Id, connVm);
-            connVm.UpdateInput(conn.Input);
-            connVm.UpdateName(conn.Name);
-            connVm.UpdateSelectedSite(selectedSite);
-            connVm.UpdateSelectedBrowser(selectedBrowser);
+            connVm.Input = conn.Input;
+            connVm.Name = conn.Name;
+            connVm.SelectedSite = selectedSite;
+            connVm.SelectedBrowser = selectedBrowser;
             connVm.UpdateLoggedInUsername(conn.LoggedInUserName);
 
             var metaVm = new MetadataViewModel()
@@ -684,21 +684,21 @@ namespace mcv2.MainViewPlugin
             var connection = _connDict[newStatus.ConnectionId];
             if (newStatus.Name != null)
             {
-                connection.UpdateName(newStatus.Name);
+                connection.Name = newStatus.Name;
             }
             if (newStatus.Input != null)
             {
-                connection.UpdateInput(newStatus.Input);
+                connection.Input = newStatus.Input;
             }
             if (newStatus.Site != null)
             {
                 var newSite = _siteDict[newStatus.Site];
-                connection.UpdateSelectedSite(newSite);
+                connection.SelectedSite = newSite;
             }
             if (newStatus.Browser.HasValue)
             {
                 var newBrowser = _browserDict[newStatus.Browser.Value];
-                connection.UpdateSelectedBrowser(newBrowser);
+                connection.SelectedBrowser = newBrowser;
             }
             if (newStatus.IsConnected.HasValue)
             {

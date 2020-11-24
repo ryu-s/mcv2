@@ -50,21 +50,14 @@ namespace mcv2.MainViewPlugin
             }
             set
             {
+                if (_selectedSite == value) return;
+                _selectedSite = value;
                 _host.SendRequest(new RequestChangeConnectionStatus(Id)
                 {
                     Site = value?.SiteId,
                 });
+                RaisePropertyChanged();
             }
-        }
-        /// <summary>
-        /// 選択しているサイトを更新する。
-        /// コードから更新する際はプロパティではなくこのメソッド経由で行わないとStackOverflowになる。
-        /// </summary>
-        /// <param name="newSite"></param>
-        public void UpdateSelectedSite(SiteViewModel newSite)
-        {
-            _selectedSite = newSite;
-            RaisePropertyChanged(nameof(SelectedSite));
         }
         private readonly IModel _host;
         private readonly IConnectionModel _connHost;
@@ -86,16 +79,14 @@ namespace mcv2.MainViewPlugin
             }
             set
             {
+                if (_selectedBrowser == value) return;
+                _selectedBrowser = value;
                 _host.SendRequest(new RequestChangeConnectionStatus(Id)
                 {
                     Browser = value?.BrowserId,
                 });
+                RaisePropertyChanged();
             }
-        }
-        public void UpdateSelectedBrowser(BrowserViewModel newBrowser)
-        {
-            _selectedBrowser = newBrowser;
-            RaisePropertyChanged(nameof(SelectedBrowser));
         }
         public ICommand ConnectCommand { get; }
         public ICommand DisconnectCommand { get; }
@@ -107,16 +98,15 @@ namespace mcv2.MainViewPlugin
             }
             set
             {
+                //このコードだと他のプラグインでInputを変更した場合（_input != value）にもRequestChangeConnectionStatusをしてしまう
+                if (_input == value) return;
+                _input = value;
                 _host.SendRequest(new RequestChangeConnectionStatus(Id)
                 {
                     Input = value,
                 });
+                RaisePropertyChanged();
             }
-        }
-        public void UpdateInput(string newInput)
-        {
-            _input = newInput;
-            RaisePropertyChanged(nameof(Input));
         }
         public string Name
         {
@@ -126,16 +116,14 @@ namespace mcv2.MainViewPlugin
             }
             set
             {
+                if (_name == value) return;
+                _name = value;
                 _host.SendRequest(new RequestChangeConnectionStatus(Id)
                 {
                     Name = value,
                 });
+                RaisePropertyChanged();
             }
-        }
-        public void UpdateName(string newName)
-        {
-            _name = newName;
-            RaisePropertyChanged(nameof(Name));
         }
 
         public ConnectionId Id { get; }
@@ -155,11 +143,6 @@ namespace mcv2.MainViewPlugin
             CanConnect = true;
             CanDisconnect = false;
             _loggedInUsername = "";
-        }
-
-        internal void UpdateValues()
-        {
-            RaisePropertyChanged(nameof(SelectedSite));
         }
 
         private void Connect()
