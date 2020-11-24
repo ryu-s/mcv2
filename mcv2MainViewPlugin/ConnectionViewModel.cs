@@ -40,58 +40,6 @@ namespace mcv2.MainViewPlugin
         bool NeedSave { get; set; }
         string LoggedInUsername { get; }
     }
-    class Adaptor
-    {
-        private readonly IModel _host;
-        private readonly Dictionary<SitePluginId, SiteViewModel> _siteDict;
-        private readonly Dictionary<Guid, BrowserViewModel> _browserDict;
-        public SiteViewModel? GetCurrentSiteViewModel(ConnectionId connectionId)
-        {
-            var site = _host.GetSelectedSite(connectionId);
-            if (site != null)
-            {
-                return _siteDict[site];
-            }
-            else
-            {
-                return null;
-            }
-        }
-        public void SetCurrentSiteViewModel(ConnectionId connectionId, SiteViewModel siteVm)
-        {
-            _host.SendRequest(new RequestChangeConnectionStatus(connectionId)
-            {
-                Site = siteVm.SiteId
-            });
-        }
-        public BrowserViewModel? GetCurrentBrowserViewModel(ConnectionId connectionId)
-        {
-            var ret = _host.GetData(new RequestConnectionStatus(connectionId));
-            if (ret is ResponseConnectionStatusAdded status)
-            {
-                var browserGuid = status.Browser;
-                var browser = _browserDict[browserGuid];
-                return browser;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        public void SetCurrentBrowserViewModel(ConnectionId connectionId, BrowserViewModel browserVm)
-        {
-            _host.SendRequest(new RequestChangeConnectionStatus(connectionId)
-            {
-                Browser = browserVm.BrowserId
-            });
-        }
-        public Adaptor(IModel host, Dictionary<SitePluginId, SiteViewModel> siteDict, Dictionary<Guid, BrowserViewModel> browserDict)
-        {
-            _host = host;
-            _siteDict = siteDict;
-            _browserDict = browserDict;
-        }
-    }
     class ConnectionViewModel : ViewModelBase, IMainViewConnectionStatus, IConnectionViewModel
     {
         public SiteViewModel SelectedSite
@@ -120,7 +68,6 @@ namespace mcv2.MainViewPlugin
         }
         private readonly IModel _host;
         private readonly IConnectionModel _connHost;
-        private readonly Adaptor _adaptor;
         private bool _canConnect;
         private bool _canDisconnect;
         private string _loggedInUsername;
@@ -196,7 +143,7 @@ namespace mcv2.MainViewPlugin
         public ObservableCollection<BrowserViewModel> Browsers { get; }
 
         public ConnectionViewModel(ConnectionId connectionId, IModel host, IConnectionModel connHost,
-            ObservableCollection<SiteViewModel> sites, ObservableCollection<BrowserViewModel> browsers, Adaptor adaptor)
+            ObservableCollection<SiteViewModel> sites, ObservableCollection<BrowserViewModel> browsers)
         {
             ConnectCommand = new RelayCommand(Connect);
             DisconnectCommand = new RelayCommand(Disconnect);
@@ -205,7 +152,6 @@ namespace mcv2.MainViewPlugin
             _connHost = connHost;
             Sites = sites;
             Browsers = browsers;
-            _adaptor = adaptor;
             CanConnect = true;
             CanDisconnect = false;
             _loggedInUsername = "";

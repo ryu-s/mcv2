@@ -650,8 +650,7 @@ namespace mcv2.MainViewPlugin
         {
             var selectedSite = GetSiteViewModel(conn.SelectedSite);
             var selectedBrowser = GetBrowserViewModel(conn.SelectedBrowser);
-            var adaptor = new Adaptor(_host, _siteDict, _browserDict);
-            var connVm = new ConnectionViewModel(conn.Id, _host, _connHost, _sites, _browsers, adaptor);
+            var connVm = new ConnectionViewModel(conn.Id, _host, _connHost, _sites, _browsers);
             //_connDict.Add()する前にconnVmのプロパティを弄ってはいけない。_connDictに登録されておらず、例外が投げられてしまう。
             Connections.Add(connVm);
             _connDict.Add(conn.Id, connVm);

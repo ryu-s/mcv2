@@ -1,7 +1,6 @@
 ﻿using Common;
 using ryu_s.BrowserCookie;
 using SitePlugin;
-using SitePluginCommon;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +10,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -119,17 +117,6 @@ namespace mcv2.Model
         public void SaveOptions(string path, string optionsStr)
         {
             _io.WriteFile(path, optionsStr);
-        }
-        private string GetDefaultName(IEnumerable<string> existingNames)
-        {
-            for (var n = 1; ; n++)
-            {
-                var testName = "#" + n;
-                if (!existingNames.Contains(testName))
-                {
-                    return testName;
-                }
-            }
         }
         private readonly PluginManager _pluginManager;
         private readonly ISitePluginManager _sitePluginManager;
@@ -476,21 +463,6 @@ namespace mcv2.Model
 
             //サイトプラグインを読み込む
             _sitePluginManager.Load();
-            //            AddSite(new YouTubeLiveSitePlugin.Test2.YouTubeLiveSiteContext2(new YouTubeLiveSitePlugin.Test2.YouTubeLiveServer(), _logger));
-            //            AddSite(new TwitchSitePlugin.TwitchSiteContext2(new TwitchSitePlugin.TwitchServer(), _logger));
-            //            AddSite(new WhowatchSitePlugin.WhowatchSiteContext2(_logger));
-            //            AddSite(new TwicasSitePlugin.TwicasSiteContext2(_logger));
-            //            AddSite(new BigoSitePlugin.BigoSiteContext(new BigoSitePlugin.BigoServer(), _logger));
-            //            AddSite(new LineLiveSitePlugin.LineLiveSiteContext(new LineLiveSitePlugin.LineLiveServer(), _logger));
-            //            AddSite(new MildomSitePlugin.MildomSiteContext2(new MildomSitePlugin.MildomServer(), _logger));
-            //            AddSite(new MirrativSitePlugin.MirrativSiteContext2(new MirrativSitePlugin.MirrativServer(), _logger));
-            //            AddSite(new NicoSitePlugin.NicoSiteContext2(new NicoSitePlugin.DataSource(), (addr, port, size, buffer) => new NicoSitePlugin.StreamSocket(addr, port, size, buffer), _logger));
-            //            AddSite(new OpenrecSitePlugin.OpenrecSiteContext2(_logger));
-            //            AddSite(new ShowRoomSitePlugin.ShowRoomSiteContext2(new ShowRoomSitePlugin.ShowRoomServer(), _logger));
-            //            AddSite(new PeriscopeSitePlugin.PeriscopeSiteContext2(new PeriscopeSitePlugin.PeriscopeServer(), _logger));
-            //#if DEBUG
-            //            AddSite(new TestSitePlugin.TestSiteContext2(_logger));
-            //#endif
 
             var browserLoader = new BrowserLoader(_logger);
             var browsers = browserLoader.LoadBrowsers().ToList();
@@ -510,19 +482,6 @@ namespace mcv2.Model
                 }
             }
         }
-
-        //readonly Dictionary<SitePluginId, ISiteContext2> _siteDict = new Dictionary<SitePluginId, ISiteContext2>();
-
-        //public void AddSite(ISiteContext2 site)
-        //{
-        //    //_siteDict.Add(site.Guid, site);
-        //    site.LoadOptions("settings\\" + site.DisplayName + ".txt", new IOTest());
-        //    _pluginManager.SetNotify(new NotifySiteAdded
-        //    {
-        //        SiteId = site.Guid,
-        //        SiteName = site.DisplayName,
-        //    });
-        //}
         public void AddSite(SitePluginId siteId, string siteDisplayName)
         {
             _pluginManager.SetNotify(new NotifySiteAdded
@@ -687,17 +646,10 @@ namespace mcv2.Model
                     var name = "multicommentviewer";
 #endif
                         var url1 = @"https://ryu-s.github.io/" + name + "_latest";
-                        var userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36";
-                        var handler = new HttpClientHandler();
                         using var client = new HttpClient();
-                        client.DefaultRequestHeaders.Add("User-Agent", userAgent);
-                        client.DefaultRequestHeaders.Add("Upgrade-Insecure-Requests", "1");
-                        client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                        client.DefaultRequestHeaders.Connection.Add("keep-alive");
                         var a = await client.GetAsync(url1);
                         var url2 = await a.Content.ReadAsStringAsync();
 
-                        //ここが20秒くらい掛かってしまう。原因不明。同じURLにブラウザとかcurlでアクセスすると一瞬なんだけど。
                         var a2 = await client.GetAsync(url2);
                         var json = await a2.Content.ReadAsStringAsync();
                         var latestVersionInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<Common.AutoUpdate.LatestVersionInfo>(json);
