@@ -14,7 +14,7 @@ namespace ShowRoomSitePlugin
         public override string DisplayName => "SHOWROOM";
         public override SiteType SiteType => SiteType.ShowRoom;
 
-        public override ICommentProvider2 CreateCommentProvider()
+        public override ICommentProvider CreateCommentProvider()
         {
             return new ShowRoomCommentProvider2(_server, _logger, _siteOptions)
             {

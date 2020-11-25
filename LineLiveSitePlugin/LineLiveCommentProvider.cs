@@ -13,7 +13,7 @@ using SitePluginCommon;
 
 namespace LineLiveSitePlugin
 {
-    internal class LineLiveCommentProvider : ICommentProvider2
+    internal class LineLiveCommentProvider : ICommentProvider
     {
         private bool _canConnect;
         public bool CanConnect

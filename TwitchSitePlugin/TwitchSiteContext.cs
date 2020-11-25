@@ -18,7 +18,7 @@ namespace TwitchSitePlugin
 
         public override SiteType SiteType => SiteType.Twitch;
 
-        public override ICommentProvider2 CreateCommentProvider()
+        public override ICommentProvider CreateCommentProvider()
         {
             return new TwitchCommentProvider2(_server, _logger, _siteOptions)
             {

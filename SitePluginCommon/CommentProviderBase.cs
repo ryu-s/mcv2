@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SitePluginCommon
 {
-    public abstract class CommentProviderBase2 : ICommentProvider2
+    public abstract class CommentProviderBase2 : ICommentProvider
     {
         private bool _canConnect;
         public bool CanConnect

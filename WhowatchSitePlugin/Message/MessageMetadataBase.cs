@@ -14,7 +14,7 @@ namespace WhowatchSitePlugin
         public bool IsSiteNgUser => false;//TODO:IUserにIsSiteNgUserを追加する
         public virtual bool IsFirstComment { get; protected set; }
         public bool Is184 { get; }
-        public ICommentProvider2 CommentProvider { get; }
+        public ICommentProvider CommentProvider { get; }
         public bool IsInitialComment { get; set; }
         public SitePluginId SiteContextGuid { get; set; }
         public string UserId { get; set; }
@@ -30,7 +30,7 @@ namespace WhowatchSitePlugin
         /// <param name="user">null可</param>
         /// <param name="cp"></param>
         /// <param name="isFirstComment"></param>
-        public MessageMetadataBase2(IWhowatchSiteOptions siteOptions, ICommentProvider2 cp)
+        public MessageMetadataBase2(IWhowatchSiteOptions siteOptions, ICommentProvider cp)
         {
             _siteOptions = siteOptions;
             CommentProvider = cp;

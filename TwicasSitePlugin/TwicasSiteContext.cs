@@ -15,7 +15,7 @@ namespace TwicasSitePlugin
         public override string DisplayName => "Twicas";
         public override SiteType SiteType => SiteType.Twicas;
 
-        public override ICommentProvider2 CreateCommentProvider()
+        public override ICommentProvider CreateCommentProvider()
         {
             return new TwicasCommentProvider2(new TwicasServer(), _logger, _siteOptions)
             {

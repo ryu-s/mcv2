@@ -49,7 +49,7 @@ namespace TwitchSitePlugin
         public string UserId { get; set; }
         public bool IsLoggedIn { get; set; }
     }
-    class TwitchCommentProvider2 : ICommentProvider2
+    class TwitchCommentProvider2 : ICommentProvider
     {
         private bool _canConnect;
         public bool CanConnect

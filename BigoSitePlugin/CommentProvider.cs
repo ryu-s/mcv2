@@ -251,7 +251,7 @@ namespace BigoSitePlugin
             }
         }
     }
-    class CommentProvider : ICommentProvider2
+    class CommentProvider : ICommentProvider
     {
         private bool _canConnect;
         public bool CanConnect
@@ -491,7 +491,7 @@ namespace BigoSitePlugin
             _messageProvider?.Disconnect();
         }
 
-        async Task ICommentProvider2.PostCommentAsync(string text)
+        async Task ICommentProvider.PostCommentAsync(string text)
         {
             var b = await PostCommentAsync(text);
         }

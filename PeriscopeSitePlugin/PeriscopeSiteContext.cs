@@ -14,7 +14,7 @@ namespace PeriscopeSitePlugin
         public override string DisplayName => "Periscope";
         public override SiteType SiteType => SiteType.Periscope;
 
-        public override ICommentProvider2 CreateCommentProvider()
+        public override ICommentProvider CreateCommentProvider()
         {
             return new PeriscopeCommentProvider99(_server, _logger, _siteOptions)
             {

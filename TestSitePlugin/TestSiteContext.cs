@@ -14,7 +14,7 @@ namespace TestSitePlugin
 
         public SiteType SiteType => SiteType.Unknown;
 
-        public ICommentProvider2 CreateCommentProvider()
+        public ICommentProvider CreateCommentProvider()
         {
             return new TestCommentProvider2(_logger)
             {

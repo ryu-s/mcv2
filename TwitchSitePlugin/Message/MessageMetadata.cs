@@ -15,13 +15,13 @@ namespace TwitchSitePlugin
         public bool IsSiteNgUser => false;
         public bool IsFirstComment { get; }
         public bool Is184 { get; }
-        public ICommentProvider2 CommentProvider { get; }
+        public ICommentProvider CommentProvider { get; }
         public bool IsInitialComment { get; set; }
         public SitePluginId SiteContextGuid { get; set; }
         public string UserId { get; set; }
         public IEnumerable<IMessagePart> UserName { get; set; }
         public SiteType SiteType => SiteType.Twitch;
-        public MessageMetadata2(ITwitchMessage message, ITwitchSiteOptions siteOptions, ICommentProvider2 cp, bool isFirstComment)
+        public MessageMetadata2(ITwitchMessage message, ITwitchSiteOptions siteOptions, ICommentProvider cp, bool isFirstComment)
         {
             _message = message;
             _siteOptions = siteOptions;

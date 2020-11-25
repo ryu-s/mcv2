@@ -18,7 +18,7 @@ namespace WhowatchSitePlugin
         public override string DisplayName => "ふわっち";
         public override SiteType SiteType => SiteType.Whowatch;
 
-        public override ICommentProvider2 CreateCommentProvider()
+        public override ICommentProvider CreateCommentProvider()
         {
             return new WhowatchCommentProvider2(_server, _siteOptions, _logger)
             {

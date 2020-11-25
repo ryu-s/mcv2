@@ -56,7 +56,7 @@ namespace YouTubeLiveSitePlugin.Test2
         private readonly IYouTubeLiveSiteOptions _siteOptions;
         private readonly Dictionary<string, int> _userCommentCountDict;
         private readonly SynchronizedCollection<string> _receivedCommentIds;
-        private readonly ICommentProvider2 _cp;
+        private readonly ICommentProvider _cp;
         ChatProvider _chatProvider;
         DisconnectReason _disconnectReason;
 
@@ -603,7 +603,7 @@ namespace YouTubeLiveSitePlugin.Test2
         }
         public EachConnection2(ILogger logger, CookieContainer cc, IYouTubeLibeServer server,
             IYouTubeLiveSiteOptions siteOptions, Dictionary<string, int> userCommentCountDict, SynchronizedCollection<string> receivedCommentIds,
-            ICommentProvider2 cp)
+            ICommentProvider cp)
         {
             _logger = logger;
             _cc = cc;

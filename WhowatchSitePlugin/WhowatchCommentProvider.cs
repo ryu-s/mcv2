@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace WhowatchSitePlugin
 {
-    internal class WhowatchCommentProvider2 : ICommentProvider2
+    internal class WhowatchCommentProvider2 : ICommentProvider
     {
         #region ICommentProvider
         #region CanConnect

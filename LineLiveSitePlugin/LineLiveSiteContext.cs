@@ -14,7 +14,7 @@ namespace LineLiveSitePlugin
         public override string DisplayName => "LINELIVE";
         public override SiteType SiteType => SiteType.LineLive;
 
-        public override ICommentProvider2 CreateCommentProvider()
+        public override ICommentProvider CreateCommentProvider()
         {
             return new LineLiveCommentProvider(_server, _logger, _siteOptions)
             {

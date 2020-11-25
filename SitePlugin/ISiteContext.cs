@@ -65,7 +65,7 @@ namespace SitePlugin
         void LoadOptions(string path, IIo io);
         void Init();
         void Save();
-        ICommentProvider2 CreateCommentProvider();
+        ICommentProvider CreateCommentProvider();
         /// <summary>
         /// inputがこのサイトの入力値に適合しているか
         /// 形式が正しいかを判定するだけで、実際に存在するかは関知しない

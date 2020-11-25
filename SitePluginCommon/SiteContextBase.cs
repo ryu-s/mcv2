@@ -12,7 +12,7 @@ namespace SitePluginCommon
         public abstract SiteType SiteType { get; }
         public abstract SitePluginId Guid { get; }
         public abstract string DisplayName { get; }
-        public abstract ICommentProvider2 CreateCommentProvider();
+        public abstract ICommentProvider CreateCommentProvider();
 
         public virtual void Init()
         {

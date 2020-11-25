@@ -20,7 +20,7 @@ namespace NicoSitePlugin
                 SiteContextGuid = Guid,
             };
         }
-        public override ICommentProvider2 CreateCommentProvider()
+        public override ICommentProvider CreateCommentProvider()
         {
             return GetNicoCommentProvider();
         }

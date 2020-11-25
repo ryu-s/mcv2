@@ -13,7 +13,7 @@ using System.Net;
 
 namespace SitePlugin
 {
-    public interface ICommentProvider2
+    public interface ICommentProvider
     {
         event EventHandler<ConnectedEventArgs> Connected;
         event EventHandler<IMessageContext2> MessageReceived;

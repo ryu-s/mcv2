@@ -14,7 +14,7 @@ namespace MirrativSitePlugin
         public override string DisplayName => "Mirrativ";
         public override SiteType SiteType => SiteType.Mirrativ;
 
-        public override ICommentProvider2 CreateCommentProvider()
+        public override ICommentProvider CreateCommentProvider()
         {
             return new MirrativCommentProvider33(_server, _logger, _siteOptions)
             {

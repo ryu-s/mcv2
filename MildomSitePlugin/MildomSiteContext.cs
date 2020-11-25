@@ -14,7 +14,7 @@ namespace MildomSitePlugin
         public override string DisplayName => "Mildom";
         public override SiteType SiteType => SiteType.Mildom;
 
-        public override ICommentProvider2 CreateCommentProvider()
+        public override ICommentProvider CreateCommentProvider()
         {
             return new MildomCommentProvider2(_server, _logger, _siteOptions)
             {

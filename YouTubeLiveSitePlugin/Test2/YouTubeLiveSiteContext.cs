@@ -13,7 +13,7 @@ namespace YouTubeLiveSitePlugin.Test2
 
         public override string DisplayName => "YouTubeLive";
         public override SiteType SiteType => SiteType.YouTubeLive;
-        public override ICommentProvider2 CreateCommentProvider()
+        public override ICommentProvider CreateCommentProvider()
         {
             //return new YouTubeCommentProvider(connectionName, _options, _siteOptions);
             return new Test2.CommentProvider2(_server, _siteOptions, _logger)

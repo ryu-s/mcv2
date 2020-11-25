@@ -7,7 +7,7 @@ namespace WhowatchSitePlugin
 {
     internal class CommentMessageMetadata2 : MessageMetadataBase2
     {
-        public CommentMessageMetadata2(IWhowatchMessage message, IWhowatchSiteOptions siteOptions, ICommentProvider2 cp, bool isFirstComment)
+        public CommentMessageMetadata2(IWhowatchMessage message, IWhowatchSiteOptions siteOptions, ICommentProvider cp, bool isFirstComment)
             : base(siteOptions, cp)
         {
             IsFirstComment = isFirstComment;

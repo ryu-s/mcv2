@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TestSitePlugin
 {
-    public class TestCommentProvider2 : ICommentProvider2
+    public class TestCommentProvider2 : ICommentProvider
     {
         #region CanConnect
         private bool _canConnect;

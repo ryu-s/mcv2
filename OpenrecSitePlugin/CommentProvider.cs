@@ -19,7 +19,7 @@ namespace OpenrecSitePlugin
     {
         public InvalidInputException() { }
     }
-    class CommentProvider2 : ICommentProvider2
+    class CommentProvider2 : ICommentProvider
     {
         string _liveId;
         Context _context;

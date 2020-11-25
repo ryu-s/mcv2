@@ -19,7 +19,7 @@ using System.Windows.Media;
 
 namespace YouTubeLiveSitePlugin.Test2
 {
-    class CommentProvider2 : ICommentProvider2
+    class CommentProvider2 : ICommentProvider
     {
         private bool _canConnect;
         public bool CanConnect
@@ -111,7 +111,7 @@ namespace YouTubeLiveSitePlugin.Test2
         protected virtual CookieContainer CreateCookieContainer(IBrowserProfile2? browserProfile)
         {
             var cc = new CookieContainer();//まずCookieContainerのインスタンスを作っておく。仮にCookieの取得で失敗しても/live_chatで"YSC"と"VISITOR_INFO1_LIVE"が取得できる。これらは/service_ajaxでメタデータを取得する際に必須。
-            if(browserProfile == null)
+            if (browserProfile == null)
             {
                 return cc;
             }
@@ -282,7 +282,7 @@ namespace YouTubeLiveSitePlugin.Test2
 
         protected virtual EachConnection2 CreateConnection(ILogger logger, CookieContainer cc, IYouTubeLibeServer server,
             IYouTubeLiveSiteOptions siteOptions, Dictionary<string, int> userCommentCountDict, SynchronizedCollection<string> receivedCommentIds,
-            ICommentProvider2 cp, SitePluginId siteContextGuid)
+            ICommentProvider cp, SitePluginId siteContextGuid)
         {
             return new EachConnection2(logger, cc, server, siteOptions, userCommentCountDict, receivedCommentIds, cp)
             {
@@ -304,7 +304,7 @@ namespace YouTubeLiveSitePlugin.Test2
             _disconnectedByUser = true;
         }
 
-        async Task ICommentProvider2.PostCommentAsync(string text)
+        async Task ICommentProvider.PostCommentAsync(string text)
         {
             var b = await PostCommentAsync(text);
         }

@@ -13,7 +13,7 @@ namespace BigoSitePlugin
 
         public override string DisplayName => "Bigo";
         public override SiteType SiteType => SiteType.Bigo;
-        public override ICommentProvider2 CreateCommentProvider()
+        public override ICommentProvider CreateCommentProvider()
         {
             //return new YouTubeCommentProvider(connectionName, _options, _siteOptions);
             return new CommentProvider(_server, _siteOptions, _logger)

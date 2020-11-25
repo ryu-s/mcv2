@@ -136,11 +136,11 @@ namespace mcv2.Model
         {
 
         }
-        Dictionary<ConnectionId, (SitePluginId, ICommentProvider2)> _dict = new Dictionary<ConnectionId, (SitePluginId, ICommentProvider2)>();
+        Dictionary<ConnectionId, (SitePluginId, ICommentProvider)> _dict = new Dictionary<ConnectionId, (SitePluginId, ICommentProvider)>();
 
         public IIo _io;
 
-        public ICommentProvider2 GetOrCreateCommentProvider(ConnectionId connectionId, SitePluginId sitePluginId)
+        public ICommentProvider GetOrCreateCommentProvider(ConnectionId connectionId, SitePluginId sitePluginId)
         {
             if (_dict.ContainsKey(connectionId))
             {
@@ -159,7 +159,7 @@ namespace mcv2.Model
             _dict.Add(connectionId, (sitePluginId, cp2));
             return cp2;
         }
-        public ICommentProvider2? GetCommentProvider(ConnectionId connectionId)
+        public ICommentProvider? GetCommentProvider(ConnectionId connectionId)
         {
             if (_dict.ContainsKey(connectionId))
             {
@@ -171,12 +171,12 @@ namespace mcv2.Model
                 return null;
             }
         }
-        private ICommentProvider2 CreateCommentProvider(SitePluginId sitePluginId)
+        private ICommentProvider CreateCommentProvider(SitePluginId sitePluginId)
         {
             var site = _siteDict[sitePluginId];
             return site.CreateCommentProvider();
         }
-        private Dictionary<ICommentProvider2, ConnectionId> _cpIdDict = new Dictionary<ICommentProvider2, ConnectionId>();
+        private Dictionary<ICommentProvider, ConnectionId> _cpIdDict = new Dictionary<ICommentProvider, ConnectionId>();
         public async Task ConnectAsync(ConnectionId connectionId, string input, SitePluginId sitePluginId, IBrowserProfile2? browserProfile)
         {
             var cp = GetOrCreateCommentProvider(connectionId, sitePluginId);
@@ -201,7 +201,7 @@ namespace mcv2.Model
 
         private void Cp_MetadataUpdated(object? sender, IMetadata e)
         {
-            var cp = sender as ICommentProvider2;
+            var cp = sender as ICommentProvider;
             if (cp == null) return;
             var connectionId = _cpIdDict[cp];
             var req = new RequestUpdateMetadata(connectionId, null, e);
@@ -210,7 +210,7 @@ namespace mcv2.Model
 
         private void Cp_MessageReceived(object? sender, IMessageContext2 e)
         {
-            var cp = sender as ICommentProvider2;
+            var cp = sender as ICommentProvider;
             if (cp == null) return;
             var connectionId = _cpIdDict[cp];
             var req = new RequestAddComment(connectionId, e.Message, e.Metadata);

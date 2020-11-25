@@ -218,7 +218,7 @@ namespace YouTubeLiveSitePluginTests
             var siteOptions = new YouTubeLiveSiteOptions();
             var loggerMock = new Mock<ILogger>();
             var broweserProfileMock = new Mock<IBrowserProfile2>();
-            var cpMock = new Mock<EachConnection2>(loggerMock.Object, new CookieContainer(), serverMock.Object, siteOptions, new Dictionary<string, int>(), new System.Collections.Generic.SynchronizedCollection<string>(), new Mock<ICommentProvider2>().Object);
+            var cpMock = new Mock<EachConnection2>(loggerMock.Object, new CookieContainer(), serverMock.Object, siteOptions, new Dictionary<string, int>(), new System.Collections.Generic.SynchronizedCollection<string>(), new Mock<ICommentProvider>().Object);
             //var cpMock = new Mock<EachConnection>(options.Object, serverMock.Object, siteOptions, loggerMock.Object, userStore.Object);
             cpMock.Protected().Setup<PostCommentContext>("PostCommentContext").Returns(new PostCommentContext() { Sej = "" });
             var cp = cpMock.Object;
@@ -236,7 +236,7 @@ namespace YouTubeLiveSitePluginTests
         }
         private Mock<EachConnection2> CreateConnection(ILogger logger, CookieContainer cc, IYouTubeLibeServer server,
             YouTubeLiveSiteOptions siteOptions, Dictionary<string, int> userCommentCountDict, SynchronizedCollection<string> receivedCommentIds,
-            ICommentProvider2 cp, SitePluginId siteContextGuid)
+            ICommentProvider cp, SitePluginId siteContextGuid)
         {
             var cpMock = new Mock<EachConnection2>(logger, cc, server, siteOptions, userCommentCountDict, receivedCommentIds, cp) { CallBase = true };
             cpMock.Object.SiteContextGuid = siteContextGuid;

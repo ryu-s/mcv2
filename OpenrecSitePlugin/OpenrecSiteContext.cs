@@ -15,7 +15,7 @@ namespace OpenrecSitePlugin
         public override string DisplayName => "OPENREC";
         public override SiteType SiteType => SiteType.Openrec;
 
-        public override ICommentProvider2 CreateCommentProvider()
+        public override ICommentProvider CreateCommentProvider()
         {
             return new CommentProvider2(_siteOptions, _logger)
             {
