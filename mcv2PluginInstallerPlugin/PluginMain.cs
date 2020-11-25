@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace mcv2PluginInstallerPlugin
 {
-    [Export(typeof(IPlugin2))]
-    public class PluginMain : IPlugin2
+    [Export(typeof(IMcvPluginV1))]
+    public class PluginMain : IMcvPluginV1
     {
         public PluginId Id { get; } = new PluginId();
         public IPluginHost Host { get; set; }

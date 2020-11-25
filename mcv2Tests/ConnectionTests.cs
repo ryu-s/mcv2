@@ -22,7 +22,7 @@ namespace mcv2Tests
             var userStoreMock = new Mock<mcv2.Model.IUserStore>();
             var model = new Model(pluginManager, sitePluginManager, userStoreMock.Object, loggerMock.Object, ioMock.Object, coreOptionsMock.Object);
 
-            var pluginMock = new Mock<IPlugin2>();
+            var pluginMock = new Mock<IMcvPluginV1>();
             pluginMock.Setup(x => x.Id).Returns(pluginId);
             pluginManager.AddPlugin(model, pluginMock.Object);
 
@@ -59,7 +59,7 @@ namespace mcv2Tests
             var userStoreMock = new Mock<mcv2.Model.IUserStore>();
             var model = new Model(pluginManager, sitePluginManager, userStoreMock.Object, loggerMock.Object, ioMock.Object, coreOptionsMock.Object);
 
-            var pluginMock = new Mock<IPlugin2>();
+            var pluginMock = new Mock<IMcvPluginV1>();
             pluginMock.Setup(x => x.Id).Returns(pluginId);
             pluginManager.AddPlugin(model, pluginMock.Object);
 
@@ -86,7 +86,7 @@ namespace mcv2Tests
             var userStoreMock = new Mock<mcv2.Model.IUserStore>();
             var model = new Model(pluginManager, sitePluginManager, userStoreMock.Object, loggerMock.Object, ioMock.Object, coreOptionsMock.Object);
 
-            var pluginMock = new Mock<IPlugin2>();
+            var pluginMock = new Mock<IMcvPluginV1>();
             pluginMock.Setup(x => x.Id).Returns(pluginId);
             pluginManager.AddPlugin(model, pluginMock.Object);
 

@@ -14,8 +14,8 @@ using System.Windows.Threading;
 
 namespace mcv2YoyakuPlugin
 {
-    [Export(typeof(IPlugin2))]
-    public class YoyakuPluginMain : IPlugin2
+    [Export(typeof(IMcvPluginV1))]
+    public class YoyakuPluginMain : IMcvPluginV1
     {
         public PluginId Id { get; } = new PluginId();
         public IPluginHost Host { get; set; }

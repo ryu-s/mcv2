@@ -50,8 +50,8 @@ namespace mcv2.MainViewPlugin
             Id = id;
         }
     }
-    [Export(typeof(IPlugin2))]
-    public class Plugin : IPlugin2, IModel, IUserHost, IConnectionModel
+    [Export(typeof(IMcvPluginV1))]
+    public class Plugin : IMcvPluginV1, IModel, IUserHost, IConnectionModel
     {
         MainViewModel _vm;
         public string Name => "MainView";

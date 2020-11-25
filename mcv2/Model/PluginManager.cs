@@ -20,11 +20,11 @@ namespace mcv2.Model
     }
     public class PluginManager
     {
-        public event EventHandler<IPlugin2> PluginAdded;
+        public event EventHandler<IMcvPluginV1> PluginAdded;
         //ここで発生した例外をCoreに通知する方法としてeventが一番疎結合を保てる気がする。
         public event EventHandler<PluginManagerExceptionEventArgs> ExceptionOccurred;
         //public event EventHandler<IPlugin> PluginRemoved;
-        readonly List<IPlugin2> _plugins = new List<IPlugin2>();
+        readonly List<IMcvPluginV1> _plugins = new List<IMcvPluginV1>();
         /// <summary>
         /// ディレクトリからプラグインを読み込む
         /// </summary>
@@ -40,8 +40,8 @@ namespace mcv2.Model
             }
             var pluginDirs = Directory.GetDirectories(dirPath);
             //var list = new List<DirectoryCatalog>();
-            var def = new ImportDefinition(d => d.ContractName == typeof(IPlugin2).FullName, "", ImportCardinality.ExactlyOne, false, false);
-            var plugins = new List<IPlugin2>();
+            var def = new ImportDefinition(d => d.ContractName == typeof(IMcvPluginV1).FullName, "", ImportCardinality.ExactlyOne, false, false);
+            var plugins = new List<IMcvPluginV1>();
             foreach (var pluginDir in pluginDirs)
             {
                 var files = Directory.GetFiles(pluginDir).Where(s => s.EndsWith("Plugin.dll"));//ファイル名がPlugin.dllで終わるアセンブリだけ探す
@@ -59,7 +59,7 @@ namespace mcv2.Model
                             continue;
                         }
                         var con = new CompositionContainer(catalog);
-                        var plugin = con.GetExport<IPlugin2>()?.Value;
+                        var plugin = con.GetExport<IMcvPluginV1>()?.Value;
                         if (plugin == null) continue;
                         AddPlugin(host, plugin);
                     }
@@ -90,12 +90,12 @@ namespace mcv2.Model
             };
         }
 
-        readonly Dictionary<PluginId, IPlugin2> _pluginDict = new Dictionary<PluginId, IPlugin2>();
+        readonly Dictionary<PluginId, IMcvPluginV1> _pluginDict = new Dictionary<PluginId, IMcvPluginV1>();
         /// <summary>
         /// プラグインのインスタンスを直接追加する
         /// </summary>
         /// <param name="plugin"></param>
-        public void AddPlugin(IPluginHost host, IPlugin2 plugin)
+        public void AddPlugin(IPluginHost host, IMcvPluginV1 plugin)
         {
             if (plugin.Id == null)
             {
@@ -142,7 +142,7 @@ namespace mcv2.Model
 
         }
 
-        private IPlugin2 GetPlugin(PluginId pluginId)
+        private IMcvPluginV1 GetPlugin(PluginId pluginId)
         {
             return _plugins.Find(p => p.Id == pluginId);
         }

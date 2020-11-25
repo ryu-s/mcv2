@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 namespace mcv2TestPlugin
 {
 
-    [Export(typeof(IPlugin2))]
-    public class TestPluginMain : IPlugin2, IPluginMain
+    [Export(typeof(IMcvPluginV1))]
+    public class TestPluginMain : IMcvPluginV1, IPluginMain
     {
         public PluginId Id { get; } = new PluginId();
         public IPluginHost Host { get; set; }

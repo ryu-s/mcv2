@@ -40,8 +40,8 @@ namespace CommentGeneratorPlugin
         public string SiteName { get; internal set; }
         public string Nickname { get; internal set; }
     }
-    [Export(typeof(IPlugin2))]
-    public class PluginMain : IPlugin2, IDisposable
+    [Export(typeof(IMcvPluginV1))]
+    public class PluginMain : IMcvPluginV1, IDisposable
     {
         private System.Timers.Timer _writeTimer;
         private System.Timers.Timer _deleteTimer;
@@ -55,7 +55,7 @@ namespace CommentGeneratorPlugin
         public IPluginHost Host { get; set; }
         public string Name { get; } = "コメジェネ連携";
         private static readonly object _lockObj = new object();
-        void IPlugin2.OnClosing()
+        void IMcvPluginV1.OnClosing()
         {
             _settingsView?.ForceClose();
             _writeTimer?.Stop();
@@ -213,7 +213,7 @@ namespace CommentGeneratorPlugin
         {
             Options.Deserialize(s);
         }
-        void IPlugin2.OnLoaded()
+        void IMcvPluginV1.OnLoaded()
         {
             SetOptions(Host.LoadOptions(Id, GetSettingsFilePath()));
 
@@ -232,7 +232,7 @@ namespace CommentGeneratorPlugin
             _deleteTimer.Start();
         }
 
-        void IPlugin2.SetNotify(INotify notify)
+        void IMcvPluginV1.SetNotify(INotify notify)
         {
             switch (notify)
             {
@@ -322,7 +322,7 @@ namespace CommentGeneratorPlugin
             return ret;
         }
 
-        void IPlugin2.SetResponse(IResponse res)
+        void IMcvPluginV1.SetResponse(IResponse res)
         {
             switch (res)
             {
@@ -331,7 +331,7 @@ namespace CommentGeneratorPlugin
             }
         }
         SettingsView _settingsView;
-        void IPlugin2.ShowSettingView()
+        void IMcvPluginV1.ShowSettingView()
         {
             if (_settingsView == null)
             {

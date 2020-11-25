@@ -724,7 +724,7 @@ namespace mcv2.Model
             _pluginManager.SetNotify(new NotifyUserAdded(e.SiteGuid, e.UserId));
         }
 
-        private void PluginManager_PluginAdded(object? sender, IPlugin2 e)
+        private void PluginManager_PluginAdded(object? sender, IMcvPluginV1 e)
         {
             var plugin = e;
             Debug.WriteLine($"Model::PluginManager_PluginAdded() Name:{plugin.Name} Id:{plugin.Id}");

@@ -127,8 +127,8 @@ namespace mcv2BouyomiPlugin
             return 0;
         }
     }
-    [Export(typeof(IPlugin2))]
-    public class PluginMain : IPlugin2
+    [Export(typeof(IMcvPluginV1))]
+    public class PluginMain : IMcvPluginV1
     {
         public PluginId Id { get; } = new PluginId();
         public string Name { get; } = "棒読みちゃん連携";

@@ -2,7 +2,7 @@
 
 namespace mcv2
 {
-    public interface IPlugin2
+    public interface IMcvPluginV1
     {
         PluginId Id { get; }
         IPluginHost Host { get; set; }
