@@ -1,7 +1,7 @@
 ﻿using SitePlugin;
 using System.Collections.Generic;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     public class Metadata : IMetadata
     {

@@ -38,7 +38,7 @@ namespace YouTubeLiveSitePlugin
         public DateTime PostedAt { get; set; }
         public IMessageImage UserIcon { get; set; }
         public string PurchaseAmount { get; }
-        public YouTubeLiveSuperchat(Test2.CommentData commentData) : base(commentData.Raw)
+        public YouTubeLiveSuperchat(CommentData commentData) : base(commentData.Raw)
         {
             UserId = commentData.UserId;
             Id = commentData.Id;
@@ -63,7 +63,7 @@ namespace YouTubeLiveSitePlugin
         public IMessageImage UserIcon { get; set; }
         public string Info { get; set; }
         public UserType UserType { get; }
-        public YouTubeLiveComment(Test2.CommentData commentData) : base(commentData.Raw)
+        public YouTubeLiveComment(CommentData commentData) : base(commentData.Raw)
         {
             UserId = commentData.UserId;
             Id = commentData.Id;

@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using SitePlugin;
 using System.Collections.Generic;
-using YouTubeLiveSitePlugin.Test2;
+using YouTubeLiveSitePlugin;
 
 namespace YouTubeLiveSitePluginTests
 {
@@ -14,7 +14,7 @@ namespace YouTubeLiveSitePluginTests
         {
             var data = Tools.GetSampleData("AddChatItemAction_authorBadge.txt");
             dynamic d = JsonConvert.DeserializeObject(data);
-            CommentData commentData = YouTubeLiveSitePlugin.Test2.Parser.ParseLiveChatTextMessageRenderer(d.addChatItemAction.item.liveChatTextMessageRenderer.ToString());
+            CommentData commentData = YouTubeLiveSitePlugin.Parser.ParseLiveChatTextMessageRenderer(d.addChatItemAction.item.liveChatTextMessageRenderer.ToString());
             Assert.AreEqual("UC0jl5mtntIH8O0ajZ0_V-tw", commentData.UserId);
             Assert.IsFalse(commentData.IsPaidMessage);
             Assert.AreEqual(new List<IMessagePart>
@@ -34,7 +34,7 @@ namespace YouTubeLiveSitePluginTests
         {
             var data = Tools.GetSampleData("AddChatItemAction_authorBadge_moderator.txt");
             dynamic d = JsonConvert.DeserializeObject(data);
-            CommentData commentData = YouTubeLiveSitePlugin.Test2.Parser.ParseLiveChatTextMessageRenderer(d.addChatItemAction.item.liveChatTextMessageRenderer.ToString());
+            CommentData commentData = YouTubeLiveSitePlugin.Parser.ParseLiveChatTextMessageRenderer(d.addChatItemAction.item.liveChatTextMessageRenderer.ToString());
             Assert.AreEqual("UCTBOZy7Q97gvK_TeaqkFQjQ", commentData.UserId);
             Assert.IsFalse(commentData.IsPaidMessage);
             Assert.AreEqual(new List<IMessagePart>
@@ -53,7 +53,7 @@ namespace YouTubeLiveSitePluginTests
         {
             var data = Tools.GetSampleData("AddChatAction_liveChatPaidMessageRenderer.txt");
             dynamic d = JsonConvert.DeserializeObject(data);
-            CommentData commentData = YouTubeLiveSitePlugin.Test2.Parser.ParseLiveChatPaidMessageRenderer(d.addChatItemAction.item.liveChatPaidMessageRenderer.ToString());
+            CommentData commentData = YouTubeLiveSitePlugin.Parser.ParseLiveChatPaidMessageRenderer(d.addChatItemAction.item.liveChatPaidMessageRenderer.ToString());
             Assert.AreEqual("UCWzefMLeuAhrCyhqYsFLl5Q", commentData.UserId);
             Assert.IsTrue(commentData.IsPaidMessage);
             Assert.AreEqual("￥1,200", commentData.PurchaseAmount);

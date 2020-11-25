@@ -1,7 +1,7 @@
 ﻿using SitePlugin;
 using System.Threading.Tasks;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     internal class YouTubeLiveMessageMethods : IMessageMethods
     {

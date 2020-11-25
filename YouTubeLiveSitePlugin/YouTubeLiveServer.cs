@@ -7,14 +7,14 @@ using System;
 using System.Net.Http.Headers;
 using SitePluginCommon;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     public class YouTubeLiveServerResponse
     {
         public HttpStatusCode StatusCode { get; set; }
         public string Content { get; set; }
     }
-    public class YouTubeLiveServer : ServerBase, IYouTubeLibeServer
+    public class YouTubeLiveServer : ServerBase, IYouTubeLiveServer
     {
         public async Task<string> GetAsync(HttpOptions options)
         {

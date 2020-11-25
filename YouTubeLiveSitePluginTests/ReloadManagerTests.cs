@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using YouTubeLiveSitePlugin.Test2;
+using YouTubeLiveSitePlugin;
 
 namespace YouTubeLiveSitePluginTests
 {

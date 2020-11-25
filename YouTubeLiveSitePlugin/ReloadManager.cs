@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     /// <summary>
     /// リロードの日時や回数を記録、管理

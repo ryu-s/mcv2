@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     [Serializable]
     internal class InvalidInputException : Exception

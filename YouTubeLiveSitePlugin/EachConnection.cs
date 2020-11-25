@@ -11,7 +11,7 @@ using System.Net.Http;
 using System.Diagnostics;
 using Newtonsoft.Json;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     /// <summary>
     /// 接続が切れた理由
@@ -48,11 +48,11 @@ namespace YouTubeLiveSitePlugin.Test2
         ServerError,
         InvalidInput,
     }
-    class EachConnection2
+    class EachConnection
     {
         private readonly ILogger _logger;
         private readonly CookieContainer _cc;
-        private readonly IYouTubeLibeServer _server;
+        private readonly IYouTubeLiveServer _server;
         private readonly IYouTubeLiveSiteOptions _siteOptions;
         private readonly Dictionary<string, int> _userCommentCountDict;
         private readonly SynchronizedCollection<string> _receivedCommentIds;
@@ -601,7 +601,7 @@ namespace YouTubeLiveSitePlugin.Test2
             };
             return metadata;
         }
-        public EachConnection2(ILogger logger, CookieContainer cc, IYouTubeLibeServer server,
+        public EachConnection(ILogger logger, CookieContainer cc, IYouTubeLiveServer server,
             IYouTubeLiveSiteOptions siteOptions, Dictionary<string, int> userCommentCountDict, SynchronizedCollection<string> receivedCommentIds,
             ICommentProvider cp)
         {

@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.Text;
 using YouTubeLiveIF;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     class LiveChatContext
     {

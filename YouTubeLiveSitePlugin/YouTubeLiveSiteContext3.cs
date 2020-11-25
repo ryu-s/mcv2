@@ -4,14 +4,13 @@ using SitePlugin;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using YouTubeLiveSitePlugin.Test2;
 
 namespace YouTubeLiveSitePlugin
 {
     public class YouTubeLiveSitePlugin : ISitePlugin
     {
-        Dictionary<ConnectionId, CommentProvider2> _dict = new Dictionary<ConnectionId, CommentProvider2>();
-        private readonly IYouTubeLibeServer _server;
+        Dictionary<ConnectionId, CommentProvider> _dict = new Dictionary<ConnectionId, CommentProvider>();
+        private readonly IYouTubeLiveServer _server;
         private readonly ILogger _logger;
 
         public async void Connect(ConnectionId connectionId, string input, IBrowserProfile2 browser)
@@ -30,11 +29,11 @@ namespace YouTubeLiveSitePlugin
                 //disconnectedの通知
             }
         }
-        private CommentProvider2 GetOrCreateCommentProvider(ConnectionId connectionId)
+        private CommentProvider GetOrCreateCommentProvider(ConnectionId connectionId)
         {
             if (!_dict.TryGetValue(connectionId, out var cp))
             {
-                cp = new CommentProvider2(_server, Convert(_siteOptions), _logger);
+                cp = new CommentProvider(_server, Convert(_siteOptions), _logger);
             }
             return cp;
         }
@@ -64,7 +63,7 @@ namespace YouTubeLiveSitePlugin
                 _siteOptions.Set(ytOptions);
             }
         }
-        public YouTubeLiveSitePlugin(IYouTubeLibeServer server, ILogger logger)
+        public YouTubeLiveSitePlugin(IYouTubeLiveServer server, ILogger logger)
         {
             _server = server;
             _logger = logger;

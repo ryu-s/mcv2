@@ -12,14 +12,14 @@ using System.Diagnostics;
 using System.Net.Http;
 using YouTubeLiveIF;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     class ChatProvider
     {
         public event EventHandler<List<CommentData>> ActionsReceived;
         public event EventHandler<InfoData> InfoReceived;
         CancellationTokenSource _cts;
-        private readonly IYouTubeLibeServer _server;
+        private readonly IYouTubeLiveServer _server;
         private readonly ILogger _logger;
         public int IntervalAfterWebException { get; set; } = 5000;
         private void SendInfo(string message, InfoType type)
@@ -113,7 +113,7 @@ namespace YouTubeLiveSitePlugin.Test2
                 }
             }
         }
-        public ChatProvider(IYouTubeLibeServer server, ILogger logger)
+        public ChatProvider(IYouTubeLiveServer server, ILogger logger)
         {
             _server = server;
             _logger = logger;

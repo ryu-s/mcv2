@@ -9,7 +9,7 @@ namespace YouTubeLiveSitePluginTests
         [Test]
         public void Test()
         {
-            var server = new YouTubeLiveSitePlugin.Test2.YouTubeLiveServer();
+            var server = new YouTubeLiveSitePlugin.YouTubeLiveServer();
             Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
                 await server.GetAsync("https://int-main.net/api/404");

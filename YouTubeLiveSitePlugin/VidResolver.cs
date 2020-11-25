@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Diagnostics;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     interface IVidResult
     {
@@ -107,7 +107,7 @@ namespace YouTubeLiveSitePlugin.Test2
             vid = match.Groups[1].Value;
             return true;
         }
-        internal async Task<string> GetChannelIdFromUserId(IYouTubeLibeServer server, string userId)
+        internal async Task<string> GetChannelIdFromUserId(IYouTubeLiveServer server, string userId)
         {
             var url = "https://www.youtube.com/user/" + userId;
             var html = await server.GetAsync(url);
@@ -135,7 +135,7 @@ namespace YouTubeLiveSitePlugin.Test2
             vid = null;
             return false;
         }
-        internal async Task<(string channelId, string reason)> TryGetChannelIdFromCustomChannel(IYouTubeLibeServer server, string input)
+        internal async Task<(string channelId, string reason)> TryGetChannelIdFromCustomChannel(IYouTubeLiveServer server, string input)
         {
             var match1 = _regexCustomChannel.Match(input);
             if (match1.Success)
@@ -161,7 +161,7 @@ namespace YouTubeLiveSitePlugin.Test2
             var match = _regexUser.Match(input);
             return match.Groups[1].Value;
         }
-        public async Task<IVidResult> GetVid(IYouTubeLibeServer server, string input)
+        public async Task<IVidResult> GetVid(IYouTubeLiveServer server, string input)
         {
             if (string.IsNullOrEmpty(input)) throw new ArgumentNullException(nameof(input));
             if (TryVid(input, out string vid))
@@ -195,7 +195,7 @@ namespace YouTubeLiveSitePlugin.Test2
             throw new ParseException(input);
         }
 
-        internal async Task<IVidResult> GetResultFromChannelId(IYouTubeLibeServer server, string channelId)
+        internal async Task<IVidResult> GetResultFromChannelId(IYouTubeLiveServer server, string channelId)
         {
             if (string.IsNullOrEmpty(channelId))
                 throw new ArgumentNullException(nameof(channelId));
@@ -214,7 +214,7 @@ namespace YouTubeLiveSitePlugin.Test2
                 return new MultiVidsResult { Vids = vids };
             }
         }
-        internal async Task<List<string>> GetVidsFromChannelId2(IYouTubeLibeServer server, string channelId)
+        internal async Task<List<string>> GetVidsFromChannelId2(IYouTubeLiveServer server, string channelId)
         {
             var url = $"https://www.youtube.com/channel/{channelId}/live";
             var html = await server.GetEnAsync(url);
@@ -256,7 +256,7 @@ namespace YouTubeLiveSitePlugin.Test2
         /// <exception cref="YtInitialDataNotFoundException"></exception>
         /// <exception cref="SpecChangedException"></exception>
         [Obsolete("2019/07/18放送開始から５分程度経過しないとvidを取得できなくなっている")]
-        internal async Task<List<string>> GetVidsFromChannelId(IYouTubeLibeServer server, string channelId)
+        internal async Task<List<string>> GetVidsFromChannelId(IYouTubeLiveServer server, string channelId)
         {
             var url = $"https://www.youtube.com/channel/{channelId}/videos?flow=list&view=0";
             var html = await server.GetEnAsync(url);

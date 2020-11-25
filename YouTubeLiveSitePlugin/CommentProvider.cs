@@ -17,9 +17,9 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
-    class CommentProvider2 : ICommentProvider
+    class CommentProvider : ICommentProvider
     {
         private bool _canConnect;
         public bool CanConnect
@@ -129,7 +129,7 @@ namespace YouTubeLiveSitePlugin.Test2
             }
             return cc;
         }
-        EachConnection2 _connection;
+        EachConnection _connection;
         public async Task ConnectAsync(string input, IBrowserProfile2 browserProfile)
         {
             if (string.IsNullOrEmpty(input))
@@ -270,7 +270,7 @@ namespace YouTubeLiveSitePlugin.Test2
             AfterConnect();
         }
 
-        protected virtual Task<DisconnectReason> ReceiveConnectionAsync(EachConnection2 connection, BrowserType browserType, string vid)
+        protected virtual Task<DisconnectReason> ReceiveConnectionAsync(EachConnection connection, BrowserType browserType, string vid)
         {
             return connection.ReceiveAsync(vid, browserType);
         }
@@ -280,11 +280,11 @@ namespace YouTubeLiveSitePlugin.Test2
             return new Dictionary<string, int>();
         }
 
-        protected virtual EachConnection2 CreateConnection(ILogger logger, CookieContainer cc, IYouTubeLibeServer server,
+        protected virtual EachConnection CreateConnection(ILogger logger, CookieContainer cc, IYouTubeLiveServer server,
             IYouTubeLiveSiteOptions siteOptions, Dictionary<string, int> userCommentCountDict, SynchronizedCollection<string> receivedCommentIds,
             ICommentProvider cp, SitePluginId siteContextGuid)
         {
-            return new EachConnection2(logger, cc, server, siteOptions, userCommentCountDict, receivedCommentIds, cp)
+            return new EachConnection(logger, cc, server, siteOptions, userCommentCountDict, receivedCommentIds, cp)
             {
                 SiteContextGuid = siteContextGuid,
             };
@@ -342,8 +342,8 @@ namespace YouTubeLiveSitePlugin.Test2
         }
 
         public SitePluginId SiteContextGuid { get; set; }
-        IYouTubeLibeServer _server;
-        public CommentProvider2(IYouTubeLibeServer server, IYouTubeLiveSiteOptions siteOptions, ILogger logger)
+        IYouTubeLiveServer _server;
+        public CommentProvider(IYouTubeLiveServer server, IYouTubeLiveSiteOptions siteOptions, ILogger logger)
         {
             _siteOptions = siteOptions;
             _logger = logger;

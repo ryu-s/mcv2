@@ -7,7 +7,7 @@ using Common;
 using System.Threading;
 using System.Diagnostics;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     abstract class IMetadataProvider
     {

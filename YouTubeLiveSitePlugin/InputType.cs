@@ -1,0 +1,7 @@
+﻿namespace YouTubeLiveSitePlugin
+{
+    enum InputType
+    {
+
+    }
+}

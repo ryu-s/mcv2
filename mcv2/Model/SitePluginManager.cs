@@ -94,7 +94,7 @@ namespace mcv2.Model
 
         public void Load()
         {
-            AddSite(new YouTubeLiveSitePlugin.Test2.YouTubeLiveSiteContext2(new YouTubeLiveSitePlugin.Test2.YouTubeLiveServer(), _logger));
+            AddSite(new YouTubeLiveSitePlugin.YouTubeLiveSiteContext(new YouTubeLiveSitePlugin.YouTubeLiveServer(), _logger));
             AddSite(new TwitchSitePlugin.TwitchSiteContext2(new TwitchSitePlugin.TwitchServer(), _logger));
             AddSite(new WhowatchSitePlugin.WhowatchSiteContext2(_logger));
             AddSite(new TwicasSitePlugin.TwicasSiteContext2(_logger));

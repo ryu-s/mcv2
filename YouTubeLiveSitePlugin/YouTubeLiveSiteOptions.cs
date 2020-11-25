@@ -4,7 +4,7 @@ using System.Windows.Media;
 using System.Windows;
 using System.Linq;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     interface IYouTubeLiveSiteOptions
     {

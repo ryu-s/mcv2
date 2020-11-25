@@ -7,7 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using YouTubeLiveSitePlugin.Test2;
+using YouTubeLiveSitePlugin;
 namespace YouTubeLiveSitePluginTests
 {
     [TestFixture]
@@ -17,7 +17,7 @@ namespace YouTubeLiveSitePluginTests
         public async Task 短縮URLに対応()
         {
             var s = new VidResolver();
-            var serverMock = new Mock<IYouTubeLibeServer>();
+            var serverMock = new Mock<IYouTubeLiveServer>();
             var result1 = await s.GetVid(serverMock.Object, "https://youtu.be/bexmlC2nD0U");
             Assert.IsTrue(result1 is IVidResult);
             Assert.AreEqual("bexmlC2nD0U", ((VidResult)result1).Vid);
@@ -26,7 +26,7 @@ namespace YouTubeLiveSitePluginTests
         public async Task ResolveVidFromWatchUrl()
         {
             var s = new VidResolver();
-            var serverMock = new Mock<IYouTubeLibeServer>();
+            var serverMock = new Mock<IYouTubeLiveServer>();
             var result1 = await s.GetVid(serverMock.Object, "https://www.youtube.com/watch?v=Rs-WxTGgVus");
             Assert.IsTrue(result1 is IVidResult);
             Assert.AreEqual("Rs-WxTGgVus", ((VidResult)result1).Vid);
@@ -40,7 +40,7 @@ namespace YouTubeLiveSitePluginTests
         {
             var sample = Tools.GetSampleData("Channel_live.txt");
             var s = new VidResolver();
-            var serverMock = new Mock<IYouTubeLibeServer>();
+            var serverMock = new Mock<IYouTubeLiveServer>();
             serverMock.Setup(k => k.GetEnAsync(It.IsAny<string>())).Returns(Task.FromResult(sample));
             var result1 = await s.GetVid(serverMock.Object, "https://www.youtube.com/channel/UCkDuaqQxw3k7Aa816kngUYg") as VidResult;
             Assert.IsTrue(result1 is VidResult);
@@ -60,7 +60,7 @@ namespace YouTubeLiveSitePluginTests
         public async Task GetVidsFromChannelId_CC_label_Test()
         {
             var html = Tools.GetSampleData("Channel_some_archives_with_cc_label.txt");
-            var server = new Mock<IYouTubeLibeServer>();
+            var server = new Mock<IYouTubeLiveServer>();
             var channelId = "UCBL9Blq9GDhPGAQbfUJIYXQ";
             server.Setup(s => s.GetEnAsync("https://www.youtube.com/channel/" + channelId + "/videos?flow=list&view=0")).Returns(Task.FromResult(html));
             var resolver = new VidResolver();
@@ -71,7 +71,7 @@ namespace YouTubeLiveSitePluginTests
         public async Task GetVidsFromChannelId_on_air_Test()
         {
             var html = Tools.GetSampleData("Channel_on_air.txt");
-            var server = new Mock<IYouTubeLibeServer>();
+            var server = new Mock<IYouTubeLiveServer>();
             var channelId = "UCBL9Blq9GDhPGAQbfUJIYXQ";
             server.Setup(s => s.GetEnAsync("https://www.youtube.com/channel/" + channelId + "/videos?flow=list&view=0")).Returns(Task.FromResult(html));
             var resolver = new VidResolver();
@@ -83,7 +83,7 @@ namespace YouTubeLiveSitePluginTests
         public async Task GetVidsFromChannelId_Three_on_air_Test()
         {
             var html = Tools.GetSampleData("Channel_Three_on_air.txt");
-            var server = new Mock<IYouTubeLibeServer>();
+            var server = new Mock<IYouTubeLiveServer>();
             var channelId = "UCBL9Blq9GDhPGAQbfUJIYXQ";
             server.Setup(s => s.GetEnAsync("https://www.youtube.com/channel/" + channelId + "/videos?flow=list&view=0")).Returns(Task.FromResult(html));
             var resolver = new VidResolver();

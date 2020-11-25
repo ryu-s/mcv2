@@ -5,9 +5,9 @@ using System.Diagnostics;
 using System.Windows.Controls;
 using SitePluginCommon;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
-    public class YouTubeLiveSiteContext2 : SiteContextBase, IYouTubeSiteContext2
+    public class YouTubeLiveSiteContext : SiteContextBase, IYouTubeSiteContext
     {
         public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("F1631B64-6572-4530-ABAF-21707F15D893"));
 
@@ -16,7 +16,7 @@ namespace YouTubeLiveSitePlugin.Test2
         public override ICommentProvider CreateCommentProvider()
         {
             //return new YouTubeCommentProvider(connectionName, _options, _siteOptions);
-            return new Test2.CommentProvider2(_server, _siteOptions, _logger)
+            return new CommentProvider(_server, _siteOptions, _logger)
             {
                 SiteContextGuid = Guid,
             };
@@ -58,10 +58,10 @@ namespace YouTubeLiveSitePlugin.Test2
             return resolver.IsValidInput(input);
         }
 
-        private readonly IYouTubeLibeServer _server;
+        private readonly IYouTubeLiveServer _server;
         private readonly ILogger _logger;
-        private Test2.YouTubeLiveSiteOptions _siteOptions;
-        public YouTubeLiveSiteContext2(IYouTubeLibeServer server, ILogger logger)
+        private YouTubeLiveSiteOptions _siteOptions;
+        public YouTubeLiveSiteContext(IYouTubeLiveServer server, ILogger logger)
             : base(logger)
         {
             _server = server;

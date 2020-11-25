@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using SitePlugin;
 namespace YouTubeLiveSitePlugin
 {
-    public interface IYouTubeSiteContext2 : ISiteContext
+    public interface IYouTubeSiteContext : ISiteContext
     {
 
     }

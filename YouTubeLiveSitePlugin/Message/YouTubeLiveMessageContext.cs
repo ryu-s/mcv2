@@ -31,7 +31,7 @@ namespace YouTubeLiveSitePlugin
         }
     }
 }
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     internal class YouTubeLiveMessageContext2 : IMessageContext2
     {

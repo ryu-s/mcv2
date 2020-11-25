@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Net.Http;
 using SitePluginCommon;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
-    public interface IYouTubeLibeServer
+    public interface IYouTubeLiveServer
     {
         Task<string> GetAsync(string url);
         Task<string> GetAsync(string url, CookieContainer cc);

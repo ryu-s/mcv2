@@ -4,7 +4,7 @@ using System.Windows;
 using System;
 using System.Collections.Generic;
 
-namespace YouTubeLiveSitePlugin.Test2
+namespace YouTubeLiveSitePlugin
 {
     internal class YouTubeLiveMessageMetadata2 : IMessageMetadata2
     {
