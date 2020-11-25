@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 namespace SitePlugin
 {
-    public interface IIo
+    public interface IIo//Commonに移したい
     {
         string ReadFile(string path);
         Task<string> ReadFileAsync(string path);

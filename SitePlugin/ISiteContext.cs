@@ -53,7 +53,7 @@ namespace SitePlugin
         void Connect(ConnectionId connectionId, string input, IBrowserProfile2 browser);
         void Disconnect(ConnectionId connectionId);
     }
-    public interface ISiteContext2
+    public interface ISiteContext
     {
         /// <summary>
         /// 

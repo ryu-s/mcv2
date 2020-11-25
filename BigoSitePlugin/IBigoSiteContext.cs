@@ -3,7 +3,7 @@ using System;
 
 namespace BigoSitePlugin
 {
-    public interface IBigoSiteContext : ISiteContext2
+    public interface IBigoSiteContext : ISiteContext
     {
 
     }

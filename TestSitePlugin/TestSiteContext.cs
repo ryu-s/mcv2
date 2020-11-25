@@ -7,7 +7,7 @@ using System.Text;
 
 namespace TestSitePlugin
 {
-    public class TestSiteContext2 : ISiteContext2
+    public class TestSiteContext2 : ISiteContext
     {
         public SitePluginId Guid { get; } = new SitePluginId(new System.Guid("609B4057-A5CE-49BA-A30F-211C4DFE838E"));
         public string DisplayName => "Test";

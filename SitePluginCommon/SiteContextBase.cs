@@ -5,7 +5,7 @@ using System.Windows.Controls;
 
 namespace SitePluginCommon
 {
-    public abstract class SiteContextBase2 : ISiteContext2
+    public abstract class SiteContextBase2 : ISiteContext
     {
         private readonly ILogger _logger;
 

@@ -36,7 +36,7 @@ namespace mcv2.Model
     }
     class SitePluginAdaptor : ISitePlugin
     {
-        private readonly ISiteContext2 _siteContext;
+        private readonly ISiteContext _siteContext;
 
         public void Connect(ConnectionId connectionId, string input, IBrowserProfile2 browser)
         {
@@ -62,7 +62,7 @@ namespace mcv2.Model
         {
             throw new NotImplementedException();
         }
-        public SitePluginAdaptor(ISiteContext2 siteContext)
+        public SitePluginAdaptor(ISiteContext siteContext)
         {
             _siteContext = siteContext;
         }
@@ -110,8 +110,8 @@ namespace mcv2.Model
             AddSite(new TestSitePlugin.TestSiteContext2(_logger));
 #endif
         }
-        Dictionary<SitePluginId, ISiteContext2> _siteDict = new Dictionary<SitePluginId, ISiteContext2>();
-        private void AddSite(ISiteContext2 siteContext)
+        Dictionary<SitePluginId, ISiteContext> _siteDict = new Dictionary<SitePluginId, ISiteContext>();
+        private void AddSite(ISiteContext siteContext)
         {
             //サイトプラグインをどうやって読み込もうか。
             //現在のファイル形式だとSiteContextでないと型が分からない
