@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace PeriscopeSitePlugin
 {
-    public class PeriscopeSiteContext2 : SiteContextBase2
+    public class PeriscopeSiteContext2 : SiteContextBase
     {
         public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("FB468FFA-D0E5-4423-968C-5B9E1D258730"));
         public override string DisplayName => "Periscope";

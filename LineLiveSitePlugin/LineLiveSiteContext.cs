@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace LineLiveSitePlugin
 {
-    public class LineLiveSiteContext : SiteContextBase2
+    public class LineLiveSiteContext : SiteContextBase
     {
         public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("36F139CA-EAB9-45B1-8CDC-AD47A4051BD3"));
         public override string DisplayName => "LINELIVE";

@@ -7,7 +7,7 @@ using SitePluginCommon;
 
 namespace BigoSitePlugin
 {
-    public class BigoSiteContext : SiteContextBase2, IBigoSiteContext
+    public class BigoSiteContext : SiteContextBase, IBigoSiteContext
     {
         public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("F2A72B82-324D-4792-858A-338AE7B34D7F"));
 

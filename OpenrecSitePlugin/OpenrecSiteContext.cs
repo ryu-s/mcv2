@@ -9,7 +9,7 @@ using SitePluginCommon;
 
 namespace OpenrecSitePlugin
 {
-    public class OpenrecSiteContext2 : SiteContextBase2
+    public class OpenrecSiteContext2 : SiteContextBase
     {
         public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("F4434012-3E68-4DD9-B2A8-F2BD7D601723"));
         public override string DisplayName => "OPENREC";

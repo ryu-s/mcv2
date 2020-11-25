@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Controls;
 namespace NicoSitePlugin
 {
-    public class NicoSiteContext2 : SiteContextBase2, INicoSiteContext2
+    public class NicoSiteContext2 : SiteContextBase, INicoSiteContext2
     {
         public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("5A477452-FF28-4977-9064-3A4BC7C63252"));
         public override string DisplayName => "ニコ生";

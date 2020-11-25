@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace WhowatchSitePlugin
 {
-    public class WhowatchSiteContext2 : SiteContextBase2
+    public class WhowatchSiteContext2 : SiteContextBase
     {
         private IWhowatchSiteOptions _siteOptions;
         private readonly IDataServer _server;

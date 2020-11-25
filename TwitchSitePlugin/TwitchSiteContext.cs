@@ -11,7 +11,7 @@ using SitePluginCommon;
 
 namespace TwitchSitePlugin
 {
-    public class TwitchSiteContext2 : SiteContextBase2
+    public class TwitchSiteContext2 : SiteContextBase
     {
         public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("22F7824A-EA1B-411E-85CA-6C9E6BE94E39"));
         public override string DisplayName => "Twitch";

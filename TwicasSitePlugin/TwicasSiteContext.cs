@@ -9,7 +9,7 @@ using SitePluginCommon;
 
 namespace TwicasSitePlugin
 {
-    public class TwicasSiteContext2 : SiteContextBase2
+    public class TwicasSiteContext2 : SiteContextBase
     {
         public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("8649A30C-D9C8-4ADB-862D-E0DAAEA24CE2"));
         public override string DisplayName => "Twicas";

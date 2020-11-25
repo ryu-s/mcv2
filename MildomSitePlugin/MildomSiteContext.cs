@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace MildomSitePlugin
 {
-    public class MildomSiteContext2 : SiteContextBase2
+    public class MildomSiteContext2 : SiteContextBase
     {
         public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("DBBA654F-0A5D-41CC-8153-5DB2D5869BCF"));
         public override string DisplayName => "Mildom";

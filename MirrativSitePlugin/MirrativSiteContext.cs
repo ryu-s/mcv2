@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace MirrativSitePlugin
 {
-    public class MirrativSiteContext2 : SiteContextBase2
+    public class MirrativSiteContext2 : SiteContextBase
     {
         public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("6DAFA768-280D-4E70-8494-FD5F31812EF5"));
         public override string DisplayName => "Mirrativ";

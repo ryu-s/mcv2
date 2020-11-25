@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace ShowRoomSitePlugin
 {
-    public class ShowRoomSiteContext2 : SiteContextBase2
+    public class ShowRoomSiteContext2 : SiteContextBase
     {
         public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("C64FBE36-029E-483D-AA56-F1906C42B43B"));
         public override string DisplayName => "SHOWROOM";

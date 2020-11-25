@@ -7,7 +7,7 @@ using SitePluginCommon;
 
 namespace YouTubeLiveSitePlugin.Test2
 {
-    public class YouTubeLiveSiteContext2 : SiteContextBase2, IYouTubeSiteContext2
+    public class YouTubeLiveSiteContext2 : SiteContextBase, IYouTubeSiteContext2
     {
         public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("F1631B64-6572-4530-ABAF-21707F15D893"));
 

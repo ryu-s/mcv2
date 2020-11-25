@@ -5,7 +5,7 @@ using System.Windows.Controls;
 
 namespace SitePluginCommon
 {
-    public abstract class SiteContextBase2 : ISiteContext
+    public abstract class SiteContextBase : ISiteContext
     {
         private readonly ILogger _logger;
 
@@ -27,7 +27,7 @@ namespace SitePluginCommon
         }
 
         public abstract void SaveOptions(string path, IIo io);
-        public SiteContextBase2(ILogger logger)
+        public SiteContextBase(ILogger logger)
         {
             _logger = logger;
         }
