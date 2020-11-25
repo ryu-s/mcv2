@@ -10,6 +10,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BrowserCookieInterfaces\BrowserCookieInterfaces.csproj" />
+    <ProjectReference Include="..\mcv2Plugin\mcv2Plugin.csproj" />
   </ItemGroup>
 </Project>

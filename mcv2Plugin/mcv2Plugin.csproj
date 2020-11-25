@@ -8,6 +8,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SitePlugin\SitePlugin.csproj" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BrowserCookieInterfaces\BrowserCookieInterfaces.csproj" />
   </ItemGroup>
 </Project>
