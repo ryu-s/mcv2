@@ -31,9 +31,9 @@ namespace NicoSitePlugin
             });
             MessageReceived?.Invoke(this, context);
         }
-        public async Task<NicoMessageContext2> CreateMessageContextAsync(IChat chat, string roomName, bool isInitialComment)
+        public async Task<NicoMessageContext2?> CreateMessageContextAsync(IChat chat, string roomName, bool isInitialComment)
         {
-            NicoMessageContext2 messageContext = null;
+            NicoMessageContext2? messageContext = null;
             INicoMessageMetadata2 metadata;
 
             var userId = chat.UserId;
@@ -63,6 +63,8 @@ namespace NicoSitePlugin
                         {
                             IsInitialComment = isInitialComment,
                             SiteContextGuid = SiteContextGuid,
+                            UserId = userId,
+
                         };
                     }
                     break;

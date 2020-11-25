@@ -202,7 +202,11 @@ namespace mcv2.Model
         private void Cp_MetadataUpdated(object? sender, IMetadata e)
         {
             var cp = sender as ICommentProvider;
-            if (cp == null) return;
+            if (cp == null)
+            {
+                //TODO:バグ報告
+                return;
+            }
             var connectionId = _cpIdDict[cp];
             var req = new RequestUpdateMetadata(connectionId, null, e);
             MetadataUpdated?.Invoke(this, req);

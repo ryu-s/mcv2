@@ -33,8 +33,8 @@ namespace NicoSitePlugin
         }
         public bool IsInitialComment { get; set; }
         public SitePluginId SiteContextGuid { get; set; }
-        public string UserId { get; }
-        public IEnumerable<IMessagePart> UserName { get; }
+        public string UserId { get; set; }
+        public IEnumerable<IMessagePart> UserName { get; set; }
         public SiteType SiteType => SiteType.NicoLive;
 
         protected MessageMetadataBase2(INicoSiteOptions siteOptions)

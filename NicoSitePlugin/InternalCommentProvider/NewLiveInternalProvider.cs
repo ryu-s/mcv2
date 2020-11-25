@@ -17,6 +17,8 @@ namespace NicoSitePlugin
         public override void BeforeConnect()
         {
             IsConnected = true;
+            _elapsedTimer.Enabled = false;
+            _keepSeatTimer.Enabled = false;
         }
 
         public override void AfterDisconnected()
@@ -101,7 +103,7 @@ namespace NicoSitePlugin
         string _roomName;
         string _ticket;
         WatchDataProps _watchDataProps;
-        TaskCompletionSource<object> _tcs = new TaskCompletionSource<object>();
+        TaskCompletionSource<object?> _tcs = new TaskCompletionSource<object?>();
         public override void Disconnect()
         {
             _messageProvider?.Disconnect();
@@ -126,7 +128,7 @@ namespace NicoSitePlugin
             _messageProvider.ThreadReceived += MessageProvider_ThreadReceived;
         }
 
-        private void MessageProvider_ThreadReceived(object sender, IThread e)
+        private void MessageProvider_ThreadReceived(object? sender, IThread e)
         {
             if (!string.IsNullOrEmpty(e.Ticket))
             {
@@ -134,7 +136,7 @@ namespace NicoSitePlugin
             }
         }
 
-        private async void MessageProvider_ChatReceived(object sender, ReceivedChat e)
+        private async void MessageProvider_ChatReceived(object? sender, ReceivedChat e)
         {
             var chat = e.Message;
             var isInitialComment = e.IsInitialComment;
@@ -143,24 +145,60 @@ namespace NicoSitePlugin
             var context = await CreateMessageContextAsync(chat, roomName, isInitialComment);
             RaiseMessageReceived(context);
         }
-
-        private void MetaProvider_MessageReceived(object sender, IInternalMessage e)
+        System.Timers.Timer _keepSeatTimer = new System.Timers.Timer();
+        System.Timers.Timer _elapsedTimer = new System.Timers.Timer();
+        DateTime? _startedAt;
+        private void MetaProvider_MessageReceived(object? sender, IInternalMessage e)
         {
             switch (e)
             {
-                case ICurrentRoom currentRoom:
+                case RoomInternalMessage room:
+                    _messageUrl = room.MessageServerUrl;
+                    _threadId = room.ThreadId;
+                    _roomName = room.RoomName;
+                    _tcs.SetResult(null);
+                    break;
+                case StatisticsInternalMessage stat:
+                    //stat.Viewers
+                    RaiseMetadataUpdated(new Metadata
                     {
-                        //currentRoom.MessageServerUri
-                        _messageUrl = currentRoom.MessageServerUri;
-                        _threadId = currentRoom.ThreadId;
-                        _roomName = currentRoom.RoomName;
-                        _tcs.SetResult(null);
-                    }
+                        TotalViewers = stat.Viewers.ToString(),
+                        Others = $"広告P:{stat.AdPoint} ギフトP:{stat.GiftPoints}",
+                    });
+                    break;
+                case SeatInternalMessage seat:
+                    var intervalSec = seat.KeepIntervalSec;
+                    _keepSeatTimer.Interval = intervalSec * 1000;
+                    _keepSeatTimer.AutoReset = true;
+                    _keepSeatTimer.Elapsed += _keepSeatTimer_Elapsed;
+                    _keepSeatTimer.Enabled = true;
+                    break;
+                case ScheduleInternalMessage schedule:
+                    _startedAt = DateTime.Parse(schedule.Begin);
+                    _elapsedTimer.Interval = 500;
+                    _elapsedTimer.Elapsed += _elapsedTimer_Elapsed;
+                    _elapsedTimer.AutoReset = true;
+                    _elapsedTimer.Enabled = true;
+                    break;
+                case DisconnectInternalMessage disconnect:
+                    Disconnect();
                     break;
             }
-
         }
-
+        private void _elapsedTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (_startedAt.HasValue)
+            {
+                RaiseMetadataUpdated(new Metadata
+                {
+                    Elapsed = SitePluginCommon.Utils.ElapsedToString(DateTime.Now - _startedAt.Value),
+                });
+            }
+        }
+        private void _keepSeatTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            _metaProvider.SendKeepSeat();
+        }
         public override Task PostCommentAsync(string comment, string mail)
         {
             //[{"ping":{"content":"rs:1"}},{"ping":{"content":"ps:5"}},{"chat":{"thread":"1651612445","vpos":356587,"mail":"184 ","ticket":"0x3d4e000","user_id":"2297426","premium":1,"content":"？","postkey":".1559405184.b-Obktn_YDybdhLR9Hf9Pa17c4g"}},{"ping":{"content":"pf:5"}},{"ping":{"content":"rf:1"}}]

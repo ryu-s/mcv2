@@ -143,22 +143,9 @@ namespace NicoSitePlugin
                 return;
             }
             BeforeConnect();
-            _internal.MetadataUpdated += (s, e) => MetadataUpdated?.Invoke(s, e);
-            _internal.MessageReceived += (s, e) =>
-            {
-                if (e.Message is INicoComment nicoComment)
-                {
-                    var userId = nicoComment.UserId;
-                    var comment = nicoComment.Text;
-                    var postedDate = nicoComment.PostedAt;
-                    if (!_blocker.IsUniqueComment(userId, comment, postedDate))
-                    {
-                        Debug.WriteLine("ニコ生で二重コメントを発見したため無視します");
-                        return;
-                    }
-                }
-                MessageReceived?.Invoke(s, e);
-            };
+            //_internal.MetadataUpdated += (s, e) => MetadataUpdated?.Invoke(this, e);
+            _internal.MetadataUpdated += Internal_MetadataUpdated;
+            _internal.MessageReceived += Internal_MessageReceived;
             try
             {
                 await _internal.ConnectAsync(input, cc);
@@ -169,10 +156,31 @@ namespace NicoSitePlugin
             }
             finally
             {
-                _internal.MetadataUpdated -= (s, e) => MetadataUpdated?.Invoke(s, e);
-                _internal.MessageReceived -= (s, e) => MessageReceived?.Invoke(s, e);
+                _internal.MetadataUpdated -= Internal_MetadataUpdated;
+                _internal.MessageReceived -= Internal_MessageReceived;
                 AfterDisconnected();
             }
+        }
+
+        private void Internal_MessageReceived(object? sender, IMessageContext2 e)
+        {
+            if (e.Message is INicoComment nicoComment)
+            {
+                var userId = nicoComment.UserId;
+                var comment = nicoComment.Text;
+                var postedDate = nicoComment.PostedAt;
+                if (!_blocker.IsUniqueComment(userId, comment, postedDate))
+                {
+                    Debug.WriteLine("ニコ生で二重コメントを発見したため無視します");
+                    return;
+                }
+            }
+            MessageReceived?.Invoke(this, e);
+        }
+
+        private void Internal_MetadataUpdated(object? sender, IMetadata e)
+        {
+            MetadataUpdated?.Invoke(this, e);
         }
 
         public void Disconnect()
