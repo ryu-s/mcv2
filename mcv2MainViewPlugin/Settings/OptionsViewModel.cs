@@ -24,7 +24,7 @@ namespace mcv2.MainViewPlugin
         public BigoOptionsViewModel BigoViewModel { get; }
         public MildomSiteOptionsViewModel MildomViewModel { get; }
         public MirrativSiteOptionsViewModel MirrativViewModel { get; }
-        public NicoSiteOptionsViewModel NicoViewModel { get; }
+        public NicoSiteOptionsViewModel NicoLiveViewModel { get; }
         public OpenrecOptionsViewModel OpenrecViewModel { get; }
         public ShowRoomSiteOptionsViewModel ShowroomViewModel { get; }
         public PeriscopeSiteOptionsViewModel PeriscopeViewModel { get; }
@@ -39,7 +39,7 @@ namespace mcv2.MainViewPlugin
             BigoViewModel = new BigoOptionsViewModel(bigoSiteOptions);
             MildomViewModel = new MildomSiteOptionsViewModel(mildomSiteOptions);
             MirrativViewModel = new MirrativSiteOptionsViewModel(mirrativSiteOptions);
-            NicoViewModel = new NicoSiteOptionsViewModel(nicoSiteOptions);
+            NicoLiveViewModel = new NicoSiteOptionsViewModel(nicoSiteOptions);
             OpenrecViewModel = new OpenrecOptionsViewModel(openrecSiteOptions);
             ShowroomViewModel = new ShowRoomSiteOptionsViewModel(showroomSiteOptions);
             PeriscopeViewModel = new PeriscopeSiteOptionsViewModel(periscopeSiteOptions);

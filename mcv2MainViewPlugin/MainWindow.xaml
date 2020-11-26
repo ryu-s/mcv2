@@ -1,4 +1,5 @@
 ﻿<Window x:Class="mcv2.MainViewPlugin.MainWindow"
+        x:Name="mainView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -459,7 +460,7 @@
             </Grid.ColumnDefinitions>
             <ComboBox ItemsSource="{Binding Connections}" SelectedValue="{Binding SelectedConnection}" DisplayMemberPath="Name" Grid.Column="0" Margin="10" Height="30" />
             <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Column="2">
-                <local:YouTubeCommentPostPanel DataContext="{Binding YouTubeCommentPostPanelViewModel}" Visibility="{Binding IsShowYouTubeCommentPostPanel, Converter={StaticResource booleanToVisibilityConverter}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0" />
+                <local:YouTubeCommentPostPanel DataContext="{Binding YouTubeCommentPostPanelViewModel}" Visibility="{Binding DataContext.IsShowYouTubeCommentPostPanel,ElementName=mainView, Converter={StaticResource booleanToVisibilityConverter}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0" />
             </Grid>
         </Grid>
     </Grid>

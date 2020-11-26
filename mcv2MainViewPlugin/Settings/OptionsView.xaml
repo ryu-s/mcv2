@@ -34,7 +34,7 @@
                 <local:WhowatchOptionsPanel DataContext="{Binding WhowatchViewModel}" />
             </TabItem>
             <TabItem Header="Mirrativ">
-                <local:MirrativTabPagePanel DataContext="{Binding MirrativSiteOptionsViewModel}" />
+                <local:MirrativTabPagePanel DataContext="{Binding MirrativViewModel}" />
             </TabItem>
             <TabItem Header="Periscope">
                 <local:PeriscopeOptionsPanel DataContext="{Binding PeriscopeViewModel}" />
