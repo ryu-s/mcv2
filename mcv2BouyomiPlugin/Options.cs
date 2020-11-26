@@ -17,7 +17,6 @@ namespace mcv2BouyomiPlugin
         public bool IsExecBouyomiChanAtBoot { get { return GetValue(); } set { SetValue(value); } }
         public bool IsKillBouyomiChan { get { return GetValue(); } set { SetValue(value); } }
         public bool IsVoiceTypeSpecfied { get { return GetValue(); } set { SetValue(value); } }
-        public int VoiceTypeIndex { get { return GetValue(); } set { SetValue(value); } }
         public int VoiceVolume { get { return GetValue(); } set { SetValue(value); } }
         public int VoiceSpeed { get { return GetValue(); } set { SetValue(value); } }
         public int VoiceTone { get { return GetValue(); } set { SetValue(value); } }
@@ -126,7 +125,6 @@ namespace mcv2BouyomiPlugin
             Dict.Add(nameof(IsExecBouyomiChanAtBoot), new Item { DefaultValue = false, Predicate = b => true, Serializer = b => b.ToString(), Deserializer = s => bool.Parse(s) });
             Dict.Add(nameof(IsKillBouyomiChan), new Item { DefaultValue = false, Predicate = b => true, Serializer = b => b.ToString(), Deserializer = s => bool.Parse(s) });
             Dict.Add(nameof(IsVoiceTypeSpecfied), new Item { DefaultValue = false, Predicate = b => true, Serializer = b => b.ToString(), Deserializer = s => bool.Parse(s) });
-            Dict.Add(nameof(VoiceTypeIndex), new Item { DefaultValue = 0, Predicate = n => true, Serializer = n => n.ToString(), Deserializer = n => int.Parse(n) });
             Dict.Add(nameof(VoiceVolume), new Item { DefaultValue = 100, Predicate = n => true, Serializer = n => n.ToString(), Deserializer = n => int.Parse(n) });
             Dict.Add(nameof(VoiceSpeed), new Item { DefaultValue = 100, Predicate = n => true, Serializer = n => n.ToString(), Deserializer = n => int.Parse(n) });
             Dict.Add(nameof(VoiceTone), new Item { DefaultValue = 100, Predicate = n => true, Serializer = n => n.ToString(), Deserializer = n => int.Parse(n) });

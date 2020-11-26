@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Wpf;
@@ -58,21 +59,11 @@ namespace mcv2BouyomiPlugin
     }
     public interface IBouyomiChanClient
     {
-        int AddTalkTask2(string text, int voiceSpeed, int voiceTone, int voiceVolume, int voiceTypeIndex);
+        int AddTalkTask2(string text, Int16 voiceSpeed, Int16 voiceTone, Int16 voiceVolume, Int16 voiceTypeIndex);
         int AddTalkTask2(string text);
+        void SetSettings(IBouyomiChanClientSettings settings);
     }
-    public class BouyomiChanClientIpc : IBouyomiChanClient
-    {
-        public int AddTalkTask2(string text, int voiceSpeed, int voiceTone, int voiceVolume, int voiceTypeIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int AddTalkTask2(string text)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    public interface IBouyomiChanClientSettings { }
     public class BouyomiChanClientTcp : IBouyomiChanClient
     {
         public string HostAddr { get; set; } = "";
@@ -87,19 +78,14 @@ namespace mcv2BouyomiPlugin
         /// <param name="voiceTypeIndex"></param>
         /// <returns></returns>
         /// <exception cref=""
-        public int AddTalkTask2(string text, int voiceSpeed, int voiceTone, int voiceVolume, int voiceTypeIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int AddTalkTask2(string text)
+        public int AddTalkTask2(string text, Int16 voiceSpeed, Int16 voiceTone, Int16 voiceVolume, Int16 voiceTypeIndex)
         {
             string sMessage = text;
             byte bCode = 0;
-            Int16 iVoice = 1;
-            Int16 iVolume = -1;
-            Int16 iSpeed = -1;
-            Int16 iTone = -1;
+            Int16 iVoice = voiceTypeIndex;
+            Int16 iVolume = voiceVolume;
+            Int16 iSpeed = voiceSpeed;
+            Int16 iTone = voiceTone;
             Int16 iCommand = 0x0001;
             byte[] bMessage = Encoding.UTF8.GetBytes(sMessage);
             Int32 iLength = bMessage.Length;
@@ -126,6 +112,29 @@ namespace mcv2BouyomiPlugin
             }
             return 0;
         }
+
+        public int AddTalkTask2(string text)
+        {
+            return AddTalkTask2(text, -1, -1, -1, 0);
+        }
+
+        public void SetSettings(IBouyomiChanClientSettings settings)
+        {
+            if (!(settings is BouyomiChanClientSettingsTcp tcp)) return;
+            if (tcp.HostAddr != null)
+            {
+                HostAddr = tcp.HostAddr;
+            }
+            if (tcp.HostPort != null)
+            {
+                HostPort = tcp.HostPort.Value;
+            }
+        }
+    }
+    class BouyomiChanClientSettingsTcp : IBouyomiChanClientSettings
+    {
+        public string? HostAddr { get; set; }
+        public int? HostPort { get; set; }
     }
     [Export(typeof(IMcvPluginV1))]
     public class PluginMain : IMcvPluginV1
@@ -141,8 +150,22 @@ namespace mcv2BouyomiPlugin
         {
             _bouyomiChanClient = new BouyomiChanClientTcp
             {
-                HostAddr = "127.0.0.1",//本来はOnLoad()以降でないと設定が読み込めない。後で実装する
-                HostPort = 50001,
+                HostAddr = _options.HostAddr,
+                HostPort = _options.HostPort,
+            };
+            _options.PropertyChanged += (s, e) =>
+            {
+                switch (e.PropertyName)
+                {
+                    case nameof(Options.HostAddr):
+                        _bouyomiChanClient.SetSettings(new BouyomiChanClientSettingsTcp { HostAddr = _options.HostAddr });
+                        break;
+                    case nameof(Options.HostPort):
+                        _bouyomiChanClient.SetSettings(new BouyomiChanClientSettingsTcp { HostPort = _options.HostPort });
+                        break;
+                    default:
+                        break;
+                }
             };
         }
         public void OnClosing()
@@ -266,16 +289,38 @@ namespace mcv2BouyomiPlugin
 
             }
         }
+        private Int16 Convert(int n, Int16 min, Int16 max, Int16 defaultValue)
+        {
+            if (n >= min && n <= max) return (Int16)n;
+            else return defaultValue;
+        }
+        private Int16 VoiceTypeSelectedIndex2VoiceTypeId(int voiceTypeIndex)
+        {
+            //0:棒読みちゃん画面上の設定、1:女性1、2:女性2、3:男性1、4:男性2、5:中性、6:ロボット、7:機械1、8:機械2、10001～:SAPI5
+            const Int16 offset = 10001;
+            if (voiceTypeIndex >= 0 && voiceTypeIndex <= 8)
+            {
+                return (Int16)voiceTypeIndex;
+            }
+            else if (voiceTypeIndex >= 9 && voiceTypeIndex <= (Int16.MaxValue - offset))
+            {
+                return (Int16)(voiceTypeIndex - 9 + offset);
+            }
+            else
+            {
+                return 0;
+            }
+        }
         private int TalkText(string text)
         {
             if (_options.IsVoiceTypeSpecfied)
             {
                 return _bouyomiChanClient.AddTalkTask2(
                     text,
-                    _options.VoiceSpeed,
-                    _options.VoiceTone,
-                    _options.VoiceVolume,
-                     _options.VoiceTypeIndex
+                    Convert(_options.VoiceSpeed, -1, Int16.MaxValue, -1),
+                    Convert(_options.VoiceTone, -1, Int16.MaxValue, -1),
+                    Convert(_options.VoiceVolume, -1, Int16.MaxValue, -1),
+                    VoiceTypeSelectedIndex2VoiceTypeId(_options.VoiceTypeSelectedIndex)
                 );
             }
             else
