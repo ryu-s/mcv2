@@ -10,10 +10,10 @@ namespace Common
 {
     public class IOTest : IIo
     {
-        public string ReadFile(string path)
+        public string? ReadFile(string path)
         {
             var totalWaitTime = 0;
-            string s = null;
+            string? s = null;
             while (totalWaitTime < 5000)
             {
                 try
@@ -48,14 +48,18 @@ namespace Common
             }
             return s;
         }
-        public async Task<string> ReadFileAsync(string path)
+        public async Task<string?> ReadFileAsync(string path)
         {
             var totalWaitTime = 0;
-            string s = null;
+            string? s = null;
             while (totalWaitTime < 5000)
             {
                 try
                 {
+                    if (!File.Exists(path))
+                    {
+                        return null;
+                    }
                     using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read))
                     using (var sr = new StreamReader(fs))
                     {
