@@ -16,6 +16,39 @@ namespace mcv2Tests
     class UserTests
     {
         [Test]
+        public void UserSerializeDeserializeTest()
+        {
+            var userId = "abc";
+            var user = new McvUser(userId)
+            {
+                IsNgUser = true,
+                IsSiteNgUser = true,
+                Name = new List<IMessagePart>
+                  {
+                      new MessageImage
+                      {
+                          Alt = "alt",
+                          Height = 12,
+                          Width = 88,
+                          Url = "https://int-main.net",
+                          X = 79,
+                          Y = 51,
+                      },
+                      Common.MessagePartFactory.CreateMessageText("oak"),
+                  },
+                Nickname = "nick",
+            };
+            var str = McvUser.Serialize(user);
+            var deserialized = McvUser.Deserialize(str);
+            Assert.IsNotNull(deserialized);
+            Assert.AreEqual(user.Guid, deserialized!.Guid);
+            Assert.AreEqual(user.Id, deserialized.Id);
+            Assert.AreEqual(user.IsNgUser, deserialized.IsNgUser);
+            Assert.AreEqual(user.IsSiteNgUser, deserialized.IsSiteNgUser);
+            Assert.AreEqual(user.Name, deserialized.Name);
+            Assert.AreEqual(user.Nickname, deserialized.Nickname);
+        }
+        [Test]
         public void ニックネームを変更する()
         {
             var sitePluginManager = new Mock<ISitePluginManager>().Object;

@@ -58,8 +58,8 @@ namespace mcv2
             {
                 _coreOptions.Deserialize(optionsStr);
             }
-            Model.IUserStore userStore = new TestUserStore();
-
+            Model.IUserStore userStore = new SqliteUserStore(System.IO.Path.Combine("settings", "coreusers.db"));
+            await userStore.InitAsync();
             var model = new Model.Model(pluginManager, sitePluginManager, userStore, Logger2, io, _coreOptions);
             try
             {
@@ -69,6 +69,8 @@ namespace mcv2
             {
                 var s = _coreOptions.Serialize();
                 await io.WriteFileAsync(optionsFilePath, s);
+
+                await userStore.SaveAsync();
             }
         }
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

@@ -12,7 +12,7 @@ namespace mcv2
         /// <summary>
         /// コメビュ独自で付けた名前
         /// </summary>
-        string Nickname { get; }
+        string? Nickname { get; }
         /// <summary>
         /// ユーザーID
         /// </summary>

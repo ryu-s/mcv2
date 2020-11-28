@@ -19,6 +19,10 @@ namespace SitePlugin
         {
             return -2045414129 + _guid.GetHashCode();
         }
+        public override string ToString()
+        {
+            return _guid.ToString();
+        }
     }
 }
 
