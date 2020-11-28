@@ -15,6 +15,8 @@ namespace mcv2
     {
         //static readonly ILogger Logger = new Common.LoggerTest();
         static readonly ILogger Logger2 = new LoggerTest2();
+        ICoreOptions _coreOptions = new CoreOptions();
+        static readonly string optionsFilePath = System.IO.Path.Combine("settings", "core.txt");
         [STAThread]
         //static async Task Main(string[] args)
         static void Main()
@@ -51,11 +53,23 @@ namespace mcv2
             var pluginManager = new Model.PluginManager();
             var io = new IOTest();
             var sitePluginManager = new Model.SitePluginManager(Logger2, io);
-            var options = new CoreOptions();
+            var optionsStr = await io.ReadFileAsync(optionsFilePath);
+            if (optionsStr != null)
+            {
+                _coreOptions.Deserialize(optionsStr);
+            }
             Model.IUserStore userStore = new TestUserStore();
-            var model = new Model.Model(pluginManager, sitePluginManager, userStore, Logger2, io, options);
 
-            await model.Run();
+            var model = new Model.Model(pluginManager, sitePluginManager, userStore, Logger2, io, _coreOptions);
+            try
+            {
+                await model.Run();
+            }
+            finally
+            {
+                var s = _coreOptions.Serialize();
+                await io.WriteFileAsync(optionsFilePath, s);
+            }
         }
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {

@@ -7,6 +7,8 @@
         bool IsAutoUpdateCheck { get; set; }
         double MainViewPositionX { get; set; }
         double MainViewPositionY { get; set; }
+        string Serialize();
+        void Deserialize(string s);
     }
 
 
