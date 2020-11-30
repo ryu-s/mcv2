@@ -73,7 +73,15 @@ namespace mcv2.MainViewPlugin
         {
             get
             {
-                return _model.GetIsNgUser(_siteContextGuid, UserId);
+                try
+                {
+                    return _model.GetIsNgUser(_siteContextGuid, UserId);
+                }
+                catch (Exception ex)
+                {
+                    _model.SendError(ex, "", "");
+                    return false;
+                }
             }
             set
             {

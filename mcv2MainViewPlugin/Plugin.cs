@@ -33,6 +33,7 @@ namespace mcv2.MainViewPlugin
         void SetIsSiteNgUser(SitePluginId siteContextGuid, string userId, bool value);
         string GetNickname(SitePluginId siteContextGuid, string userId);
         void SetNickname(SitePluginId siteContextGuid, string userId, string? value);
+        void SendError(Exception ex, string message, string rawData);
     }
     public class ConnectionData
     {
@@ -316,6 +317,10 @@ namespace mcv2.MainViewPlugin
         bool IUserHost.GetIsNgUser(SitePluginId siteContextGuid, string userId)
         {
             var ret = Host.GetData(new RequestUser(siteContextGuid, userId)) as ResponseUser;
+            if (ret == null)
+            {
+                throw new BugException();
+            }
             var user = ret.User;
             return user.IsNgUser;
         }
@@ -331,6 +336,10 @@ namespace mcv2.MainViewPlugin
         bool IUserHost.GetIsSiteNgUser(SitePluginId siteContextGuid, string userId)
         {
             var ret = Host.GetData(new RequestUser(siteContextGuid, userId)) as ResponseUser;
+            if (ret == null)
+            {
+                throw new BugException();
+            }
             var user = ret.User;
             return user.IsSiteNgUser;
         }

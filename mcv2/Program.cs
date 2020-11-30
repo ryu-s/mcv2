@@ -58,7 +58,7 @@ namespace mcv2
             {
                 _coreOptions.Deserialize(optionsStr);
             }
-            Model.IUserStore userStore = new SqliteUserStore(System.IO.Path.Combine("settings", "coreusers.db"));
+            Model.IUserStore userStore = new SqliteUserStore(System.IO.Path.Combine("settings", "coreusers.db"), Logger2);
             await userStore.InitAsync();
             var model = new Model.Model(pluginManager, sitePluginManager, userStore, Logger2, io, _coreOptions);
             try

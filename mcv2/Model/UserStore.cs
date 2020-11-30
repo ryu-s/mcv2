@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Common;
+using Microsoft.Data.Sqlite;
 using SitePlugin;
 using System;
 using System.Collections.Generic;
@@ -70,33 +71,40 @@ namespace mcv2.Model
                 DataSource = FilePath,
                 Mode = SqliteOpenMode.ReadWrite,
             }.ToString();
-            using (var connection = new SqliteConnection(connectionString))
+            try
             {
-                connection.Open();
-
-                if (!ExistTable(connection, tableName))
+                using (var connection = new SqliteConnection(connectionString))
                 {
-                    CreateTable(connection, tableName);
-                }
-                var command = connection.CreateCommand();
-                command.CommandText = $"SELECT id,json FROM {tableName}";
+                    connection.Open();
 
-                using (var reader = command.ExecuteReader())
-                {
-                    while (await reader.ReadAsync())
+                    if (!ExistTable(connection, tableName))
                     {
-                        var id = reader.GetString(0);
-                        var siteIdRaw = reader.GetString(1);
-                        var siteGuid = Guid.Parse(siteIdRaw);
-                        var siteId = new SitePluginId(siteGuid);
-                        var json = reader.GetString(2);
-                        var user = McvUser.Deserialize(json);
-                        if (user != null)
+                        CreateTable(connection, tableName);
+                    }
+                    var command = connection.CreateCommand();
+                    command.CommandText = $"SELECT id,json FROM {tableName}";
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (await reader.ReadAsync())
                         {
-                            list.Add((siteId, user));
+                            var id = reader.GetString(0);
+                            var siteIdRaw = reader.GetString(1);
+                            var siteGuid = Guid.Parse(siteIdRaw);
+                            var siteId = new SitePluginId(siteGuid);
+                            var json = reader.GetString(2);
+                            var user = McvUser.Deserialize(json);
+                            if (user != null)
+                            {
+                                list.Add((siteId, user));
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogException(ex);
             }
             _internal.AddRangeUser(list);
         }
@@ -133,38 +141,48 @@ namespace mcv2.Model
                 DataSource = FilePath,
                 Mode = SqliteOpenMode.ReadWriteCreate,
             }.ToString();
-            using (var connection = new SqliteConnection(connectionString))
+            try
             {
-                connection.Open();
-                if (!ExistTable(connection, tableName))
+                using (var connection = new SqliteConnection(connectionString))
                 {
-                    CreateTable(connection, tableName);
-                }
-                using (var transaction = connection.BeginTransaction())
-                {
-                    foreach (var (siteId, user) in users)
+                    connection.Open();
+                    if (!ExistTable(connection, tableName))
                     {
-                        if (!McvUser.HasChanged(user))
-                        {
-                            continue;
-                        }
-                        var command = connection.CreateCommand();
-                        command.CommandText = $"INSERT INTO {tableName} (id,siteid,json) VALUES ($id,$siteid,$json)";
-                        command.Parameters.AddWithValue("$id", user.Id);
-                        command.Parameters.AddWithValue("$siteid", siteId.ToString());
-                        command.Parameters.AddWithValue("$json", McvUser.Serialize(user));
-                        await command.ExecuteNonQueryAsync();
+                        CreateTable(connection, tableName);
                     }
-                    await transaction.CommitAsync();
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        foreach (var (siteId, user) in users)
+                        {
+                            if (!McvUser.HasChanged(user))
+                            {
+                                continue;
+                            }
+                            var command = connection.CreateCommand();
+                            command.CommandText = $"INSERT INTO {tableName} (id,siteid,json) VALUES ($id,$siteid,$json)";
+                            command.Parameters.AddWithValue("$id", user.Id);
+                            command.Parameters.AddWithValue("$siteid", siteId.ToString());
+                            command.Parameters.AddWithValue("$json", McvUser.Serialize(user));
+                            await command.ExecuteNonQueryAsync();
+                        }
+                        await transaction.CommitAsync();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogException(ex);
             }
         }
         TestUserStore _internal;
-        public SqliteUserStore(string filePath)
+        private readonly ILogger _logger;
+
+        public SqliteUserStore(string filePath, ILogger logger)
         {
             _internal = new TestUserStore();
             _internal.UserAdded += _internal_UserAdded;
             FilePath = filePath;
+            _logger = logger;
             SQLitePCL.Batteries.Init();
         }
 
