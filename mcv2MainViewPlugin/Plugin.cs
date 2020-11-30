@@ -65,17 +65,25 @@ namespace mcv2.MainViewPlugin
         DynamicOptionsTest _options;
         UserStore _userStore;
         Dispatcher _dispatcher;
+        internal virtual MainViewModel CreateMainViewModel(IModel model, IConnectionModel connectionModel, DynamicOptionsTest options)
+        {
+            return new MainViewModel(model, connectionModel, options);
+        }
+        internal virtual DynamicOptionsTest CreateOptions()
+        {
+            return new DynamicOptionsTest();
+        }
         public void OnLoaded()
         {
             var optionsStr = Host.LoadOptions(GetSettingsFilePath());
-            _options = new DynamicOptionsTest();
+            _options = CreateOptions();
             _options.Deserialize(optionsStr);
 
             _userStore = new UserStore(_options, this);
 
             _dispatcher = Dispatcher.CurrentDispatcher;
 
-            _vm = new MainViewModel(this, this, _options);
+            _vm = CreateMainViewModel(this, this, _options);
             if (Host.GetData(new RequestLoadedPlugins()) is ResponseLoadedPlugins resPlugins)
             {
                 foreach (var (pluginId, pluginName) in resPlugins.Plugins.Select(x => (x.PluginId, x.Name)))
@@ -101,7 +109,7 @@ namespace mcv2.MainViewPlugin
         {
 
         }
-        string GetSettingsFilePath()
+        protected virtual string GetSettingsFilePath()
         {
             var dir = Host.SettingsDirPath;
             string name;
@@ -269,7 +277,7 @@ namespace mcv2.MainViewPlugin
             return;
         }
 
-        public void ShowSettingView()
+        public virtual void ShowSettingView()
         {
             var window = new MainWindow
             {
