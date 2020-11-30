@@ -13,11 +13,11 @@ namespace ryu_s.BrowserCookie
         #region IFirefoxManager
         public BrowserType Type { get; }
 
-        public List<IBrowserProfile> GetProfiles()
+        public List<IBrowserProfile2> GetProfiles()
         {
             var profileFileName = "profiles.ini";
-            var list = new List<IBrowserProfile>();
-            if(!File.Exists(Path.Combine(_moz_path, profileFileName)))
+            var list = new List<IBrowserProfile2>();
+            if (!File.Exists(Path.Combine(_moz_path, profileFileName)))
             {
                 //多分Firefoxをインストールしていない
                 return list;
@@ -38,9 +38,10 @@ namespace ryu_s.BrowserCookie
             Type = BrowserType.Firefox;
         }
         #endregion
-        class FirefoxCookie : IBrowserProfile
+        class FirefoxCookie : IBrowserProfile2
         {
             #region IBrowserProfile
+            public Guid Id { get; } = Guid.NewGuid();
             public string Path { get; }
 
             public string ProfileName { get; }
@@ -247,7 +248,7 @@ namespace ryu_s.BrowserCookie.Firefox
             if (arr.Length >= 2)
             {
                 var pos = line.IndexOf('=');
-                return new KeyValuePair<string, string>(arr[0],line.Substring(pos+1));
+                return new KeyValuePair<string, string>(arr[0], line.Substring(pos + 1));
             }
             else
             {

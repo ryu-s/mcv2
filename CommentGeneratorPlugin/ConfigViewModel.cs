@@ -25,11 +25,11 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using System.Diagnostics;
 using System.Net;
-namespace CommentViewer.Plugin
+namespace CommentGeneratorPlugin
 {
-    public sealed class ConfigViewModel : ViewModelBase
+    class ConfigViewModel : ViewModelBase
     {
-        private readonly Options _options;
+        private readonly IOptions _options;
         public bool IsEnabled
         {
             get { return _options.IsEnabled; }
@@ -63,7 +63,7 @@ namespace CommentViewer.Plugin
         {
             if ((bool)(DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(DependencyObject)).DefaultValue))
             {
-                _options = new Plugin.Options();
+                _options = new Options();
                 IsEnabled = true;
                 HcgSettingFilePath = "HTML5コメジェネ設定ファイルパス";
                 IsMirrativJoin = true;
@@ -74,7 +74,7 @@ namespace CommentViewer.Plugin
             }
         }
         [GalaSoft.MvvmLight.Ioc.PreferredConstructor]
-        public ConfigViewModel(Options options)
+        public ConfigViewModel(IOptions options)
         {
             _options = options;
             _options.PropertyChanged += (s, e) =>

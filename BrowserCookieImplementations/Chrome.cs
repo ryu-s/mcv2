@@ -15,9 +15,9 @@ namespace ryu_s.BrowserCookie
     {
         #region IChromeManager
         public virtual BrowserType Type => BrowserType.Chrome;
-        public List<IBrowserProfile> GetProfiles()
+        public List<IBrowserProfile2> GetProfiles()
         {
-            var list = new List<IBrowserProfile>();
+            var list = new List<IBrowserProfile2>();
             if (!Directory.Exists(ChromeSettingsDirPath))
             {
                 //恐らくChromeがインストールされていない
@@ -49,9 +49,10 @@ namespace ryu_s.BrowserCookie
         public ChromeManager()
         {
         }
-        class ChromeProfile : IBrowserProfile
+        class ChromeProfile : IBrowserProfile2
         {
             #region IBrowserProfile
+            public Guid Id { get; } = Guid.NewGuid();
             public string Path { get; }
 
             public string ProfileName { get; }

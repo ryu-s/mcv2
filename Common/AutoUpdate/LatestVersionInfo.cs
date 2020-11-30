@@ -2,7 +2,6 @@
 
 namespace Common.AutoUpdate
 {
-    [Obsolete]
     public class LatestVersionInfo
     {
         public Version Version { get; }

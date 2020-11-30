@@ -32,7 +32,7 @@ namespace MildomSitePluginTests
         {
             var data = "{\"area\": 2000, \"cmd\": \"onChat\", \"msg\": \"よくやった\", \"msgId\": \"1598498460835_0_8192\", \"reqId\": 0, \"roomId\": 10007428, \"time\": \"1598498460835\", \"toId\": 10007428, \"toName\": \"*\", \"type\": 3, \"userName\": \"guest737168\"}";
             var chat = MessageParser.Parse(data, new Dictionary<int, string>()) as OnChatMessage;
-            Assert.IsNull(chat.UserId);
+            Assert.AreEqual("guest737168", chat.UserId);
             Assert.IsNull(chat.UserImg);
         }
         [Test]

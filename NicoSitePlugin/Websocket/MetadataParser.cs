@@ -15,7 +15,11 @@ namespace NicoSitePlugin.Websocket
         public IInternalMessage Parse(string s)
         {
             IInternalMessage message = null;
-            dynamic d = Newtonsoft.Json.JsonConvert.DeserializeObject(s);
+            dynamic? d = Newtonsoft.Json.JsonConvert.DeserializeObject(s);
+            if (d == null)
+            {
+                throw new ParseException(s);
+            }
             switch ((string)d.type)
             {
                 case "room":
@@ -70,6 +74,7 @@ namespace NicoSitePlugin.Websocket
                     break;
                 default:
                     throw new ParseException(s);
+
             }
             return message;
         }
@@ -78,6 +83,7 @@ namespace NicoSitePlugin.Websocket
     {
         string Raw { get; }
     }
+
     class RoomInternalMessage : IInternalMessage
     {
         public bool IsFirst { get; set; }

@@ -13,13 +13,11 @@ using System.Threading.Tasks;
 
 namespace TwicasSitePlugin
 {
-    class TwicasCommentProvider2 : CommentProviderBase
+    class TwicasCommentProvider2 : CommentProviderBase2
     {
         private readonly IDataServer _server;
         private readonly ILogger _logger;
-        private readonly ICommentOptions _options;
         private readonly TwicasSiteOptions _siteOptions;
-        private readonly IUserStoreManager _userStoreManager;
         private readonly FirstCommentDetector _first = new FirstCommentDetector();
         private readonly MessageUntara _messenger = new MessageUntara();
         TwicasAutoReconnector _autoReconnector;
@@ -45,9 +43,9 @@ namespace TwicasSitePlugin
                 LoggedInStateChanged?.Invoke(this, EventArgs.Empty);
             }
         }
-        private async Task<List<TwicasMessageContext>> GetInitialComments(long liveId)
+        private async Task<List<TwicasMessageContext2>> GetInitialComments(long liveId)
         {
-            var list = new List<TwicasMessageContext>();
+            var list = new List<TwicasMessageContext2>();
             var (initialComments, initialRaw) = await API.GetListAll(_server, _broadcasterId, liveId, _lastCommentId, 0, 20, _cc);
             if (initialComments.Length > 0)
             {
@@ -70,7 +68,7 @@ namespace TwicasSitePlugin
         }
         CookieContainer _cc;
         string _broadcasterId;
-        public override async Task ConnectAsync(string input, IBrowserProfile browserProfile)
+        public override async Task ConnectAsync(string input, IBrowserProfile2 browserProfile)
         {
             BeforeConnect();
             _first.Reset();
@@ -134,9 +132,9 @@ namespace TwicasSitePlugin
             var messageContext = CreateMessageContext(item, false);
             RaiseMessageReceived(messageContext);
         }
-        private TwicasMessageContext CreateMessageContext(InternalItem item, bool isInitialComment)
+        private TwicasMessageContext2 CreateMessageContext(InternalItem item, bool isInitialComment)
         {
-            var user = GetUser(item.UserId);
+            //var user = GetUser(item.UserId);
             var _ = _first.IsFirstComment(item.UserId);//アイテムを最初に投げる場合もありえる。
             var isFirstComment = false;//常にfalseにしておく。現状こうしないとアイテムの文字色背景色が適用されない。そっちのコードを直したとしてもアイテムには不要だろう。
             var commentItems = new List<IMessagePart>();
@@ -166,13 +164,13 @@ namespace TwicasSitePlugin
                 UserId = item.UserId,
                 UserName = item.ScreenName,
             };
-            var metadata = new MessageMetadata(itemMessage, _options, _siteOptions, user, this, isFirstComment)
+            var metadata = new MessageMetadata2(itemMessage, _siteOptions, isFirstComment)
             {
                 IsInitialComment = isInitialComment,
                 SiteContextGuid = SiteContextGuid,
             };
             var methods = new TwicasMessageMethods();
-            var context = new TwicasMessageContext(itemMessage, metadata, methods);
+            var context = new TwicasMessageContext2(itemMessage, metadata, methods);
             return context;
         }
         private void P1_MessageReceived(object sender, IInternalMessage e)
@@ -189,9 +187,9 @@ namespace TwicasSitePlugin
                     break;
             }
         }
-        private TwicasMessageContext CreateMessageContext(InternalComment comment, bool isInitialComment)
+        private TwicasMessageContext2 CreateMessageContext(InternalComment comment, bool isInitialComment)
         {
-            var user = GetUser(comment.UserId);
+            //var user = GetUser(comment.UserId);
             var isFirstComment = _first.IsFirstComment(comment.UserId);
             var message = new TwicasComment(comment.Raw)
             {
@@ -208,13 +206,13 @@ namespace TwicasSitePlugin
                     Width = 40,//commentData.ThumbnailWidth,
                 },
             };
-            var metadata = new MessageMetadata(message, _options, _siteOptions, user, this, isFirstComment)
+            var metadata = new MessageMetadata2(message, _siteOptions, isFirstComment)
             {
                 IsInitialComment = isInitialComment,
                 SiteContextGuid = SiteContextGuid,
             };
             var methods = new TwicasMessageMethods();
-            var messageContext = new TwicasMessageContext(message, metadata, methods);
+            var messageContext = new TwicasMessageContext2(message, metadata, methods);
             return messageContext;
         }
         public override void Disconnect()
@@ -222,7 +220,7 @@ namespace TwicasSitePlugin
             _autoReconnector?.Disconnect();
         }
 
-        public override Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile browserProfile)
+        public override Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile)
         {
             var cc = GetCookieContainer(browserProfile, "twitcasting.tv");
             string name = null;
@@ -243,11 +241,6 @@ namespace TwicasSitePlugin
             return Task.FromResult<ICurrentUserInfo>(info);
         }
 
-        public override IUser GetUser(string userId)
-        {
-            return _userStoreManager.GetUser(SiteType.Twicas, userId);
-        }
-
         public override async Task PostCommentAsync(string text)
         {
             var (res, raw) = await API.PostCommentAsync(_server, _broadcasterId, _liveId.Value, _lastCommentId, text, _cc);
@@ -256,14 +249,12 @@ namespace TwicasSitePlugin
                 //error
             }
         }
-        public TwicasCommentProvider2(IDataServer server, ILogger logger, ICommentOptions options, TwicasSiteOptions siteOptions, IUserStoreManager userStoreManager)
-            : base(logger, options)
+        public TwicasCommentProvider2(IDataServer server, ILogger logger, TwicasSiteOptions siteOptions)
+            : base(logger)
         {
             _server = server;
             _logger = logger;
-            _options = options;
             _siteOptions = siteOptions;
-            _userStoreManager = userStoreManager;
             _messenger.SystemInfoReiceved += _messenger_SystemInfoReiceved;
         }
 

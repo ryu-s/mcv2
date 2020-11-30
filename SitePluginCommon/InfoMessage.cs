@@ -25,39 +25,23 @@ namespace SitePluginCommon
 
         public event EventHandler<ValueChangedEventArgs> ValueChanged;
     }
-    public class InfoMessageMetadata : IMessageMetadata
+    public class InfoMessageMetadata2 : IMessageMetadata2
     {
         private readonly IInfoMessage _infoMessage;
-        private readonly ICommentOptions _options;
-
-        public Color BackColor => _options.InfoBackColor;
-        public Color ForeColor => _options.InfoForeColor;
-        public FontFamily FontFamily => _options.FontFamily;
-        public int FontSize => _options.FontSize;
-        public FontWeight FontWeight => _options.FontWeight;
-        public FontStyle FontStyle => _options.FontStyle;
         public bool IsNgUser => false;
         public bool IsSiteNgUser => false;
         public bool IsFirstComment => false;
         public bool IsInitialComment => false;
         public bool Is184 => false;
-        public IUser User => null;
-        public ICommentProvider CommentProvider => null;
-        public bool IsVisible
-        {
-            get
-            {
-                return true;
-            }
-        }
-        public bool IsNameWrapping => false;
-        public Guid SiteContextGuid { get; set; }
-        public event PropertyChangedEventHandler PropertyChanged;
+        public SitePluginId SiteContextGuid { get; set; }
+        public string UserId { get; }
+        public IEnumerable<IMessagePart> UserName { get; }
 
-        public InfoMessageMetadata(IInfoMessage infoMessage, ICommentOptions options)
+        public event PropertyChangedEventHandler PropertyChanged;
+        public SiteType SiteType => SiteType.Unknown;//発生元のサイトにするべき？
+        public InfoMessageMetadata2(IInfoMessage infoMessage)
         {
             _infoMessage = infoMessage;
-            _options = options;
         }
     }
     public class InfoMessageMethods : IMessageMethods
@@ -67,24 +51,20 @@ namespace SitePluginCommon
             return Task.CompletedTask;
         }
     }
-    public class InfoMessageContext : IMessageContext
+    public class InfoMessageContext2 : IMessageContext2
     {
         public SitePlugin.ISiteMessage Message { get; }
 
-        public IMessageMetadata Metadata { get; }
-
-        public IMessageMethods Methods { get; }
-        public InfoMessageContext(IInfoMessage message, InfoMessageMetadata metadata, InfoMessageMethods methods)
+        public IMessageMetadata2 Metadata { get; }
+        public InfoMessageContext2(IInfoMessage message, InfoMessageMetadata2 metadata)
         {
             Message = message;
             Metadata = metadata;
-            Methods = methods;
         }
-        public static InfoMessageContext Create(InfoMessage message, ICommentOptions options)
+        public static InfoMessageContext2 Create(InfoMessage message)
         {
-            var metadata = new InfoMessageMetadata(message, options);
-            var methods = new InfoMessageMethods();
-            var context = new InfoMessageContext(message, metadata, methods);
+            var metadata = new InfoMessageMetadata2(message);
+            var context = new InfoMessageContext2(message, metadata);
             return context;
 
         }

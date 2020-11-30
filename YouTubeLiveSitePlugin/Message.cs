@@ -2,6 +2,7 @@
 using SitePlugin;
 using System;
 using System.Collections.Generic;
+using YouTubeLiveIF;
 
 namespace YouTubeLiveSitePlugin
 {
@@ -37,19 +38,11 @@ namespace YouTubeLiveSitePlugin
         public DateTime PostedAt { get; set; }
         public IMessageImage UserIcon { get; set; }
         public string PurchaseAmount { get; }
-        public YouTubeLiveSuperchat(Test2.CommentData commentData) : base(commentData.Raw)
+        public YouTubeLiveSuperchat(CommentData commentData) : base(commentData.Raw)
         {
             UserId = commentData.UserId;
             Id = commentData.Id;
-
-            var list = new List<IMessagePart>();
-            var s = commentData.PurchaseAmount;
-            if (commentData.MessageItems.Count > 0)
-                s += Environment.NewLine;
-            list.Add(MessagePartFactory.CreateMessageText(s));
-            list.AddRange(commentData.MessageItems);
-            CommentItems = list;
-
+            CommentItems = commentData.MessageItems;
             NameItems = commentData.NameItems;
             PurchaseAmount = commentData.PurchaseAmount;
             UserIcon = commentData.Thumbnail;
@@ -68,7 +61,9 @@ namespace YouTubeLiveSitePlugin
         public string UserId { get; set; }
         public DateTime PostedAt { get; set; }
         public IMessageImage UserIcon { get; set; }
-        public YouTubeLiveComment(Test2.CommentData commentData) : base(commentData.Raw)
+        public string Info { get; set; }
+        public UserType UserType { get; }
+        public YouTubeLiveComment(CommentData commentData) : base(commentData.Raw)
         {
             UserId = commentData.UserId;
             Id = commentData.Id;
@@ -76,6 +71,8 @@ namespace YouTubeLiveSitePlugin
             NameItems = commentData.NameItems;
             UserIcon = commentData.Thumbnail;
             PostedAt = SitePluginCommon.Utils.UnixtimeToDateTime(commentData.TimestampUsec / (1000 * 1000));
+            Info = commentData.Info;
+            UserType = commentData.UserType;
         }
     }
 }

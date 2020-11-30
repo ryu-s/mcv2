@@ -13,7 +13,7 @@ namespace PeriscopeSitePlugin
         public PeriscopeMessageType PeriscopeMessageType { get; } = PeriscopeMessageType.Comment;
         public string Id { get; set; }
         public string UserId { get; set; }
-        public DateTime? PostedAt { get; set; }
+        public DateTime PostedAt { get; set; }
         public string Text { get; }
         public string DisplayName { get; }
         public PeriscopeComment(Kind1Type1 kind1Type1) : base(kind1Type1.Raw)
@@ -22,38 +22,15 @@ namespace PeriscopeSitePlugin
             UserId = kind1Type1.UserId;
             Text = kind1Type1.Body;
             DisplayName = kind1Type1.DisplayName;
+            //timestampの長さが10,13,19の場合を確認済み。全て10にして処理する
             var timestampStr = kind1Type1.Timestamp.ToString();
-            DateTime? utcDate = null;
-            if (timestampStr.Length == 13)
-            {
-                utcDate = DateTimeFromUnixTimestampMillis(kind1Type1.Timestamp);
-            }
-            else if (timestampStr.Length == 19)
-            {
-                utcDate = DateTimeFromUnixTimestampNanos(kind1Type1.Timestamp);
-            }
-            else if (timestampStr.Length == 10)
-            {
-                utcDate = DateTimeFromUnixTimestampSec(kind1Type1.Timestamp);
-            }
-            if (utcDate.HasValue)
-            {
-                PostedAt = utcDate.Value.ToLocalTime();
-            }
+            var timestamp10Str = new string(timestampStr.Take(10).ToArray());
+            PostedAt = DateTimeFromUnixTimestampSec(long.Parse(timestamp10Str)).ToLocalTime();
         }
         static readonly DateTime BaseTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         public static DateTime DateTimeFromUnixTimestampSec(long sec)
         {
             return BaseTime.AddSeconds(sec);
-        }
-        public static DateTime DateTimeFromUnixTimestampMillis(long millis)
-        {
-            return BaseTime.AddMilliseconds(millis);
-        }
-        public static DateTime DateTimeFromUnixTimestampNanos(long nano)
-        {
-            var millis = nano / 1000 / 1000;
-            return BaseTime.AddMilliseconds(millis);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Codeplex.Data;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace PeriscopeSitePlugin
@@ -188,6 +189,7 @@ namespace PeriscopeSitePlugin
                                     var kind2payloadkind4Low = Tools.Deserialize<Low.kind2payloadkind4.RootObject>(payload);
                                     var kind2kind4Low = Tools.Deserialize<Low.kind2kind4.RootObject>(kind2payloadkind4Low.Body);
                                     var kind2kind4 = new Kind2Kind4(kind2kind4Low, kind2payloadkind4Low.Sender, raw);
+                                    Debug.WriteLine(kind2kind4.Occupancy);
                                     message = kind2kind4;
                                 }
                                 break;

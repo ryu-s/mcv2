@@ -1,4 +1,5 @@
-﻿using SitePlugin;
+﻿using Common;
+using SitePlugin;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -6,37 +7,20 @@ using System.Text;
 
 namespace TestSitePlugin
 {
-    public class TestSiteContext : ISiteContext
+    public class TestSiteContext2 : ISiteContext
     {
-        private readonly ICommentOptions _options;
-
-        public Guid Guid => new Guid("609B4057-A5CE-49BA-A30F-211C4DFE838E");
+        public SitePluginId Guid { get; } = new SitePluginId(new System.Guid("609B4057-A5CE-49BA-A30F-211C4DFE838E"));
         public string DisplayName => "Test";
-        public IOptionsTabPage TabPanel { get; }
+
+        public SiteType SiteType => SiteType.Unknown;
 
         public ICommentProvider CreateCommentProvider()
         {
-            return new TestCommentProvider(_options, _userStore)
+            return new TestCommentProvider2(_logger)
             {
                 SiteContextGuid = Guid,
             };
         }
-
-        public System.Windows.Controls.UserControl GetCommentPostPanel(ICommentProvider commentProvider)
-        {
-            var testCommentProvider = commentProvider as TestCommentProvider;
-            Debug.Assert(testCommentProvider != null);
-            if (testCommentProvider == null)
-                return null;
-
-            var vm = new CommentPostPanelViewModel(testCommentProvider);
-            var panel = new CommentPostPanel
-            {
-                DataContext = vm
-            };
-            return panel;
-        }
-
         public void Init()
         {
         }
@@ -57,15 +41,10 @@ namespace TestSitePlugin
         public void SaveOptions(string path, IIo io)
         {
         }
-        public IUser GetUser(string userId)
+        private readonly ILogger _logger;
+        public TestSiteContext2(ILogger logger)
         {
-            return _userStore.GetUser(userId);
-        }
-        private readonly IUserStore _userStore;
-        public TestSiteContext(ICommentOptions options)
-        {
-            _options = options;
-            _userStore = new TestUserStore();
+            _logger = logger;
         }
     }
 }

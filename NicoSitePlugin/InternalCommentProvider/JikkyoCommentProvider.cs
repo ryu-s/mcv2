@@ -10,7 +10,7 @@ using SitePluginCommon;
 
 namespace NicoSitePlugin
 {
-    class JikkyoCommentProvider : CommentProviderInternalBase
+    class JikkyoCommentProvider2 : CommentProviderInternalBase2
     {
         public override void AfterDisconnected()
         {
@@ -38,42 +38,42 @@ namespace NicoSitePlugin
             _mainRoomThreadId = jkInfo.ThreadId;
             _roomCommentProvider = new Next20181012.XmlSocketRoomCommentProvider(jkInfo.Name, jkInfo.ThreadId, 1000, CreateStreamSoket(jkInfo.XmlSocketAddr, jkInfo.XmlSocketPort));
             _roomCommentProvider.CommentReceived += async (s, e) =>
-             {
-                 var chat = e;
-                 Debug.WriteLine(chat.Text);
-                 try
-                 {
-                     var context = await CreateMessageContextAsync(chat, jkInfo.Name, false);
-                     if (context != null)
-                     {
-                         RaiseMessageReceived(context);
-                     }
-                 }
-                 catch (Exception ex)
-                 {
-                     _logger.LogException(ex);
-                 }
-             };
+            {
+                var chat = e;
+                Debug.WriteLine(chat.Text);
+                try
+                {
+                    var context = await CreateMessageContextAsync(chat, jkInfo.Name, false);
+                    if (context != null)
+                    {
+                        RaiseMessageReceived(context);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogException(ex);
+                }
+            };
             _roomCommentProvider.InitialCommentsReceived += async (s, e) =>
-             {
-                 var chats = e;
-                 foreach (var chat in chats)
-                 {
-                     Debug.WriteLine(chat.Text);
-                     try
-                     {
-                         var context = await CreateMessageContextAsync(chat, jkInfo.Name, false);
-                         if (context != null)
-                         {
-                             RaiseMessageReceived(context);
-                         }
-                     }
-                     catch (Exception ex)
-                     {
-                         _logger.LogException(ex);
-                     }
-                 }
-             };
+            {
+                var chats = e;
+                foreach (var chat in chats)
+                {
+                    Debug.WriteLine(chat.Text);
+                    try
+                    {
+                        var context = await CreateMessageContextAsync(chat, jkInfo.Name, false);
+                        if (context != null)
+                        {
+                            RaiseMessageReceived(context);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogException(ex);
+                    }
+                }
+            };
             await _roomCommentProvider.ReceiveAsync();
             await Task.CompletedTask;
         }
@@ -136,8 +136,8 @@ namespace NicoSitePlugin
         public override void SetMessage(string raw)
         {
         }
-        public JikkyoCommentProvider(ICommentOptions options, INicoSiteOptions siteOptions, IUserStoreManager userStoreManager, IDataSource dataSource, ILogger logger, ICommentProvider commentProvider)
-            : base(options, siteOptions, userStoreManager, dataSource, logger)
+        public JikkyoCommentProvider2(INicoSiteOptions siteOptions, IDataSource dataSource, ILogger logger)
+            : base(siteOptions, dataSource, logger)
         {
         }
     }

@@ -7,7 +7,7 @@ using System.IO;
 
 namespace ryu_s.BrowserCookie
 {
-    public class OperaGxManager: OperaManager
+    public class OperaGxManager : OperaManager
     {
         public override BrowserType Type => BrowserType.OperaGx;
         protected override string ChromeSettingsDirPath => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Opera Software\Opera GX Stable";
@@ -16,9 +16,9 @@ namespace ryu_s.BrowserCookie
     {
         #region IChromeManager
         public virtual BrowserType Type => BrowserType.Opera;
-        public List<IBrowserProfile> GetProfiles()
+        public List<IBrowserProfile2> GetProfiles()
         {
-            var list = new List<IBrowserProfile>();
+            var list = new List<IBrowserProfile2>();
             var defaultDbFilePath = Path.Combine(ChromeSettingsDirPath, _dbFilename);
             if (System.IO.File.Exists(defaultDbFilePath))
             {
@@ -33,9 +33,10 @@ namespace ryu_s.BrowserCookie
         public OperaManager()
         {
         }
-        class OperaProfile : IBrowserProfile
+        class OperaProfile : IBrowserProfile2
         {
             #region IBrowserProfile
+            public Guid Id { get; } = Guid.NewGuid();
             public string Path { get; }
 
             public string ProfileName { get; }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using SitePlugin;
 namespace NicoSitePlugin
 {
-    public interface INicoCommentProvider : ICommentProvider
+    public interface INicoCommentProvider2 : ICommentProvider
     {
         Task PostCommentAsync(string text, string mail);
     }

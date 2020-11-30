@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using SitePlugin;
 namespace NicoSitePlugin
 {
-    public interface INicoSiteContext : ISiteContext
+    public interface INicoSiteContext2 : ISiteContext
     {
-        INicoCommentProvider CreateNicoCommentProvider();
+        INicoCommentProvider2 CreateNicoCommentProvider();
         INicoSiteOptions GetNicoSiteOptions();
     }
 }

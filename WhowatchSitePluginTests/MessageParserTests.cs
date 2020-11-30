@@ -54,10 +54,10 @@ namespace WhowatchSitePluginTests
 
             var shout = message as IWhowatchComment;
             Assert.IsNotNull(shout);
-            Assert.AreEqual("@kv510k", shout.AccountName);
+            Assert.AreEqual("@kv510k", shout!.AccountName);
             Assert.AreEqual("てｓｔ", shout.Comment);
             Assert.AreEqual("714170546", shout.Id);
-            Assert.AreEqual("03:52:58", shout.PostTime);
+            Assert.AreEqual("03:52:58", shout.PostedAt);
             Assert.AreEqual(data, shout.Raw);
             Assert.AreEqual(SiteType.Whowatch, shout.SiteType);
             Assert.AreEqual("1072838", shout.UserId);

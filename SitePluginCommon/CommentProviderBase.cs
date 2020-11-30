@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SitePluginCommon
 {
-    public abstract class CommentProviderBase : ICommentProvider
+    public abstract class CommentProviderBase2 : ICommentProvider
     {
         private bool _canConnect;
         public bool CanConnect
@@ -25,7 +25,6 @@ namespace SitePluginCommon
 
         private bool _canDisconnect;
         private readonly ILogger _logger;
-        private readonly ICommentOptions _options;
 
         public bool CanDisconnect
         {
@@ -38,8 +37,8 @@ namespace SitePluginCommon
                 CanDisconnectChanged?.Invoke(this, EventArgs.Empty);
             }
         }
-        public Guid SiteContextGuid { get; set; }
-        protected virtual CookieContainer GetCookieContainer(IBrowserProfile browserProfile, string domain)
+        public SitePluginId SiteContextGuid { get; set; }
+        protected virtual CookieContainer GetCookieContainer(IBrowserProfile2 browserProfile, string domain)
         {
             var cc = new CookieContainer();
             try
@@ -58,20 +57,20 @@ namespace SitePluginCommon
         }
         protected void SendSystemInfo(string message, InfoType type)
         {
-            var context = InfoMessageContext.Create(new InfoMessage
+            var context = InfoMessageContext2.Create(new InfoMessage
             {
                 Text = message,
                 SiteType = SiteType.Periscope,
                 Type = type,
-            }, _options);
+            });
             MessageReceived?.Invoke(this, context);
         }
         public event EventHandler<IMetadata> MetadataUpdated;
         public event EventHandler CanConnectChanged;
         public event EventHandler CanDisconnectChanged;
         public event EventHandler<ConnectedEventArgs> Connected;
-        public event EventHandler<IMessageContext> MessageReceived;
-        protected void RaiseMessageReceived(IMessageContext context)
+        public event EventHandler<IMessageContext2> MessageReceived;
+        protected void RaiseMessageReceived(IMessageContext2 context)
         {
             MessageReceived?.Invoke(this, context);
         }
@@ -79,15 +78,13 @@ namespace SitePluginCommon
         {
             MetadataUpdated?.Invoke(this, metadata);
         }
-        public abstract Task ConnectAsync(string input, IBrowserProfile browserProfile);
+        public abstract Task ConnectAsync(string input, IBrowserProfile2 browserProfile);
 
         public abstract void Disconnect();
 
-        public abstract IUser GetUser(string userId);
-
         public abstract Task PostCommentAsync(string text);
 
-        public abstract Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile browserProfile);
+        public abstract Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile);
         protected virtual void BeforeConnect()
         {
             CanConnect = false;
@@ -101,10 +98,9 @@ namespace SitePluginCommon
 
         public abstract void SetMessage(string raw);
 
-        public CommentProviderBase(ILogger logger, ICommentOptions options)
+        public CommentProviderBase2(ILogger logger)
         {
             _logger = logger;
-            _options = options;
 
             CanConnect = true;
             CanDisconnect = false;

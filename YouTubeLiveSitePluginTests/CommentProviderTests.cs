@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using YouTubeLiveSitePlugin.Test2;
+using YouTubeLiveSitePlugin;
 using Moq;
 using Moq.Protected;
 using SitePlugin;
@@ -24,7 +24,7 @@ namespace YouTubeLiveSitePluginTests
     public class CommentProviderTests
     {
 
-        public class Server : IYouTubeLibeServer
+        public class Server : IYouTubeLiveServer
         {
             private readonly string _clientIdPrefix;
             private readonly string _comment;
@@ -95,6 +95,11 @@ namespace YouTubeLiveSitePluginTests
                 throw new NotImplementedException();
             }
 
+            public Task<YouTubeLiveServerResponse> GetNoThrowAsync(string url, CookieContainer cc)
+            {
+                throw new NotImplementedException();
+            }
+
             public Server(string clientIdPrefix, string comment, string sej, string sessionToken)
             {
                 _clientIdPrefix = clientIdPrefix;
@@ -111,23 +116,19 @@ namespace YouTubeLiveSitePluginTests
             var sej = "b";
             var sessionToken = "c";
             var cc = new CookieContainer();
-            var optionsMock = new Mock<ICommentOptions>();
-            var options = optionsMock.Object;
             var server = new Server(clientIdPrefix, comment, sej, sessionToken);
-            var serverMock = new Mock<IYouTubeLibeServer>();
+            var serverMock = new Mock<IYouTubeLiveServer>();
             //serverMock.Setup(s => s.PostAsync(It.IsAny<string>(), It.IsAny<Dictionary<string,string>>(), It.IsAny<CookieContainer>())).Callback<Task<string>>(a=>PostAsync(a,b,c));
             //serverMock.Verify(h=>h.PostAsync())
             var siteOptions = new YouTubeLiveSiteOptions();
             var loggerMock = new Mock<ILogger>();
             var logger = loggerMock.Object;
-            var userStoreMock = new Mock<IUserStoreManager>();
-            var userStoreManager = userStoreMock.Object;
             var userCommentCountDict = new Dictionary<string, int>();
             var receivedCommentIds = new SynchronizedCollection<string>();
-            var cpMock = CreateCommentProviderMock(options, server, siteOptions, logger, userStoreManager);
+            var cpMock = CreateCommentProviderMock(server, siteOptions, logger);
             var cp = cpMock.Object;
             //var cp = new C(options.Object, server, siteOptions, logger.Object, userStore.Object, clientIdPrefix, sej, sessionToken);
-            var connMock = CreateConnection(logger, cc, options, server, siteOptions, userCommentCountDict, receivedCommentIds, cp, userStoreManager, Guid.NewGuid());
+            var connMock = CreateConnection(logger, cc, server, siteOptions, userCommentCountDict, receivedCommentIds, cp, new SitePluginId(new Guid()));
             connMock.Protected().Setup<PostCommentContext>("PostCommentContext").Returns(new PostCommentContext
             {
                 ClientIdPrefix = clientIdPrefix,
@@ -141,45 +142,56 @@ namespace YouTubeLiveSitePluginTests
             connMock.VerifyAll();
         }
 
-        private static Mock<CommentProvider> CreateCommentProviderMock(ICommentOptions options, IYouTubeLibeServer server, YouTubeLiveSiteOptions siteOptions, ILogger logger, IUserStoreManager userStoreManager)
+        private static Mock<CommentProvider> CreateCommentProviderMock(IYouTubeLiveServer server, YouTubeLiveSiteOptions siteOptions, ILogger logger)
         {
-            return new Mock<CommentProvider>(options, server, siteOptions, logger, userStoreManager);
+            return new Mock<CommentProvider>(server, siteOptions, logger);
         }
 
         [Test]
         public async Task ConnectedEventTest()
         {
-            var options = new Mock<ICommentOptions>();
-            var serverMock = new Mock<IYouTubeLibeServer>();
+            var serverMock = new Mock<IYouTubeLiveServer>();
             serverMock.Setup(s => s.GetEnAsync("https://www.youtube.com/channel/UCv1fFr156jc65EMiLbaLImw/live")).Returns(Task.FromResult(Tools.GetSampleData("Channel_live.txt")));
-            serverMock.Setup(s => s.GetAsync("https://www.youtube.com/live_chat?v=klvzbBP7zM8&is_popout=1", It.Is<CookieContainer>(c => true))).Returns(Task.FromResult(Tools.GetSampleData("LiveChat.txt")));
+            serverMock.Setup(s => s.GetNoThrowAsync("https://www.youtube.com/live_chat?v=klvzbBP7zM8&is_popout=1", It.Is<CookieContainer>(c => true))).Returns(Task.FromResult(new YouTubeLiveServerResponse
+            {
+                Content = Tools.GetSampleData("LiveChat.txt"),
+                StatusCode = HttpStatusCode.OK,
+            }));
+            serverMock.Setup(s => s.PostAsync(It.IsAny<HttpOptions>(), It.IsAny<StringContent>())).Returns(Task.FromResult("{}"));
             var siteOptions = new YouTubeLiveSiteOptions();
             var logger = new Mock<ILogger>();
-            var userStore = new Mock<IUserStoreManager>();
-            var broweserProfileMock = new Mock<IBrowserProfile>();
+            var broweserProfileMock = new Mock<IBrowserProfile2>();
             broweserProfileMock.Setup(x => x.GetCookieCollection(It.IsAny<string>())).Returns(new List<Cookie>());
 
             var b = false;
-            var cp = new CommentProvider(options.Object, serverMock.Object, siteOptions, logger.Object, userStore.Object);
+            var cp = new CommentProvider(serverMock.Object, siteOptions, logger.Object);
+            var eventFired = false;
             cp.Connected += (s, e) =>
             {
                 b = e.IsInputStoringNeeded;
+                eventFired = true;
+                cp.Disconnect();
             };
-            await cp.ConnectAsync("https://www.youtube.com/channel/UCv1fFr156jc65EMiLbaLImw", broweserProfileMock.Object);
+            var cpT = cp.ConnectAsync("https://www.youtube.com/channel/UCv1fFr156jc65EMiLbaLImw", broweserProfileMock.Object);
+            var timeoutT = Task.Delay(5000);
+            var t = await Task.WhenAny(cpT, timeoutT);
+            if (t == timeoutT)
+            {
+                Assert.Fail("timeout");
+            }
             Assert.IsTrue(b);
+            Assert.IsTrue(eventFired);
         }
         [Test]
         public async Task GetCurrentUserInfoAsync_LoggedInTest()
         {
             var data = Tools.GetSampleData("Embed_loggedin.txt");
-            var options = new Mock<ICommentOptions>();
-            var serverMock = new Mock<IYouTubeLibeServer>();
+            var serverMock = new Mock<IYouTubeLiveServer>();
             serverMock.Setup(s => s.GetAsync(It.IsAny<string>(), It.IsAny<CookieContainer>())).Returns(Task.FromResult(data));
             var siteOptions = new YouTubeLiveSiteOptions();
             var loggerMock = new Mock<ILogger>();
-            var userStore = new Mock<IUserStoreManager>();
-            var broweserProfileMock = new Mock<IBrowserProfile>();
-            var cp = new CommentProvider(options.Object, serverMock.Object, siteOptions, loggerMock.Object, userStore.Object);
+            var broweserProfileMock = new Mock<IBrowserProfile2>();
+            var cp = new CommentProvider(serverMock.Object, siteOptions, loggerMock.Object);
             var info = await cp.GetCurrentUserInfo(broweserProfileMock.Object);
             Assert.IsTrue(info.IsLoggedIn);
             Assert.AreEqual("Ryu", info.Username);
@@ -188,14 +200,12 @@ namespace YouTubeLiveSitePluginTests
         public async Task GetCurrentUserInfoAsync_NotLoggedInTest()
         {
             var data = Tools.GetSampleData("Embed_notloggedin.txt");
-            var options = new Mock<ICommentOptions>();
-            var serverMock = new Mock<IYouTubeLibeServer>();
+            var serverMock = new Mock<IYouTubeLiveServer>();
             serverMock.Setup(s => s.GetAsync(It.IsAny<string>(), It.IsAny<CookieContainer>())).Returns(Task.FromResult(data));
             var siteOptions = new YouTubeLiveSiteOptions();
             var loggerMock = new Mock<ILogger>();
-            var userStore = new Mock<IUserStoreManager>();
-            var broweserProfileMock = new Mock<IBrowserProfile>();
-            var cp = new CommentProvider(options.Object, serverMock.Object, siteOptions, loggerMock.Object, userStore.Object);
+            var broweserProfileMock = new Mock<IBrowserProfile2>();
+            var cp = new CommentProvider(serverMock.Object, siteOptions, loggerMock.Object);
             var info = await cp.GetCurrentUserInfo(broweserProfileMock.Object);
             Assert.IsFalse(info.IsLoggedIn);
         }
@@ -203,14 +213,12 @@ namespace YouTubeLiveSitePluginTests
         public async Task 短すぎるコメントを投稿したときのエラーメッセージを正しく処理できるか()
         {
             var data = Tools.GetSampleData("CommentPost_Result_TooShort.txt");
-            var optionsMock = new Mock<ICommentOptions>();
-            var serverMock = new Mock<IYouTubeLibeServer>();
+            var serverMock = new Mock<IYouTubeLiveServer>();
             serverMock.Setup(s => s.PostAsync(It.IsAny<string>(), It.IsAny<Dictionary<string, string>>(), It.IsAny<CookieContainer>())).Returns(Task.FromResult(data));
             var siteOptions = new YouTubeLiveSiteOptions();
             var loggerMock = new Mock<ILogger>();
-            var userStoreManagerMock = new Mock<IUserStoreManager>();
-            var broweserProfileMock = new Mock<IBrowserProfile>();
-            var cpMock = new Mock<EachConnection>(loggerMock.Object, new CookieContainer(), optionsMock.Object, serverMock.Object, siteOptions, new Dictionary<string, int>(), new System.Collections.Generic.SynchronizedCollection<string>(), new Mock<ICommentProvider>().Object, userStoreManagerMock.Object);
+            var broweserProfileMock = new Mock<IBrowserProfile2>();
+            var cpMock = new Mock<EachConnection>(loggerMock.Object, new CookieContainer(), serverMock.Object, siteOptions, new Dictionary<string, int>(), new System.Collections.Generic.SynchronizedCollection<string>(), new Mock<ICommentProvider>().Object);
             //var cpMock = new Mock<EachConnection>(options.Object, serverMock.Object, siteOptions, loggerMock.Object, userStore.Object);
             cpMock.Protected().Setup<PostCommentContext>("PostCommentContext").Returns(new PostCommentContext() { Sej = "" });
             var cp = cpMock.Object;
@@ -226,50 +234,42 @@ namespace YouTubeLiveSitePluginTests
             await cp.PostCommentAsync("");
             Assert.IsTrue(expectedResult);
         }
-        private Mock<EachConnection> CreateConnection(ILogger logger, CookieContainer cc, ICommentOptions options, IYouTubeLibeServer server,
+        private Mock<EachConnection> CreateConnection(ILogger logger, CookieContainer cc, IYouTubeLiveServer server,
             YouTubeLiveSiteOptions siteOptions, Dictionary<string, int> userCommentCountDict, SynchronizedCollection<string> receivedCommentIds,
-            ICommentProvider cp, IUserStoreManager userStoreManager, Guid siteContextGuid)
+            ICommentProvider cp, SitePluginId siteContextGuid)
         {
-            var cpMock = new Mock<EachConnection>(logger, cc, options, server, siteOptions, userCommentCountDict, receivedCommentIds, cp, userStoreManager) { CallBase = true };
+            var cpMock = new Mock<EachConnection>(logger, cc, server, siteOptions, userCommentCountDict, receivedCommentIds, cp) { CallBase = true };
             cpMock.Object.SiteContextGuid = siteContextGuid;
             return cpMock;
         }
         [Test]
         public async Task 再接続時の初期コメントが重複判定されるか()
         {
-            var optionsMock = new Mock<ICommentOptions>();
-            var options = optionsMock.Object;
-            var serverMock = new Mock<IYouTubeLibeServer>();
-            serverMock.Setup(s => s.GetAsync("https://www.youtube.com/live_chat?v=EiLzFNajLas&is_popout=1", It.Is<CookieContainer>(c => true))).Returns(Task.FromResult(Tools.GetSampleData("LiveChat.txt")));
+            var serverMock = new Mock<IYouTubeLiveServer>();
+            serverMock.Setup(s => s.GetNoThrowAsync("https://www.youtube.com/live_chat?v=EiLzFNajLas&is_popout=1", It.IsAny<CookieContainer>())).Returns(Task.FromResult(new YouTubeLiveServerResponse { StatusCode = HttpStatusCode.OK, Content = Tools.GetSampleData("LiveChat.txt") }));
             serverMock.Setup(s => s.GetBytesAsync("https://www.youtube.com/live_chat/get_live_chat?continuation=0ofMyAPAARqQAUNpTVNJUW9ZVlVOSGFsWTBZbk5ETkROUGJpMVpkV2xNV21ObVREQjNFZ1V2YkdsMlpScERxcm5CdlFFOUNqdG9kSFJ3Y3pvdkwzZDNkeTU1YjNWMGRXSmxMbU52YlM5c2FYWmxYMk5vWVhRX2RqMUJkVVpQVDFWMFNYbFZXU1pwYzE5d2IzQnZkWFE5TVNBQzABSiAIABAAGAAgACoHNjVlODgzZjoAQABKAFDvwL3QuYjcAmgBggEECAEQAA%253D%253D&pbj=1")).ThrowsAsync(new HttpRequestException());
             var server = serverMock.Object;
 
             var siteOptions = new YouTubeLiveSiteOptions();
             var loggerMock = new Mock<ILogger>();
             var logger = loggerMock.Object;
-            var userStoreManagerMock = new Mock<IUserStoreManager>();
-            userStoreManagerMock.Setup(u => u.GetUser(SiteType.YouTubeLive, It.IsAny<string>())).Returns(new UserTest("1"));
-            var userStore = userStoreManagerMock.Object;
-            var browserProfileMock = new Mock<IBrowserProfile>();
+            var browserProfileMock = new Mock<IBrowserProfile2>();
             browserProfileMock.Setup(b => b.GetCookieCollection(It.IsAny<string>())).Returns(new List<Cookie>());
             var browserProfile = browserProfileMock.Object;
 
             var userCommentCountDict = new Dictionary<string, int>();
             var receivedCommentIds = new SynchronizedCollection<string>();
-            var cpMock = new Mock<CommentProvider>(options, server, siteOptions, logger, userStore) { CallBase = true };
+            var cpMock = new Mock<CommentProvider>(server, siteOptions, logger) { CallBase = true };
             var cp = cpMock.Object;
-            var eachConnectionMock = CreateConnection(logger, new CookieContainer(), options, server, siteOptions, userCommentCountDict, receivedCommentIds, cp, userStore, Guid.NewGuid());
+            var eachConnectionMock = CreateConnection(logger, new CookieContainer(), server, siteOptions, userCommentCountDict, receivedCommentIds, cp, new SitePluginId(new Guid()));
             eachConnectionMock.Protected().Setup<Task>("CreateMetadataReceivingTask", ItExpr.Ref<IMetadataProvider>.IsAny, ItExpr.IsAny<BrowserType>(), ItExpr.IsAny<string>(), ItExpr.IsAny<string>()).Returns(Task.CompletedTask);
             cpMock.Protected().Setup<EachConnection>("CreateConnection",
                 ItExpr.IsAny<ILogger>(),
                 ItExpr.IsAny<CookieContainer>(),
-                ItExpr.IsAny<ICommentOptions>(),
-                ItExpr.IsAny<IYouTubeLibeServer>(),
+                ItExpr.IsAny<IYouTubeLiveServer>(),
                 ItExpr.IsAny<YouTubeLiveSiteOptions>(),
                 ItExpr.IsAny<Dictionary<string, int>>(),
                 ItExpr.IsAny<SynchronizedCollection<string>>(),
-                ItExpr.IsAny<ICommentProvider>(),
-                ItExpr.IsAny<IUserStoreManager>(),
                 ItExpr.IsAny<Guid>()
                 ).Returns(eachConnectionMock.Object);
             int i = 0;

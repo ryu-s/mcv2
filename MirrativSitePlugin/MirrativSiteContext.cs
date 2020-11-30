@@ -8,25 +8,15 @@ using System.Windows.Controls;
 
 namespace MirrativSitePlugin
 {
-    public class MirrativSiteContext : SiteContextBase
+    public class MirrativSiteContext2 : SiteContextBase
     {
-        public override Guid Guid => new Guid("6DAFA768-280D-4E70-8494-FD5F31812EF5");
-
+        public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("6DAFA768-280D-4E70-8494-FD5F31812EF5"));
         public override string DisplayName => "Mirrativ";
-        protected override SiteType SiteType => SiteType.Mirrativ;
-        public override IOptionsTabPage TabPanel
-        {
-            get
-            {
-                var panel = new TabPagePanel();
-                panel.SetViewModel(new MirrativSiteOptionsViewModel(_siteOptions));
-                return new MirrativOptionsTabPage(DisplayName, panel);
-            }
-        }
+        public override SiteType SiteType => SiteType.Mirrativ;
 
         public override ICommentProvider CreateCommentProvider()
         {
-            return new MirrativCommentProvider2(_server, _logger, _options, _siteOptions, _userStoreManager)
+            return new MirrativCommentProvider33(_server, _logger, _siteOptions)
             {
                 SiteContextGuid = Guid,
             };
@@ -65,17 +55,11 @@ namespace MirrativSitePlugin
         {
             return Tools.IsValidLiveId(input) || Tools.IsValidUserId(input);
         }
-        public override UserControl GetCommentPostPanel(ICommentProvider commentProvider)
-        {
-            return null;
-        }
-        private readonly ICommentOptions _options;
         private readonly IDataServer _server;
         private readonly ILogger _logger;
-        public MirrativSiteContext(ICommentOptions options, IDataServer server, ILogger logger, IUserStoreManager userStoreManager)
-            : base(options, userStoreManager, logger)
+        public MirrativSiteContext2(IDataServer server, ILogger logger)
+            : base(logger)
         {
-            _options = options;
             _server = server;
             _logger = logger;
         }

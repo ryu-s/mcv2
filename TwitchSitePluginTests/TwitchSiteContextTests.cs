@@ -13,17 +13,15 @@ using SitePluginCommon;
 namespace TwitchSitePluginTests
 {
     [TestFixture]
-    class TwitchSiteContextTests        
+    class TwitchSiteContextTests
     {
         [Test]
         public void TwitchSite_IsValdUrlTest()
         {
-            var optionsMock = new Mock<ICommentOptions>();
             var loggerMock = new Mock<ILogger>();
             var serverMock = new Mock<IDataServer>();
             var webSocket = new Mock<IMessageProvider>();
-            var userStoreManager = new Mock<IUserStoreManager>();
-            var site = new TwitchSiteContext(optionsMock.Object, serverMock.Object, loggerMock.Object, userStoreManager.Object);
+            var site = new TwitchSiteContext2(serverMock.Object, loggerMock.Object);
             Assert.IsTrue(site.IsValidInput("https://www.twitch.tv/abc"));
             Assert.IsTrue(site.IsValidInput("https://www.twitch.tv/abc?"));
             Assert.IsTrue(site.IsValidInput("https://www.twitch.tv/abc/"));

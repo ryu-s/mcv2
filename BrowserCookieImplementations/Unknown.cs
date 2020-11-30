@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace ryu_s.BrowserCookie
 {
-    public class UnknownProfile : IBrowserProfile
+    public class UnknownProfile : IBrowserProfile2
     {
+        public Guid Id { get; } = Guid.NewGuid();
         public string Path { get; }
 
         public string ProfileName { get; }
@@ -31,9 +33,9 @@ namespace ryu_s.BrowserCookie
     {
         public BrowserType Type { get; }
 
-        public List<IBrowserProfile> GetProfiles()
+        public List<IBrowserProfile2> GetProfiles()
         {
-            return new List<IBrowserProfile>()
+            return new List<IBrowserProfile2>()
             {
                 new UnknownProfile(),
             };

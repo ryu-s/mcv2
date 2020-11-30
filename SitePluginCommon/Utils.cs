@@ -27,32 +27,6 @@ namespace SitePluginCommon
             return dt.AddSeconds(unixTimeStamp).ToLocalTime();
         }
         /// <summary>
-        /// @コテハンがあったら抽出してuser.Nicknameに設定する
-        /// </summary>
-        /// <param name="message">コメント本文</param>
-        /// <param name="user">コメントを投稿したユーザ</param>
-        public static void SetNickname(string message, IUser user, string matchStr = "@|＠")
-        {
-            var nick = ExtractNickname(message, matchStr);
-            if (!string.IsNullOrEmpty(nick))
-            {
-                user.Nickname = nick;
-            }
-        }
-        /// <summary>
-        /// @コテハンがあったら抽出してuser.Nicknameに設定する
-        /// </summary>
-        /// <param name="message">コメント本文</param>
-        /// <param name="user">コメントを投稿したユーザ</param>
-        public static void SetNickname(string message, IUser2 user)
-        {
-            var nick = ExtractNickname(message);
-            if (!string.IsNullOrEmpty(nick))
-            {
-                user.Nickname = nick;
-            }
-        }
-        /// <summary>
         /// 文字列から@ニックネームを抽出する
         /// 文字列中に@が複数ある場合は一番最後のものを採用する
         /// 数字だけのニックネームは不可
@@ -74,7 +48,7 @@ namespace SitePluginCommon
             //sb.Replace(")", "\\)");
             //sb.Replace("[", "\\[");
             //sb.Replace("]", "\\]");
-            var splitted = matchStr.Split('|').Where(k=>!string.IsNullOrWhiteSpace(k)).Select(k=>Regex.Escape(k)).ToList();
+            var splitted = matchStr.Split('|').Where(k => !string.IsNullOrWhiteSpace(k)).Select(k => Regex.Escape(k)).ToList();
             var matchStrEscaped = splitted.Count == 0 ? Regex.Escape(matchStr) : string.Join("|", splitted);// sb.ToString();
             var a = splitted.Count == 0 ? Regex.Escape(matchStr) : string.Join("", splitted);// sb.ToString();
 

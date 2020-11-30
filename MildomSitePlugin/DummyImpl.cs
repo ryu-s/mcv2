@@ -11,7 +11,7 @@ namespace MildomSitePlugin
     {
         private readonly IDataServer _server;
         private readonly string _input;
-        private readonly IBrowserProfile _browserProfile;
+        private readonly IBrowserProfile2 _browserProfile;
         private readonly ILogger _logger;
         private readonly IMildomSiteOptions _siteOptions;
         private readonly MessageProvider _p1;
@@ -38,7 +38,7 @@ namespace MildomSitePlugin
             };
         }
 
-        public DummyImpl(IDataServer server, string input, IBrowserProfile browserProfile, ILogger logger, IMildomSiteOptions siteOptions, MessageProvider p1)
+        public DummyImpl(IDataServer server, string input, IBrowserProfile2 browserProfile, ILogger logger, IMildomSiteOptions siteOptions, MessageProvider p1)
         {
             _server = server;
             _input = input;

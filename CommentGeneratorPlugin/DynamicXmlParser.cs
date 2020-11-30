@@ -4,7 +4,7 @@ using System.IO;
 using System.Xml.Linq;
 using System.Dynamic;
 
-namespace CommentViewer.Plugin
+namespace CommentGeneratorPlugin
 {
     /// <summary>
     /// 

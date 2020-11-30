@@ -44,17 +44,19 @@ namespace Common
                     continue;
                 var k = kv[0];
                 var v = kv[1];
-                if (_dict.TryGetValue(k, out Item item))
+                if (_dict.TryGetValue(k, out Item? item))
                 {
                     try
                     {
                         item.Value = item.Deserializer(v);
                     }
+#pragma warning disable CA1031 // Do not catch general exception types
                     catch (Exception ex)
                     {
                         Debug.WriteLine(ex.Message);
                         //最初にReset()しているから、ここに来たらitem.Value==item.DefaultValue
                     }
+#pragma warning restore CA1031 // Do not catch general exception types
                     if (!item.Predicate(item.Value))
                     {
                         item.Value = item.DefaultValue;
@@ -71,7 +73,7 @@ namespace Common
         protected void SetValue(dynamic d, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
             var item = _dict[propertyName];
-            if(item.Predicate(d))
+            if (item.Predicate(d))
                 item.Value = d;
             RaisePropertyChanged(propertyName);
         }
@@ -136,9 +138,9 @@ namespace Common
             /// 文字列をDeserializerに通した後の値の妥当性を評価する。
             /// 文字列に形式上の問題がある場合はDeserializerで例外が投げられるだろうからcatchしてDefaultValueを入れる
             /// </summary>
-            public Predicate<dynamic> Predicate { get; set; }
-            public dynamic DefaultValue { get; set; }
-            public dynamic Value { get; set; }
+            public Predicate<dynamic?> Predicate { get; set; }
+            public dynamic? DefaultValue { get; set; }
+            public dynamic? Value { get; set; }
             public Func<dynamic, string> Serializer { get; set; }
             public Func<string, dynamic> Deserializer { get; set; }
 

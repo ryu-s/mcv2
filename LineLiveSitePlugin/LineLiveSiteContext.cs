@@ -10,23 +10,13 @@ namespace LineLiveSitePlugin
 {
     public class LineLiveSiteContext : SiteContextBase
     {
-        public override Guid Guid => new Guid("36F139CA-EAB9-45B1-8CDC-AD47A4051BD3");
-
+        public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("36F139CA-EAB9-45B1-8CDC-AD47A4051BD3"));
         public override string DisplayName => "LINELIVE";
-        protected override SiteType SiteType => SiteType.LineLive;
-        public override IOptionsTabPage TabPanel
-        {
-            get
-            {
-                var panel = new LineLiveOptionsPanel();
-                panel.SetViewModel(new LineLiveSiteOptionsViewModel(_siteOptions));
-                return new LineLiveOptionsTabPage(DisplayName, panel);
-            }
-        }
+        public override SiteType SiteType => SiteType.LineLive;
 
         public override ICommentProvider CreateCommentProvider()
         {
-            return new LineLiveCommentProvider(_server, _logger, _options, _siteOptions, _userStoreManager)
+            return new LineLiveCommentProvider(_server, _logger, _siteOptions)
             {
                 SiteContextGuid = Guid,
             };
@@ -69,18 +59,11 @@ namespace LineLiveSitePlugin
             var b = Regex.IsMatch(input, "line\\.me/channels/\\d+");
             return b;
         }
-
-        public override UserControl GetCommentPostPanel(ICommentProvider commentProvider)
-        {
-            return null;
-        }
-        private readonly ICommentOptions _options;
         private readonly IDataServer _server;
         private readonly ILogger _logger;
-        public LineLiveSiteContext(ICommentOptions options, IDataServer server, ILogger logger, IUserStoreManager userStoreManager)
-            : base(options, userStoreManager, logger)
+        public LineLiveSiteContext(IDataServer server, ILogger logger)
+            : base(logger)
         {
-            _options = options;
             _server = server;
             _logger = logger;
         }

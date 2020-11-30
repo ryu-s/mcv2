@@ -1,4 +1,5 @@
 ﻿using Common;
+using ryu_s.BrowserCookie;
 using SitePlugin;
 using SitePluginCommon;
 using System;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TestSitePlugin
 {
-    public class TestCommentProvider : ICommentProvider
+    public class TestCommentProvider2 : ICommentProvider
     {
         #region CanConnect
         private bool _canConnect;
@@ -41,15 +42,13 @@ namespace TestSitePlugin
         #endregion //CanDisconnect
 
         public event EventHandler<ConnectedEventArgs> Connected;
-        public event EventHandler<IMessageContext> MessageReceived;
+        public event EventHandler<IMessageContext2> MessageReceived;
         public event EventHandler<IMetadata> MetadataUpdated;
         public event EventHandler CanConnectChanged;
         public event EventHandler CanDisconnectChanged;
         CancellationTokenSource _cts;
-        private readonly ICommentOptions _options;
-        private readonly IUserStore _userStore;
 
-        public async Task ConnectAsync(string input, global::ryu_s.BrowserCookie.IBrowserProfile browserProfile)
+        public async Task ConnectAsync(string input, IBrowserProfile2 browserProfile)
         {
             if (_cts != null)
             {
@@ -68,7 +67,9 @@ namespace TestSitePlugin
                 {
                     await Task.Delay(1000, _cts.Token);
                 }
+#pragma warning disable CA1031 // Do not catch general exception types
                 catch (TaskCanceledException) { break; }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
             CanConnect = true;
             CanDisconnect = false;
@@ -84,7 +85,7 @@ namespace TestSitePlugin
             public string Username { get; set; }
             public bool IsLoggedIn { get; set; }
         }
-        public Task<ICurrentUserInfo> GetCurrentUserInfo(global::ryu_s.BrowserCookie.IBrowserProfile browserProfile)
+        public Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile)
         {
             ICurrentUserInfo info = new CurrentUserInfo
             {
@@ -94,11 +95,6 @@ namespace TestSitePlugin
             return Task.FromResult(info);
         }
 
-        public IUser GetUser(string userId)
-        {
-            return _userStore.GetUser(userId);
-        }
-
         public Task PostCommentAsync(string text)
         {
             var arr = text.Split(',');
@@ -106,18 +102,17 @@ namespace TestSitePlugin
             {
                 var userId = arr[0];
                 var content = arr[1];
-                var user = _userStore.GetUser(userId);
                 var comment = new TestComment
                 {
                     UserId = userId,
                     Text = content,
                 };
-                var metadata = new TestMetadata(user)
+                var metadata = new TestMetadata2(userId)
                 {
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new TestMethods();
-                var context = new MessageContext(comment, metadata, methods);
+                var context = new MessageContext2(comment, metadata, methods);
                 MessageReceived?.Invoke(this, context);
             }
             else if (arr.Length == 3)
@@ -125,19 +120,18 @@ namespace TestSitePlugin
                 var userId = arr[0];
                 var name = arr[1];
                 var content = arr[2];
-                var user = _userStore.GetUser(userId);
                 var comment = new TestComment
                 {
                     UserId = userId,
                     UserName = name,
                     Text = content,
                 };
-                var metadata = new TestMetadata(user)
+                var metadata = new TestMetadata2(userId)
                 {
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new TestMethods();
-                var context = new MessageContext(comment, metadata, methods);
+                var context = new MessageContext2(comment, metadata, methods);
                 MessageReceived?.Invoke(this, context);
             }
             else
@@ -148,12 +142,12 @@ namespace TestSitePlugin
         }
         private void SendSystemInfo(string message, InfoType type)
         {
-            var context = InfoMessageContext.Create(new InfoMessage
+            var context = InfoMessageContext2.Create(new InfoMessage
             {
                 Text = message,
                 SiteType = SiteType.Unknown,
                 Type = type,
-            }, _options);
+            });
             MessageReceived?.Invoke(this, context);
         }
 
@@ -162,11 +156,11 @@ namespace TestSitePlugin
             throw new NotImplementedException();
         }
 
-        public Guid SiteContextGuid { get; set; }
-        public TestCommentProvider(ICommentOptions options, IUserStore userStore)
+        public SitePluginId SiteContextGuid { get; set; }
+        private readonly ILogger _logger;
+        public TestCommentProvider2(ILogger logger)
         {
-            _options = options;
-            _userStore = userStore;
+            _logger = logger;
             CanConnect = true;
             CanDisconnect = false;
         }

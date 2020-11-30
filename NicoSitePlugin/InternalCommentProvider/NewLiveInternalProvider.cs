@@ -10,20 +10,20 @@ using System.Collections.Generic;
 
 namespace NicoSitePlugin
 {
-    class NewLiveInternalProvider : CommentProviderInternalBase
+    class NewLiveInternalProvider2 : CommentProviderInternalBase2
     {
         private readonly IDataSource _server;
 
         public override void BeforeConnect()
         {
             IsConnected = true;
+            _elapsedTimer.Enabled = false;
+            _keepSeatTimer.Enabled = false;
         }
 
         public override void AfterDisconnected()
         {
             IsConnected = false;
-            _elapsedTimer.Enabled = false;
-            _keepSeatTimer.Enabled = false;
         }
         public bool IsConnected { get; protected set; }
         public override async Task ConnectAsync(string input, CookieContainer cc)
@@ -103,7 +103,7 @@ namespace NicoSitePlugin
         string _roomName;
         string _ticket;
         WatchDataProps _watchDataProps;
-        TaskCompletionSource<object> _tcs = new TaskCompletionSource<object>();
+        TaskCompletionSource<object?> _tcs = new TaskCompletionSource<object?>();
         public override void Disconnect()
         {
             _messageProvider?.Disconnect();
@@ -116,8 +116,8 @@ namespace NicoSitePlugin
         MetaProvider _metaProvider;
         MessageProvider _messageProvider;
         public bool IsLoggedIn { get; set; }
-        public NewLiveInternalProvider(ICommentOptions options, INicoSiteOptions siteOptions, IUserStoreManager userStoreManager, ILogger logger, IDataSource server)
-            : base(options, siteOptions, userStoreManager, server, logger)
+        public NewLiveInternalProvider2(INicoSiteOptions siteOptions, ILogger logger, IDataSource server)
+            : base(siteOptions, server, logger)
         {
             _server = server;
             _metaProvider = new MetaProvider();
@@ -128,7 +128,7 @@ namespace NicoSitePlugin
             _messageProvider.ThreadReceived += MessageProvider_ThreadReceived;
         }
 
-        private void MessageProvider_ThreadReceived(object sender, IThread e)
+        private void MessageProvider_ThreadReceived(object? sender, IThread e)
         {
             if (!string.IsNullOrEmpty(e.Ticket))
             {
@@ -136,7 +136,7 @@ namespace NicoSitePlugin
             }
         }
 
-        private async void MessageProvider_ChatReceived(object sender, ReceivedChat e)
+        private async void MessageProvider_ChatReceived(object? sender, ReceivedChat e)
         {
             var chat = e.Message;
             var isInitialComment = e.IsInitialComment;
@@ -148,25 +148,22 @@ namespace NicoSitePlugin
         System.Timers.Timer _keepSeatTimer = new System.Timers.Timer();
         System.Timers.Timer _elapsedTimer = new System.Timers.Timer();
         DateTime? _startedAt;
-
-        private void MetaProvider_MessageReceived(object sender, IInternalMessage e)
+        private void MetaProvider_MessageReceived(object? sender, IInternalMessage e)
         {
             switch (e)
             {
                 case RoomInternalMessage room:
-                    {
-                        _messageUrl = room.MessageServerUrl;
-                        _threadId = room.ThreadId;
-                        _roomName = room.RoomName;
-                        _tcs.SetResult(null);
-                    }
+                    _messageUrl = room.MessageServerUrl;
+                    _threadId = room.ThreadId;
+                    _roomName = room.RoomName;
+                    _tcs.SetResult(null);
                     break;
                 case StatisticsInternalMessage stat:
                     //stat.Viewers
                     RaiseMetadataUpdated(new Metadata
                     {
-                         TotalViewers = stat.Viewers.ToString(),
-                          Others = $"広告P:{stat.AdPoint} ギフトP:{stat.GiftPoints}",
+                        TotalViewers = stat.Viewers.ToString(),
+                        Others = $"広告P:{stat.AdPoint} ギフトP:{stat.GiftPoints}",
                     });
                     break;
                 case SeatInternalMessage seat:
@@ -187,10 +184,8 @@ namespace NicoSitePlugin
                     Disconnect();
                     break;
             }
-
         }
-
-        private void _elapsedTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void _elapsedTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
             if (_startedAt.HasValue)
             {
@@ -200,12 +195,10 @@ namespace NicoSitePlugin
                 });
             }
         }
-
-        private void _keepSeatTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void _keepSeatTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
             _metaProvider.SendKeepSeat();
         }
-
         public override Task PostCommentAsync(string comment, string mail)
         {
             //[{"ping":{"content":"rs:1"}},{"ping":{"content":"ps:5"}},{"chat":{"thread":"1651612445","vpos":356587,"mail":"184 ","ticket":"0x3d4e000","user_id":"2297426","premium":1,"content":"？","postkey":".1559405184.b-Obktn_YDybdhLR9Hf9Pa17c4g"}},{"ping":{"content":"pf:5"}},{"ping":{"content":"rf:1"}}]

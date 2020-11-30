@@ -1,4 +1,5 @@
 ﻿using SitePlugin;
+using System;
 using System.Collections.Generic;
 
 namespace WhowatchSitePlugin
@@ -32,7 +33,7 @@ namespace WhowatchSitePlugin
         string UserPath { get; }
         string UserId { get; }
         string Id { get; }
-        string PostTime { get; }
+        DateTime PostedAt { get; }
         IMessageImage UserIcon { get; }
         string AccountName { get; }
     }

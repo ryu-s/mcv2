@@ -44,7 +44,7 @@ namespace LineLiveSitePlugin
         public event EventHandler CanConnectChanged;
         public event EventHandler CanDisconnectChanged;
         public event EventHandler<ConnectedEventArgs> Connected;
-        public event EventHandler<IMessageContext> MessageReceived;
+        public event EventHandler<IMessageContext2> MessageReceived;
 
         private string _channelName;
         private IMessageProvider _provider;
@@ -78,7 +78,7 @@ namespace LineLiveSitePlugin
         /// <param name="input"></param>
         /// <returns></returns>
         /// <exception cref="InvalidUrlException"></exception>
-        protected virtual (string channelId, string liveId) GetLiveIdFromInput(string input)
+        protected virtual (string channelId, string? liveId) GetLiveIdFromInput(string input)
         {
             //https://live.line.me/channels/2234253/broadcast/8383700
             var match = Regex.Match(input, "line\\.me/channels/(\\d+)/broadcast/(\\d+)");
@@ -113,7 +113,7 @@ namespace LineLiveSitePlugin
             CanConnect = true;
             CanDisconnect = false;
         }
-        protected virtual CookieContainer GetCookieContainer(IBrowserProfile browserProfile)
+        protected virtual CookieContainer GetCookieContainer(IBrowserProfile2 browserProfile)
         {
             var cc = new CookieContainer();
             try
@@ -144,7 +144,7 @@ namespace LineLiveSitePlugin
             return Api.GetLiveInfo(_server, channelId, liveId);
         }
         FirstCommentDetector _first = new FirstCommentDetector();
-        public async Task ConnectAsync(string input, IBrowserProfile browserProfile)
+        public async Task ConnectAsync(string input, IBrowserProfile2 browserProfile)
         {
             BeforeConnect();
             var autoReconnectMode = false;
@@ -153,7 +153,7 @@ namespace LineLiveSitePlugin
             await InitLoveIconUrlDict();
 
             string channelId;
-            string liveId;
+            string? liveId;
             try
             {
                 (channelId, liveId) = GetLiveIdFromInput(input);
@@ -325,14 +325,14 @@ namespace LineLiveSitePlugin
             var (nochange, added, removed) = Tools.Split(old, @new);
             foreach (var id in removed)
             {
-                var user = GetUser(id.ToString());
-                //TODO:コメビュだけNGにしたい場合に対応できない。手動でNGに入れていたとしても解除されてしまう。
-                user.IsNgUser = false;
+                //var user = GetUser(id.ToString());
+                ////TODO:コメビュだけNGにしたい場合に対応できない。手動でNGに入れていたとしても解除されてしまう。
+                //user.IsNgUser = false;
             }
             foreach (var id in added)
             {
-                var user = GetUser(id.ToString());
-                user.IsNgUser = true;
+                //var user = GetUser(id.ToString());
+                //user.IsNgUser = true;
             }
         }
 
@@ -355,25 +355,25 @@ namespace LineLiveSitePlugin
         }
         private void SendSystemInfo(string message, InfoType type)
         {
-            var context = InfoMessageContext.Create(new InfoMessage
+            var context = InfoMessageContext2.Create(new InfoMessage
             {
                 Text = message,
                 SiteType = SiteType.LineLive,
                 Type = type,
-            }, _options);
+            });
             MessageReceived?.Invoke(this, context);
         }
         private string UnixTime2PostTime(long unixTime)
         {
             return Tools.FromUnixTime(unixTime).ToString("HH:mm:ss");
         }
-        private LineLiveMessageContext CreateMessageContext(ParseMessage.IMessage message, ParseMessage.IUser sender, string raw, bool isInitialComment)
+        private LineLiveMessageContext2? CreateMessageContext(ParseMessage.IMessage message, ParseMessage.IUser sender, string raw, bool isInitialComment)
         {
-            LineLiveMessageContext messageContext;
+            LineLiveMessageContext2? messageContext;
             if (message is ParseMessage.IMessageData comment)
             {
-                var user = GetUser(sender.Id.ToString());
-                var isFirstComment = _first.IsFirstComment(user.UserId);
+                var userId = sender.Id.ToString();
+                var isFirstComment = _first.IsFirstComment(userId);
                 var m = new LineLiveComment(raw)
                 {
                     Text = comment.Message,
@@ -383,18 +383,18 @@ namespace LineLiveSitePlugin
                     UserId = sender.Id,
                     DisplayName = sender.DisplayName,
                 };
-                var metadata = new MessageMetadata(m, _options, _siteOptions, user, this, isFirstComment)
+                var metadata = new MessageMetadata2(m, _siteOptions, isFirstComment)
                 {
                     IsInitialComment = isInitialComment,
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new LineLiveMessageMethods();
-                messageContext = new LineLiveMessageContext(m, metadata, methods);
+                messageContext = new LineLiveMessageContext2(m, metadata, methods);
             }
             else if (message is ParseMessage.ILove love)
             {
-                var user = GetUser(sender.Id.ToString());
-                var isFirstComment = _first.IsFirstComment(user.UserId);
+                var userId = sender.Id.ToString();
+                var isFirstComment = _first.IsFirstComment(userId);
                 var str = sender.DisplayName + "さんがハートを送りました！";
                 var m = new LineLiveItem(raw)
                 {
@@ -404,18 +404,18 @@ namespace LineLiveSitePlugin
                     UserId = sender.Id,
                     DisplayName = sender.DisplayName,
                 };
-                var metadata = new MessageMetadata(m, _options, _siteOptions, user, this, isFirstComment)
+                var metadata = new MessageMetadata2(m, _siteOptions, isFirstComment)
                 {
                     IsInitialComment = isInitialComment,
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new LineLiveMessageMethods();
-                messageContext = new LineLiveMessageContext(m, metadata, methods);
+                messageContext = new LineLiveMessageContext2(m, metadata, methods);
             }
             else if (message is ParseMessage.IFollowStartData follow)
             {
-                var user = GetUser(sender.Id.ToString());
-                var isFirstComment = _first.IsFirstComment(user.UserId);
+                var userId = sender.Id.ToString();
+                var isFirstComment = _first.IsFirstComment(userId);
                 var msg = sender.DisplayName + "さんがフォローしました！";
                 var m = new LineLiveItem(raw)
                 {
@@ -425,18 +425,18 @@ namespace LineLiveSitePlugin
                     UserId = sender.Id,
                     DisplayName = sender.DisplayName,
                 };
-                var metadata = new MessageMetadata(m, _options, _siteOptions, user, this, isFirstComment)
+                var metadata = new MessageMetadata2(m, _siteOptions, isFirstComment)
                 {
                     IsInitialComment = isInitialComment,
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new LineLiveMessageMethods();
-                messageContext = new LineLiveMessageContext(m, metadata, methods);
+                messageContext = new LineLiveMessageContext2(m, metadata, methods);
             }
             else if (message is ParseMessage.IGiftMessage gift)
             {
-                var user = GetUser(sender.Id.ToString());
-                var isFirstComment = _first.IsFirstComment(user.UserId);
+                var userId = sender.Id.ToString();
+                var isFirstComment = _first.IsFirstComment(userId);
                 if (_loveIconUrlDict.ContainsKey(gift.ItemId))
                 {
                     gift.Url = _loveIconUrlDict[gift.ItemId];
@@ -466,13 +466,13 @@ namespace LineLiveSitePlugin
                     UserId = sender.Id,
                     DisplayName = sender.DisplayName,
                 };
-                var metadata = new MessageMetadata(m, _options, _siteOptions, user, this, isFirstComment)
+                var metadata = new MessageMetadata2(m, _siteOptions, isFirstComment)
                 {
                     IsInitialComment = isInitialComment,
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new LineLiveMessageMethods();
-                messageContext = new LineLiveMessageContext(m, metadata, methods);
+                messageContext = new LineLiveMessageContext2(m, metadata, methods);
             }
             else
             {
@@ -538,23 +538,13 @@ namespace LineLiveSitePlugin
             _cts?.Cancel();
         }
 
-        public IEnumerable<ICommentViewModel> GetUserComments(IUser user)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task PostCommentAsync(string text)
         {
             var s = $"PRIVMSG {_channelName} :{text}";
             await Task.FromResult<object>(null);
         }
 
-        public IUser GetUser(string userId)
-        {
-            return _userStoreManager.GetUser(SiteType.LineLive, userId);
-        }
-
-        public async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile browserProfile)
+        public async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile)
         {
             var cc = GetCookieContainer(browserProfile);
             var cookies = Tools.ExtractCookies(cc);
@@ -573,20 +563,16 @@ namespace LineLiveSitePlugin
             throw new NotImplementedException();
         }
 
-        public Guid SiteContextGuid { get; set; }
+        public SitePluginId SiteContextGuid { get; set; }
         private readonly IDataServer _server;
         private readonly ILogger _logger;
-        private readonly ICommentOptions _options;
         private readonly LineLiveSiteOptions _siteOptions;
-        private readonly IUserStoreManager _userStoreManager;
 
-        public LineLiveCommentProvider(IDataServer server, ILogger logger, ICommentOptions options, LineLiveSiteOptions siteOptions, IUserStoreManager userStoreManager)
+        public LineLiveCommentProvider(IDataServer server, ILogger logger, LineLiveSiteOptions siteOptions)
         {
             _server = server;
             _logger = logger;
-            _options = options;
             _siteOptions = siteOptions;
-            _userStoreManager = userStoreManager;
             CanConnect = true;
             CanDisconnect = false;
         }

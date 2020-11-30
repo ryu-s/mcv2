@@ -44,17 +44,15 @@ namespace MildomSitePlugin
             GuestName = guestName;
         }
     }
-    class MildomCommentProvider : CommentProviderBase
+    class MildomCommentProvider2 : CommentProviderBase2
     {
         FirstCommentDetector _first = new FirstCommentDetector();
         private readonly IDataServer _server;
         private readonly ILogger _logger;
-        private readonly ICommentOptions _options;
         private readonly IMildomSiteOptions _siteOptions;
-        private readonly IUserStoreManager _userStoreManager;
 
         Dictionary<long, GiftItem> _giftDict;
-        public override async Task ConnectAsync(string input, IBrowserProfile browserProfile)
+        public override async Task ConnectAsync(string input, IBrowserProfile2 browserProfile)
         {
             BeforeConnect();
             try
@@ -72,7 +70,7 @@ namespace MildomSitePlugin
         }
         NewAutoReconnector _autoReconnector;
         Dictionary<int, string> _imageDict;
-        private async Task ConnectInternalAsync(string input, IBrowserProfile browserProfile)
+        private async Task ConnectInternalAsync(string input, IBrowserProfile2 browserProfile)
         {
             _isBeeingSentInitialComments = true;
             var mayBeRoomId = Tools.ExtractRoomId(input);
@@ -164,15 +162,15 @@ namespace MildomSitePlugin
         /// 自分名義のOnAddは確実に来るからこのロジックで問題無いと思う。
         /// </summary>
         bool _isBeeingSentInitialComments;
-        private MildomMessageContext CreateMessageContext(IInternalMessage message)
+        private MildomMessageContext2 CreateMessageContext(IInternalMessage message)
         {
             if (message is OnChatMessage chat)
             {
                 var userId = chat.UserId.ToString();
                 var isFirst = _first.IsFirstComment(userId);
-                var user = GetUser(userId);
+                //var user = GetUser(userId);
                 var comment = new MildomComment(chat, chat.Raw);
-                var metadata = new CommentMessageMetadata(comment, _options, _siteOptions, user, this, isFirst)
+                var metadata = new CommentMessageMetadata2(comment, _siteOptions, isFirst)
                 {
                     IsInitialComment = _isBeeingSentInitialComments,
                     SiteContextGuid = SiteContextGuid,
@@ -184,29 +182,29 @@ namespace MildomSitePlugin
                     var nick = SitePluginCommon.Utils.ExtractNickname(messageText);
                     if (!string.IsNullOrEmpty(nick))
                     {
-                        user.Nickname = nick;
+                        //user.Nickname = nick;
                     }
                 }
-                return new MildomMessageContext(comment, metadata, methods);
+                return new MildomMessageContext2(comment, metadata, methods);
             }
             else if (message is OnGiftMessage internalGift)
             {
                 var userId = internalGift.UserId.ToString();
                 //var isFirst = _first.IsFirstComment(userId);
-                var user = GetUser(userId);
+                //var user = GetUser(userId);
 
                 if (!_giftDict.TryGetValue(internalGift.GiftId, out var item))
                 {
                     item = new GiftItem("(未知のギフト)");
                 }
                 var gift = new MildomGift(internalGift, item);
-                var metadata = new GiftMessageMetadata(gift, _options, _siteOptions, user, this)
+                var metadata = new GiftMessageMetadata2(gift, _siteOptions)
                 {
                     IsInitialComment = _isBeeingSentInitialComments,
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new MildomMessageMethods();
-                return new MildomMessageContext(gift, metadata, methods);
+                return new MildomMessageContext2(gift, metadata, methods);
             }
             //if (message is IMildomComment comment)
             //{
@@ -234,15 +232,15 @@ namespace MildomSitePlugin
             else if (message is OnAddMessage add && _siteOptions.IsShowJoinMessage)
             {
                 var userId = add.UserId.ToString();
-                var user = GetUser(userId);
+                //var user = GetUser(userId);
                 var join = new MildomJoinRoom(add);
-                var metadata = new JoinMessageMetadata(join, _options, _siteOptions, user, this)
+                var metadata = new JoinMessageMetadata2(join, _siteOptions)
                 {
                     IsInitialComment = false,
                     SiteContextGuid = SiteContextGuid,
                 };
                 var methods = new MildomMessageMethods();
-                return new MildomMessageContext(join, metadata, methods);
+                return new MildomMessageContext2(join, metadata, methods);
             }
             ////else if (message is IMildomItem item)
             ////{
@@ -288,7 +286,7 @@ namespace MildomSitePlugin
         }
 
 
-        protected virtual CookieContainer GetCookieContainer(IBrowserProfile browserProfile)
+        protected virtual CookieContainer GetCookieContainer(IBrowserProfile2 browserProfile)
         {
             var cc = new CookieContainer();
 
@@ -306,7 +304,7 @@ namespace MildomSitePlugin
             }
             return cc;
         }
-        public override async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile browserProfile)
+        public override async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile)
         {
             await Task.Yield();
             var userInfo = Tools.GetUserInfoFromCookie(browserProfile);
@@ -331,23 +329,16 @@ namespace MildomSitePlugin
             }
         }
 
-        public override IUser GetUser(string userId)
-        {
-            return _userStoreManager.GetUser(SiteType.Mildom, userId);
-        }
-
         public override Task PostCommentAsync(string text)
         {
             throw new NotImplementedException();
         }
-        public MildomCommentProvider(IDataServer server, ILogger logger, ICommentOptions options, IMildomSiteOptions siteOptions, IUserStoreManager userStoreManager)
-            : base(logger, options)
+        public MildomCommentProvider2(IDataServer server, ILogger logger, IMildomSiteOptions siteOptions)
+            : base(logger)
         {
             _server = server;
             _logger = logger;
-            _options = options;
             _siteOptions = siteOptions;
-            _userStoreManager = userStoreManager;
         }
     }
     class CurrentUserInfo : ICurrentUserInfo

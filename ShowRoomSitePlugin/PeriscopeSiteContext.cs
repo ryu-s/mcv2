@@ -8,25 +8,15 @@ using System.Windows.Controls;
 
 namespace ShowRoomSitePlugin
 {
-    public class ShowRoomSiteContext : SiteContextBase
+    public class ShowRoomSiteContext2 : SiteContextBase
     {
-        public override Guid Guid => new Guid("C64FBE36-029E-483D-AA56-F1906C42B43B");
-
+        public override SitePluginId Guid { get; } = new SitePluginId(new System.Guid("C64FBE36-029E-483D-AA56-F1906C42B43B"));
         public override string DisplayName => "SHOWROOM";
-        protected override SiteType SiteType => SiteType.ShowRoom;
-        public override IOptionsTabPage TabPanel
-        {
-            get
-            {
-                var panel = new ShowRoomOptionsPanel();
-                panel.SetViewModel(new ShowRoomSiteOptionsViewModel(_siteOptions));
-                return new ShowRoomOptionsTabPage(DisplayName, panel);
-            }
-        }
+        public override SiteType SiteType => SiteType.ShowRoom;
 
         public override ICommentProvider CreateCommentProvider()
         {
-            return new ShowRoomCommentProvider(_server, _logger, _options, _siteOptions, _userStoreManager)
+            return new ShowRoomCommentProvider2(_server, _logger, _siteOptions)
             {
                 SiteContextGuid = Guid,
             };
@@ -66,18 +56,11 @@ namespace ShowRoomSitePlugin
             var liveId = Tools.ExtractLiveId(input);
             return !string.IsNullOrEmpty(liveId);
         }
-
-        public override UserControl GetCommentPostPanel(ICommentProvider commentProvider)
-        {
-            return null;
-        }
-        private readonly ICommentOptions _options;
         private readonly IDataServer _server;
         private readonly ILogger _logger;
-        public ShowRoomSiteContext(ICommentOptions options, IDataServer server, ILogger logger, IUserStoreManager userStoreManager)
-            : base(options, userStoreManager, logger)
+        public ShowRoomSiteContext2(IDataServer server, ILogger logger)
+            : base(logger)
         {
-            _options = options;
             _server = server;
             _logger = logger;
         }
