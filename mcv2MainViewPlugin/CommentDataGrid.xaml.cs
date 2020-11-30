@@ -64,7 +64,7 @@ namespace mcv2.MainViewPlugin
                 var menu = dataGrid.dataGrid.Resources["commentContext"] as ContextMenu;
                 Debug.Assert(menu != null);
                 var userInfoMenuItem = LogicalTreeHelper.FindLogicalNode(menu, "UserInfoMenuItem") as MenuItem;
-                userInfoMenuItem.Visibility = (bool)e.NewValue ? Visibility.Visible : Visibility.Collapsed;
+                userInfoMenuItem!.Visibility = (bool)e.NewValue ? Visibility.Visible : Visibility.Collapsed;
             }
         }
         /// <summary>
@@ -154,22 +154,24 @@ namespace mcv2.MainViewPlugin
             if (oldVerticalOffset + oldViewportHeight + 5 >= oldExtentHeight)
             {
                 //this.ScrollIntoView(this.Items[this.Items.Count - 1]);
-                ScrollViewer scrollViewer;
+                //ScrollViewer scrollViewer;
+                //if (sender is DataGrid dataGrid)
+                //{
+                //    scrollViewer = dataGrid.GetScrollViewer();
+                //}
+                //else if (sender is ScrollViewer sv)
+                //{
+                //    scrollViewer = sv;
+                //}
+                //else
+                //{
+                //    return;
+                //}
                 if (sender is DataGrid dataGrid)
                 {
-                    scrollViewer = dataGrid.GetScrollViewer();
+                    var lastItem = dataGrid.Items[dataGrid.Items.Count - 1];
+                    dataGrid.ScrollIntoView(lastItem);
                 }
-                else if (sender is ScrollViewer)
-                {
-                    scrollViewer = sender as ScrollViewer;
-                }
-                else
-                {
-                    return;
-                }
-                dataGrid = sender as DataGrid;
-                var lastItem = dataGrid.Items[dataGrid.Items.Count - 1];
-                dataGrid.ScrollIntoView(lastItem);
                 //scrollViewer.ScrollToBottom();
             }
         }

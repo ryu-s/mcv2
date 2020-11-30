@@ -293,14 +293,14 @@ namespace mcv2.MainViewPlugin
         public void RemoveSelectedConnection()
         {
         }
-        private void ChangeUser(SitePluginId siteContextGuid, string userId, IEnumerable<IMessagePart> name, string nickname, bool? isNgUser, bool? isSiteNgUser)
+        private void ChangeUser(SitePluginId siteContextGuid, string userId, IEnumerable<IMessagePart>? name, string? nickname, bool? isNgUser, bool? isSiteNgUser)
         {
             var user = _userStore.GetOrCreateUser(siteContextGuid, userId);
             if (name != null)
             {
                 user.UsernameItems = name;
             }
-            if (!string.IsNullOrEmpty(nickname))
+            if (nickname != null)
             {
                 user.Nickname = nickname;
             }
@@ -344,10 +344,6 @@ namespace mcv2.MainViewPlugin
         bool IUserHost.GetIsSiteNgUser(SitePluginId siteContextGuid, string userId)
         {
             var ret = Host.GetData(new RequestUser(siteContextGuid, userId)) as ResponseUser;
-            if (ret == null)
-            {
-                throw new BugException();
-            }
             var user = ret.User;
             return user.IsSiteNgUser;
         }

@@ -25,9 +25,9 @@ namespace mcv2.MainViewPlugin
                 YellMusicFilePath = filename;
             }
         }
-        protected virtual string OpenFileDialog(string defaultPath, string title, string filter)
+        protected virtual string? OpenFileDialog(string defaultPath, string title, string filter)
         {
-            string ret = null;
+            string? ret;
             var fileDialog = new Microsoft.Win32.OpenFileDialog
             {
                 Title = title,
@@ -37,6 +37,10 @@ namespace mcv2.MainViewPlugin
             if (result == true)
             {
                 ret = fileDialog.FileName;
+            }
+            else
+            {
+                ret = null;
             }
             return ret;
         }
