@@ -21,6 +21,9 @@ namespace TwitchSitePlugin
         public string UserId { get; set; }
         public IEnumerable<IMessagePart> UserName { get; set; }
         public SiteType SiteType => SiteType.Twitch;
+
+        public string? NewNickname { get; set; }
+
         public MessageMetadata2(ITwitchMessage message, ITwitchSiteOptions siteOptions, ICommentProvider cp, bool isFirstComment)
         {
             _message = message;

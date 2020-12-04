@@ -136,6 +136,8 @@ namespace mcv2TestPlugin
         public IEnumerable<IMessagePart> UserName { get; set; }
         public SiteType SiteType => SiteType.Unknown;
 
+        public string? NewNickname { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
     }
     class YouTubeLiveCommentInput

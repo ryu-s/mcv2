@@ -284,7 +284,17 @@ namespace OpenrecSitePlugin
             catch { }
             return cc;
         }
-
+        private string? ExtractNickname(string message, OpenrecSiteOptions siteOptions)
+        {
+            if (siteOptions.IsAutoSetNickname)
+            {
+                return SitePluginCommon.Utils.ExtractNickname(message);
+            }
+            else
+            {
+                return null;
+            }
+        }
         private OpenrecMessageContext2 CreateMessageContext(Tools.IComment comment, IOpenrecCommentData commentData, bool isInitialComment)
         {
             var userId = commentData.UserId;
@@ -314,6 +324,7 @@ namespace OpenrecSitePlugin
             {
                 messageItems.Add(MessagePartFactory.CreateMessageText(commentData.Message));
             }
+            var nickname = ExtractNickname(comment.Message, _siteOptions);
 
             OpenrecMessageContext2 messageContext = null;
             IOpenrecMessage message;
@@ -358,6 +369,7 @@ namespace OpenrecSitePlugin
                 SiteContextGuid = SiteContextGuid,
                 UserId = commentData.UserId,
                 UserName = Common.MessagePartFactory.CreateMessageItems(commentData.Name),
+                NewNickname = nickname,
             };
             var methods = new OpenrecMessageMethods();
             messageContext = new OpenrecMessageContext2(message, metadata, methods);

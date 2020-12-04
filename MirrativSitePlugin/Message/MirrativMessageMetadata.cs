@@ -25,6 +25,7 @@ namespace MirrativSitePlugin
         public string UserId { get; set; }
         public IEnumerable<IMessagePart> UserName { get; set; }
         public SiteType SiteType => SiteType.Mirrativ;
+        public string? NewNickname { get; set; }
 
         protected MessageMetadataBase2(IMirrativSiteOptions siteOptions)
         {

@@ -338,10 +338,7 @@ namespace TwitchSitePlugin
             var displayName = commentData.DisplayName;
             var isFirstComment = _commentCounter.UpdateCount(userId);
             //var user = GetUser(userId);
-            if (_siteOptions.NeedAutoSubNickname)
-            {
-                //SitePluginCommon.Utils.SetNickname(commentData.Message, user, _siteOptions.NeedAutoSubNicknameStr);
-            }
+            var nickname = ExtractNickname(commentData.Message, _siteOptions.NeedAutoSubNicknameStr);
             var message = new TwitchComment(result.Raw)
             {
                 CommentItems = Tools.GetMessageItems(result),
@@ -356,9 +353,22 @@ namespace TwitchSitePlugin
             {
                 IsInitialComment = false,
                 SiteContextGuid = SiteContextGuid,
+                NewNickname = nickname,
             };
             var messageContext = new TwitchMessageContext2(message, metadata);
             MessageReceived?.Invoke(this, messageContext);
+        }
+
+        private string? ExtractNickname(string comment, string nickStr)
+        {
+            if (_siteOptions.NeedAutoSubNickname)
+            {
+                return SitePluginCommon.Utils.ExtractNickname(comment, nickStr);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         protected virtual string GetRandomGuestUsername()

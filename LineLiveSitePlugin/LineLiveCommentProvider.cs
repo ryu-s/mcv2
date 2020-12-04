@@ -367,6 +367,17 @@ namespace LineLiveSitePlugin
         {
             return Tools.FromUnixTime(unixTime).ToString("HH:mm:ss");
         }
+        private string? ExtractNickname(string message, bool isAutoSetNickname)
+        {
+            if (isAutoSetNickname)
+            {
+                return SitePluginCommon.Utils.ExtractNickname(message);
+            }
+            else
+            {
+                return null;
+            }
+        }
         private LineLiveMessageContext2? CreateMessageContext(ParseMessage.IMessage message, ParseMessage.IUser sender, string raw, bool isInitialComment)
         {
             LineLiveMessageContext2? messageContext;
@@ -374,6 +385,7 @@ namespace LineLiveSitePlugin
             {
                 var userId = sender.Id.ToString();
                 var isFirstComment = _first.IsFirstComment(userId);
+                var nickname = ExtractNickname(comment.Message, _siteOptions.IsAutoSetNickname);
                 var m = new LineLiveComment(raw)
                 {
                     Text = comment.Message,
@@ -387,6 +399,7 @@ namespace LineLiveSitePlugin
                 {
                     IsInitialComment = isInitialComment,
                     SiteContextGuid = SiteContextGuid,
+                    NewNickname = nickname,
                 };
                 var methods = new LineLiveMessageMethods();
                 messageContext = new LineLiveMessageContext2(m, metadata, methods);

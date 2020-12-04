@@ -32,6 +32,7 @@ namespace PeriscopeSitePlugin
         public string UserId { get; }
         public IEnumerable<IMessagePart> UserName { get; }
         public SiteType SiteType => SiteType.Periscope;
+        public string? NewNickname { get; set; }
         public MessageMetadata2(IPeriscopeMessage message, IPeriscopeSiteOptions siteOptions, bool isFirstComment)
         {
             _message = message;

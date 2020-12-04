@@ -31,6 +31,17 @@ namespace NicoSitePlugin
             });
             MessageReceived?.Invoke(this, context);
         }
+        private string? ExtractNickname(string message)
+        {
+            if (_siteOptions.IsAutoSetNickname)
+            {
+                return SitePluginCommon.Utils.ExtractNickname(message);
+            }
+            else
+            {
+                return null;
+            }
+        }
         public async Task<NicoMessageContext2?> CreateMessageContextAsync(IChat chat, string roomName, bool isInitialComment)
         {
             NicoMessageContext2? messageContext = null;
@@ -59,12 +70,13 @@ namespace NicoSitePlugin
                             isFirstComment = true;
                         }
                         message = comment;
+                        var nickname = ExtractNickname(comment.Text);
                         metadata = new CommentMessageMetadata2(comment, _siteOptions, isFirstComment)
                         {
                             IsInitialComment = isInitialComment,
                             SiteContextGuid = SiteContextGuid,
                             UserId = userId,
-
+                            NewNickname = nickname,
                         };
                     }
                     break;

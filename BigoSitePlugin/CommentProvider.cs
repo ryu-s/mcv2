@@ -422,6 +422,17 @@ namespace BigoSitePlugin
         /// 意図的な切断であるか。falseの場合は自動的に再接続する。
         /// </summary>
         bool _disconnectedExpected;
+        private string? ExtractNickname(string message, bool isAutoSetNickname)
+        {
+            if (isAutoSetNickname)
+            {
+                return SitePluginCommon.Utils.ExtractNickname(message);
+            }
+            else
+            {
+                return null;
+            }
+        }
         private void MessageProvider_Received(object sender, IInternalMessage e)
         {
             switch (e)
@@ -433,7 +444,11 @@ namespace BigoSitePlugin
                     {
                         var siteMessage = new BigoComment(num1);
                         var isFirstComment = false;
-                        var metadata = new BigoMessageMetadata2(siteMessage, _siteOptions, isFirstComment);
+                        var nickname = ExtractNickname(num1.Message, _siteOptions.IsAutoSetNickname);
+                        var metadata = new BigoMessageMetadata2(siteMessage, _siteOptions, isFirstComment)
+                        {
+                            NewNickname = nickname,
+                        };
                         MessageReceived?.Invoke(this, new BigoMessageContext2(siteMessage, metadata, new BigoMessageMethods()));
                     }
                     break;

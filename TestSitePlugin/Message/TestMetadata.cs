@@ -20,6 +20,8 @@ namespace TestSitePlugin
 
         public event PropertyChangedEventHandler PropertyChanged;
         public SiteType SiteType => SiteType.Unknown;
+        public string? NewNickname { get; }
+
         public TestMetadata2(string userId)
         {
             UserId = userId;

@@ -187,6 +187,17 @@ namespace TwicasSitePlugin
                     break;
             }
         }
+        private string? ExtractNickname(string message)
+        {
+            if (_siteOptions.IsAutoSetNickname)
+            {
+                return SitePluginCommon.Utils.ExtractNickname(message);
+            }
+            else
+            {
+                return null;
+            }
+        }
         private TwicasMessageContext2 CreateMessageContext(InternalComment comment, bool isInitialComment)
         {
             //var user = GetUser(comment.UserId);
@@ -206,10 +217,12 @@ namespace TwicasSitePlugin
                     Width = 40,//commentData.ThumbnailWidth,
                 },
             };
+            var nickname = ExtractNickname(comment.Message);
             var metadata = new MessageMetadata2(message, _siteOptions, isFirstComment)
             {
                 IsInitialComment = isInitialComment,
                 SiteContextGuid = SiteContextGuid,
+                NewNickname = nickname,
             };
             var methods = new TwicasMessageMethods();
             var messageContext = new TwicasMessageContext2(message, metadata, methods);

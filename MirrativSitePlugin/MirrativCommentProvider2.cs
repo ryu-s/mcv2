@@ -138,6 +138,17 @@ namespace MirrativSitePlugin
                 RaiseMessageReceived(messageContext);
             }
         }
+        private static string? ExtractNickname(string message, bool isAutoSetNickname)
+        {
+            if (isAutoSetNickname)
+            {
+                return SitePluginCommon.Utils.ExtractNickname(message);
+            }
+            else
+            {
+                return null;
+            }
+        }
         private MirrativMessageContext2 CreateMessageContext(IMirrativMessage message, bool isInitialComment)
         {
             if (message is IMirrativComment comment)
@@ -150,17 +161,9 @@ namespace MirrativSitePlugin
                     SiteContextGuid = SiteContextGuid,
                     UserId = userId,
                     UserName = MessagePartFactory.CreateMessageItems(comment.UserName),
+                    NewNickname = ExtractNickname(comment.Text, _siteOptions.NeedAutoSubNickname),
                 };
                 var methods = new MirrativMessageMethods();
-                if (_siteOptions.NeedAutoSubNickname)
-                {
-                    var messageText = comment.Text;
-                    var nick = SitePluginCommon.Utils.ExtractNickname(messageText);
-                    if (!string.IsNullOrEmpty(nick))
-                    {
-                        //user.Nickname = nick;
-                    }
-                }
                 return new MirrativMessageContext2(comment, metadata, methods);
             }
             else if (message is IMirrativJoinRoom join && _siteOptions.IsShowJoinMessage)

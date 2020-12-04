@@ -78,14 +78,26 @@ namespace ShowRoomSitePlugin
 
     internal class ShowRoomCommentProvider2 : CommentProviderBase2
     {
-        private MessageMetadata2 CreateMessageMetadata(IShowRoomComment message, bool isFirstComment)
+        private MessageMetadata2 CreateMessageMetadata(IShowRoomComment message, bool isFirstComment, string? nickname = null)
         {
             return new MessageMetadata2(message, _siteOptions, isFirstComment)
             {
                 SiteContextGuid = SiteContextGuid,
                 UserId = message.UserId,
                 UserName = Common.MessagePartFactory.CreateMessageItems(message.UserName),
+                NewNickname = nickname,
             };
+        }
+        private static string? ExtractNickname(bool isAutoSetNickname, string message)
+        {
+            if (isAutoSetNickname)
+            {
+                return SitePluginCommon.Utils.ExtractNickname(message);
+            }
+            else
+            {
+                return null;
+            }
         }
         private void MessageProvider_Received(object sender, IInternalMessage e)
         {
@@ -106,7 +118,8 @@ namespace ShowRoomSitePlugin
                         var isFirstComment = _first.IsFirstComment(userId);
                         //var user = GetUser(userId);
                         //user.Name = Common.MessagePartFactory.CreateMessageItems(message.Text);
-                        var metadata = CreateMessageMetadata(message, isFirstComment);
+                        var nickname = ExtractNickname(_siteOptions.IsAutoSetNickname, t1.Cm);
+                        var metadata = CreateMessageMetadata(message, isFirstComment, nickname);
                         var methods = new MessageMethods();
                         RaiseMessageReceived(new MessageContext2(message, metadata, methods));
                     }

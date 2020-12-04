@@ -36,6 +36,7 @@ namespace MildomSitePlugin
         public string UserId { get; }
         public IEnumerable<IMessagePart> UserName { get; }
         public SiteType SiteType => SiteType.Mildom;
+        public string? NewNickname { get; set; }
         protected MessageMetadataBase2(IMildomSiteOptions siteOptions)
         {
             _siteOptions = siteOptions;

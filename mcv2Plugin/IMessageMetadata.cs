@@ -14,5 +14,6 @@ namespace SitePlugin
         string UserId { get; }
         IEnumerable<IMessagePart> UserName { get; }
         SiteType SiteType { get; }
+        string? NewNickname { get; }
     }
 }

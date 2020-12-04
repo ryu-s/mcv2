@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using SitePluginCommon.AutoReconnection;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MildomSitePlugin
 {
@@ -162,6 +163,16 @@ namespace MildomSitePlugin
         /// 自分名義のOnAddは確実に来るからこのロジックで問題無いと思う。
         /// </summary>
         bool _isBeeingSentInitialComments;
+        private string? ExtractNickname(IEnumerable<IMessagePart> message, bool isAutoSetNickname)
+        {
+            if (!isAutoSetNickname) return null;
+            foreach (var part in message.Where(m => m is IMessageText).Reverse().Cast<IMessageText>())
+            {
+                if (part == null) continue;
+                return SitePluginCommon.Utils.ExtractNickname(part.Text);
+            }
+            return null;
+        }
         private MildomMessageContext2 CreateMessageContext(IInternalMessage message)
         {
             if (message is OnChatMessage chat)
@@ -174,17 +185,9 @@ namespace MildomSitePlugin
                 {
                     IsInitialComment = _isBeeingSentInitialComments,
                     SiteContextGuid = SiteContextGuid,
+                    NewNickname = ExtractNickname(comment.CommentItems, _siteOptions.NeedAutoSubNickname),
                 };
                 var methods = new MildomMessageMethods();
-                if (_siteOptions.NeedAutoSubNickname)
-                {
-                    var messageText = chat.MessageItems.ToText();
-                    var nick = SitePluginCommon.Utils.ExtractNickname(messageText);
-                    if (!string.IsNullOrEmpty(nick))
-                    {
-                        //user.Nickname = nick;
-                    }
-                }
                 return new MildomMessageContext2(comment, metadata, methods);
             }
             else if (message is OnGiftMessage internalGift)

@@ -31,6 +31,7 @@ namespace OpenrecSitePlugin
         public string UserId { get; set; }
         public IEnumerable<IMessagePart> UserName { get; set; }
         public SiteType SiteType => SiteType.Openrec;
+        public string? NewNickname { get; set; }
         public MessageMetadata2(IOpenrecMessage message, IOpenrecSiteOptions siteOptions, bool isFirstComment)
         {
             _message = message;

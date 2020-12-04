@@ -388,7 +388,17 @@ namespace PeriscopeSitePlugin
         {
 
         }
-
+        private string? ExtractNickname(string message, IPeriscopeSiteOptions siteOptions)
+        {
+            if (siteOptions.IsAutoSetNickname)
+            {
+                return SitePluginCommon.Utils.ExtractNickname(message);
+            }
+            else
+            {
+                return null;
+            }
+        }
         private void P1_MessageReceived(object sender, IInternalMessage e)
         {
             if (e is Kind1Type1 kind1Type1)
@@ -398,7 +408,8 @@ namespace PeriscopeSitePlugin
                 var isFirstComment = _first.IsFirstComment(userId);
                 //var user = GetUser(userId);
                 //user.Name = MessagePartFactory.CreateMessageItems(message.Text);
-                var metadata = CreateMessageMetadata(message, isFirstComment);
+                var nickname = ExtractNickname(message.Text, _siteOptions);
+                var metadata = CreateMessageMetadata(message, isFirstComment, nickname);
                 var methods = new MessageMethods();
                 RaiseMessageReceived(new MessageContext2(message, metadata, methods));
             }
@@ -433,19 +444,20 @@ namespace PeriscopeSitePlugin
                 var methods = new MessageMethods();
                 RaiseMessageReceived(new MessageContext2(message, metadata, methods));
             }
-            else if(e is Kind2Kind4 kind2Kind4)
+            else if (e is Kind2Kind4 kind2Kind4)
             {
                 RaiseMetadataUpdated(new Metadata
                 {
-                     CurrentViewers = kind2Kind4.Occupancy.ToString(),
+                    CurrentViewers = kind2Kind4.Occupancy.ToString(),
                 });
             }
         }
-        private MessageMetadata2 CreateMessageMetadata(IPeriscopeMessage message, bool isFirstComment)
+        private MessageMetadata2 CreateMessageMetadata(IPeriscopeMessage message, bool isFirstComment, string? nickname = null)
         {
             return new MessageMetadata2(message, _siteOptions, isFirstComment)
             {
                 SiteContextGuid = SiteContextGuid,
+                NewNickname = nickname,
             };
         }
         public override void Disconnect()

@@ -552,24 +552,38 @@ namespace YouTubeLiveSitePlugin
 
             return message;
         }
+        private static string? ExtractNickname(IEnumerable<IMessagePart> message, IYouTubeLiveSiteOptions siteOptions)
+        {
+            if (!siteOptions.IsAutoSetNickname) return null;
+            foreach (var part in message.Where(m => m is IMessageText).Reverse().Cast<IMessageText>())
+            {
+                if (part == null) continue;
+                return SitePluginCommon.Utils.ExtractNickname(part.Text);
+            }
+            return null;
+        }
         private YouTubeLiveMessageMetadata2 CreateMetadata(IYouTubeLiveMessage message, bool isInitialComment)
         {
             string userId;
             IEnumerable<IMessagePart> name;
+            string? nickname;
             if (message is IYouTubeLiveComment comment)
             {
                 userId = comment.UserId;
                 name = comment.NameItems;
+                nickname = ExtractNickname(comment.CommentItems, _siteOptions);
             }
             else if (message is IYouTubeLiveSuperchat superchat)
             {
                 userId = superchat.UserId;
                 name = superchat.NameItems;
+                nickname = ExtractNickname(superchat.CommentItems, _siteOptions);
             }
             else
             {
                 userId = null;
                 name = null;
+                nickname = null;
             }
             bool isFirstComment;
             //IUser user;
@@ -598,6 +612,7 @@ namespace YouTubeLiveSitePlugin
                 SiteContextGuid = SiteContextGuid,
                 UserId = userId,
                 UserName = name,
+                NewNickname = nickname,
             };
             return metadata;
         }

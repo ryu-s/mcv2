@@ -39,6 +39,9 @@ namespace SitePluginCommon
 
         public event PropertyChangedEventHandler PropertyChanged;
         public SiteType SiteType => SiteType.Unknown;//発生元のサイトにするべき？
+
+        public string? NewNickname { get; }
+
         public InfoMessageMetadata2(IInfoMessage infoMessage)
         {
             _infoMessage = infoMessage;

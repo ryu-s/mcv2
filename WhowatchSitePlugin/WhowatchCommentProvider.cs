@@ -280,7 +280,17 @@ namespace WhowatchSitePlugin
             _lastUpdatedAt = e.UpdatedAt;
             RaiseMetadataUpdated(e);
         }
-
+        private string? ExtractNickname(string comment)
+        {
+            if (_siteOptions.NeedAutoSubNickname)
+            {
+                return SitePluginCommon.Utils.ExtractNickname(comment);
+            }
+            else
+            {
+                return null;
+            }
+        }
         private WhowatchMessageContext2 CreateMessageContext(IWhowatchMessage message, bool isInitialComment)
         {
             IMessageMetadata2 metadata = null;
@@ -292,6 +302,7 @@ namespace WhowatchSitePlugin
                 {
                     IsInitialComment = isInitialComment,
                     SiteContextGuid = SiteContextGuid,
+                    NewNickname = ExtractNickname(comment.Comment),
                 };
             }
             else if (message is IWhowatchItem item)
@@ -300,6 +311,7 @@ namespace WhowatchSitePlugin
                 {
                     IsInitialComment = isInitialComment,
                     SiteContextGuid = SiteContextGuid,
+                    NewNickname = ExtractNickname(item.Comment),
                 };
             }
             WhowatchMessageContext2 context = null;
@@ -352,31 +364,6 @@ namespace WhowatchSitePlugin
                 Debug.WriteLine(whowatchMessage.Raw);
                 _logger.LogException(ex);
             }
-        }
-        /// <summary>
-        /// 文字列から@ニックネームを抽出する
-        /// 文字列中に@が複数ある場合は一番最後のものを採用する
-        /// 数字だけのニックネームは不可
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        protected string ExtractNickname(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return null;
-            var matches = Regex.Matches(text, "(?:@|＠)(\\S+)", RegexOptions.Singleline);
-            if (matches.Count > 0)
-            {
-                foreach (Match match in matches.Cast<Match>().Reverse())
-                {
-                    var val = match.Groups[1].Value;
-                    if (!Regex.IsMatch(val, "^[0-9０１２３４５６７８９]+$"))
-                    {
-                        return val;
-                    }
-                }
-            }
-            return null;
         }
         Dictionary<long, PlayItem> _itemDict;
         IMe _me;

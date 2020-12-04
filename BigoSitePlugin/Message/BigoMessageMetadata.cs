@@ -31,7 +31,7 @@ namespace BigoSitePlugin
         public string UserId { get; }
         public IEnumerable<IMessagePart> UserName { get; }
         public SiteType SiteType => SiteType.Bigo;
-
+        public string? NewNickname { get; set; }
         public BigoMessageMetadata2(IBigoMessage message, IBigoSiteOptions siteOptions, bool isFirstComment)
         {
             _message = message;

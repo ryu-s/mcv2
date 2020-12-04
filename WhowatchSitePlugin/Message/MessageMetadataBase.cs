@@ -20,7 +20,7 @@ namespace WhowatchSitePlugin
         public string UserId { get; set; }
         public IEnumerable<IMessagePart> UserName { get; set; }
         public SiteType SiteType => SiteType.Whowatch;
-
+        public string? NewNickname { get; set; }
         /// <summary>
         /// 
         /// </summary>

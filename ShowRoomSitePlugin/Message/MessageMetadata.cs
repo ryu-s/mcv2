@@ -32,6 +32,8 @@ namespace ShowRoomSitePlugin
         public string UserId { get; set; }
         public IEnumerable<IMessagePart> UserName { get; set; }
         public SiteType SiteType => SiteType.ShowRoom;
+        public string? NewNickname { get; set; }
+
         public MessageMetadata2(IShowRoomMessage message, IShowRoomSiteOptions siteOptions, bool isFirstComment)
         {
             _message = message;

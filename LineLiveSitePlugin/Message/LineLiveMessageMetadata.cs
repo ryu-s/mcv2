@@ -31,6 +31,7 @@ namespace LineLiveSitePlugin
         public string UserId { get; }
         public IEnumerable<IMessagePart> UserName { get; }
         public SiteType SiteType => SiteType.LineLive;
+        public string? NewNickname { get; set; }
 
         public MessageMetadata2(ILineLiveMessage message, ILineLiveSiteOptions siteOptions, bool isFirstComment)
         {

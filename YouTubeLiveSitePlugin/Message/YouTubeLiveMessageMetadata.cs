@@ -31,6 +31,9 @@ namespace YouTubeLiveSitePlugin
         public string UserId { get; set; }
         public IEnumerable<IMessagePart> UserName { get; set; }
         public SiteType SiteType => SiteType.YouTubeLive;
+
+        public string? NewNickname { get; set; }
+
         public YouTubeLiveMessageMetadata2(IYouTubeLiveMessage message, IYouTubeLiveSiteOptions siteOptions, bool isFirstComment)
         {
             _message = message;
