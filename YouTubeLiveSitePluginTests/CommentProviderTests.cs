@@ -100,6 +100,11 @@ namespace YouTubeLiveSitePluginTests
                 throw new NotImplementedException();
             }
 
+            public Task<string> PostJsonAsync(string url, string payload, CookieContainer cc)
+            {
+                throw new NotImplementedException();
+            }
+
             public Server(string clientIdPrefix, string comment, string sej, string sessionToken)
             {
                 _clientIdPrefix = clientIdPrefix;

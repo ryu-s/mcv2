@@ -34,6 +34,23 @@ namespace YouTubeLiveSitePlugin
         {
             return new DateTime(timestampUsec * 10, DateTimeKind.Utc).AddTicks(new DateTime(1970, 1, 1).Ticks);
         }
+        public static string GetInnerTubeContext(string liveChatHtml)
+        {
+            var match = Regex.Match(liveChatHtml, "ytcfg\\.set\\(\"INNERTUBE_CONTEXT\",\\s*({[^\n]+})\\)\r?\n");
+            if (!match.Success)
+            {
+                throw new SpecChangedException(liveChatHtml);
+            }
+            return match.Groups[1].Value;
+        }
+        public static string AddRichTextToInnerTubeContext(string innerTubeContext, string richText)
+        {
+            //innnerTubeContextがjson形式だから、最後の'}'とそれ以外に分け、その間にrichTextを挿入する
+            var len = innerTubeContext.Length;
+            var pre = innerTubeContext[0..(len - 1)];
+            var pro = innerTubeContext[(len - 1)..];
+            return pre + "," + richText + pro;
+        }
         public static LiveChatContext GetLiveChatContext(string liveChatHtml)
         {
             var context = new LiveChatContext();

@@ -378,6 +378,17 @@ namespace YouTubeLiveSitePlugin
             CanDisconnect = false;
         }
     }
+    class PostCommentContext2
+    {
+        public string InnerTubeContext { get; }
+        public string InnerTubeApiKey { get; }
+
+        public PostCommentContext2(string innerTubeContext, string innerTubeApiKey)
+        {
+            InnerTubeContext = innerTubeContext;
+            InnerTubeApiKey = innerTubeApiKey;
+        }
+    }
     class PostCommentContext
     {
         public string SessionToken { get; set; }

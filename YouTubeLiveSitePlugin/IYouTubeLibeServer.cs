@@ -13,6 +13,7 @@ namespace YouTubeLiveSitePlugin
         Task<YouTubeLiveServerResponse> GetNoThrowAsync(string url, CookieContainer cc);
         Task<string> GetEnAsync(string url);
         Task<string> PostAsync(string url, Dictionary<string, string> data, CookieContainer cc);
+        Task<string> PostJsonAsync(string url, string payload, CookieContainer cc);
         Task<string> PostAsync(HttpOptions options, HttpContent content);
         Task<byte[]> GetBytesAsync(string url);
     }

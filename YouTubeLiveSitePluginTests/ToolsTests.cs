@@ -12,6 +12,18 @@ namespace YouTubeLiveSitePluginTests
     class ToolsTests
     {
         [Test]
+        public void Test()
+        {
+            var s = YtTools.AddRichTextToInnerTubeContext("abd", "c");
+            Assert.AreEqual("ab,cd", s);
+        }
+        [Test]
+        public void GetInnerTubeContextTest()
+        {
+            var data = Tools.GetSampleData("LiveChat.txt");
+            var s = YtTools.GetInnerTubeContext(data);
+        }
+        [Test]
         public void ExtractYtInitialFromSubscribedChannelHtmlTest()
         {
             var data = "}</script><script nonce=\"orPyHr13z9j4Y/4tOnK69A\">var ytInitialData = {\"responseContext\":\"GEpHycQwjdT6A\"}]}}};</script><tit";

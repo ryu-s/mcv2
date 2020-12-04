@@ -10,6 +10,7 @@ using ryu_s.BrowserCookie;
 using System.Net.Http;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace YouTubeLiveSitePlugin
 {
@@ -325,114 +326,15 @@ namespace YouTubeLiveSitePlugin
             }
         }
         bool CanPostComment => PostCommentContext != null;
-        protected virtual PostCommentContext PostCommentContext { get; set; }
-        int _commentPostCount;
+        protected virtual PostCommentContext2? PostCommentContext { get; set; }
         public async Task<bool> PostCommentAsync(string text)
         {
-            var ret = false;
-            if (CanPostComment)
-            {
-                try
-                {
-                    var clientMessageId = PostCommentContext.ClientIdPrefix + _commentPostCount;
-                    var s = "{\"text_segments\":[{\"text\":\"" + text + "\"}]}";
-                    var sej = PostCommentContext.Sej.Replace("\r\n", "").Replace("\t", "").Replace(" ", "");
-                    var sessionToken = PostCommentContext.SessionToken;
-                    var data = new Dictionary<string, string>
-                    {
-                        { "client_message_id",clientMessageId},
-                        { "rich_message",s},
-                        { "sej",sej},
-                        { "session_token",sessionToken},
-                    };
-                    var url = "https://www.youtube.com/service_ajax?name=sendLiveChatMessageEndpoint";
-                    var res = await _server.PostAsync(url, data, _cc);
-                    Debug.WriteLine(res);
-                    dynamic? json = JsonConvert.DeserializeObject(res);
-                    if (json == null)
-                    {
-                        throw new SpecChangedException(res);
-                    }
-                    //if (json.IsDefined("errors"))
-                    //{
-                    //    var k = string.Join("&", data.Select(kv => kv.Key + "=" + kv.Value));
-                    //    throw new PostingCommentFailedException("コメント投稿に失敗しました（" + json.errors[0] + "）",$"data={k}, res={res}");
-                    //}
-                    if (json.ContainsKey("code") && json.code == "SUCCESS")
-                    {
-                        if (json.ContainsKey("data") && json.data.ContainsKey("errorMessage"))
-                        {
-                            var k = string.Join("&", data.Select(kv => kv.Key + "=" + kv.Value));
-                            string errorText;
-                            if (json.data.errorMessage.liveChatTextActionsErrorMessageRenderer.errorText.ContainsKey("simpleText"))
-                            {
-                                errorText = (string)json.data.errorMessage.liveChatTextActionsErrorMessageRenderer.errorText.simpleText;
-                            }
-                            else if (json.data.errorMessage.liveChatTextActionsErrorMessageRenderer.errorText.ContainsKey("runs"))
-                            {
-                                errorText = (string)json.data.errorMessage.liveChatTextActionsErrorMessageRenderer.errorText.runs[0].text;
-                            }
-                            else
-                            {
-                                errorText = "";
-                            }
-                            throw new PostingCommentFailedException("コメント投稿に失敗しました（" + errorText + "）", $"data={k}, res={res}");
-                        }
-                        else if (json.ContainsKey("data") && json.data.ContainsKey("actions"))
-                        {
-                            //多分成功
-                            _commentPostCount++;
-                            ret = true;
-                            goto CommentPostsucceeded;
-                        }
-                    }
-                    var k0 = string.Join("&", data.Select(kv => kv.Key + "=" + kv.Value));
-                    throw new UnknownResponseReceivedException($"data={k0}, res={res}");
-                }
-                catch (UnknownResponseReceivedException ex)
-                {
-                    _logger.LogException(ex);
-                    SendInfo(ex.Message, InfoType.Error);
-                }
-                catch (PostingCommentFailedException ex)
-                {
-                    _logger.LogException(ex);
-                    SendInfo(ex.Message, InfoType.Error);
-                }
-                //catch (HttpException ex)
-                //{
-                //    //{\"errors\":[\"検証中にエラーが発生しました。\"]} statuscodeは分からないけど200以外
-                //    _logger.LogException(ex, "", $"text={text},statuscode={ex.StatusCode}");
-                //    SendInfo("コメント投稿時にエラーが発生", InfoType.Error);
-                //}
-                catch (HttpRequestException ex)
-                {
-                    if (ex.InnerException is WebException webEx)
-                    {
-                        string response;
-                        using (var sr = new System.IO.StreamReader(webEx.Response.GetResponseStream()))
-                        {
-                            response = sr.ReadToEnd();
-                        }
-                        var statuscode = (int)((HttpWebResponse)webEx.Response).StatusCode;
-                        //{\"errors\":[\"検証中にエラーが発生しました。\"]} statuscodeは分からないけど200以外
-                        _logger.LogException(ex, "", $"text={text},statuscode={statuscode}");
-                        SendInfo("コメント投稿時にエラーが発生", InfoType.Error);
-                    }
-                    else
-                    {
-                        _logger.LogException(ex, "", $"text={text}");
-                        SendInfo("コメント投稿時にエラーが発生", InfoType.Error);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogException(ex);
-                    SendInfo("コメント投稿時にエラーが発生", InfoType.Error);
-                }
-            }
-        CommentPostsucceeded:
-            return ret;
+            if (!CanPostComment) return false;
+            var richMessage = "\"richMessage\":{\"textSegments\":[{\"text\":\"" + text + "\"}]}";
+            var payload = Tools.AddRichTextToInnerTubeContext(PostCommentContext!.InnerTubeContext, richMessage);
+            var url = "https://www.youtube.com/youtubei/v1/live_chat/send_message?key=" + PostCommentContext.InnerTubeApiKey;
+            var res = await _server.PostJsonAsync(url, payload, _cc);
+            return true;
         }
         private void SendInfo(string v, InfoType error)
         {
@@ -490,35 +392,15 @@ namespace YouTubeLiveSitePlugin
         }
         private void PrepareForPostingComments(string liveChatHtml, string ytInitialData)
         {
-            var liveChatContext = Tools.GetLiveChatContext(liveChatHtml);
-            if (liveChatContext == null)
+            var innerTubeContext = Tools.GetInnerTubeContext(liveChatHtml);
+            if (innerTubeContext == null)
             {
                 throw new SpecChangedException(liveChatHtml);
             }
-            IsLoggedIn = liveChatContext.IsLoggedIn;
-            if (!Tools.TryExtractSendButtonServiceEndpoint(ytInitialData, out string? serviceEndPoint))
-            {
-                throw new SpecChangedException(ytInitialData);
-            }
-            try
-            {
-                dynamic? json = JsonConvert.DeserializeObject(serviceEndPoint);
-                if (json == null)
-                {
-                    throw new SpecChangedException(serviceEndPoint);
-                }
-                PostCommentContext = new PostCommentContext
-                {
-                    ClientIdPrefix = (string)json.sendLiveChatMessageEndpoint.clientIdPrefix,
-                    SessionToken = (string)liveChatContext.XsrfToken,
-                    Sej = (string)serviceEndPoint,
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogException(ex, "", $"serviceEndPoint={serviceEndPoint}");
-            }
 
+            var match = Regex.Match(liveChatHtml, "\"INNERTUBE_API_KEY\":\"([^\"]+)\"");
+            var innerTubeApiKey = match.Groups[1].Value;
+            PostCommentContext = new PostCommentContext2(innerTubeContext, innerTubeApiKey);
         }
         private YouTubeLiveMessageContext2 CreateMessageContext(CommentData commentData, bool isInitialComment)
         {
