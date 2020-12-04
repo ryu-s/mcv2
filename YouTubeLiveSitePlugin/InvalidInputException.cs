@@ -19,6 +19,7 @@ namespace YouTubeLiveSitePlugin
 
         protected InvalidInputException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
+            Details = "";
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace YouTubeLiveSitePlugin.Low.LiveChat
 {
+#nullable disable
     public class Param
     {
         public string key { get; set; }
@@ -1071,4 +1072,5 @@ namespace YouTubeLiveSitePlugin.Low.LiveChat
         public Contents contents { get; set; }
         public string trackingParams { get; set; }
     }
+#nullable enable
 }

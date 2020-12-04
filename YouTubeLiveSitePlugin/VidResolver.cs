@@ -5,6 +5,9 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.CodeDom;
+using YouTubeLiveSitePlugin.Low.ChannelYtInitialData;
+using System.Diagnostics.CodeAnalysis;
 
 namespace YouTubeLiveSitePlugin
 {
@@ -14,7 +17,11 @@ namespace YouTubeLiveSitePlugin
     }
     class MultiVidsResult : IVidResult
     {
-        public List<string> Vids { get; set; }
+        public List<string> Vids { get; }
+        public MultiVidsResult(List<string> vids)
+        {
+            Vids = vids;
+        }
     }
     class NoVidResult : IVidResult
     {
@@ -22,7 +29,11 @@ namespace YouTubeLiveSitePlugin
     }
     class VidResult : IVidResult
     {
-        public string Vid { get; set; }
+        public string Vid { get; }
+        public VidResult(string vid)
+        {
+            Vid = vid;
+        }
     }
     internal class VidResolver
     {
@@ -74,7 +85,7 @@ namespace YouTubeLiveSitePlugin
             return IsWatch(input) || IsUser(input) || IsChannel(input) || IsCustomChannel(input);
         }
 
-        internal bool TryVid(string input, out string vid)
+        internal bool TryVid(string input, [NotNullWhen(true)] out string? vid)
         {
             if (string.IsNullOrEmpty(input))
             {
@@ -90,7 +101,7 @@ namespace YouTubeLiveSitePlugin
             vid = null;
             return false;
         }
-        private bool TryStudio(string input, out string vid)
+        private bool TryStudio(string input, [NotNullWhen(true)] out string? vid)
         {
             if (string.IsNullOrEmpty(input))
             {
@@ -119,7 +130,7 @@ namespace YouTubeLiveSitePlugin
             }
             throw new ParseException(html);
         }
-        internal bool TryWatch(string input, out string vid)
+        internal bool TryWatch(string input, [NotNullWhen(true)] out string? vid)
         {
             if (string.IsNullOrEmpty(input))
             {
@@ -135,7 +146,7 @@ namespace YouTubeLiveSitePlugin
             vid = null;
             return false;
         }
-        internal async Task<(string channelId, string reason)> TryGetChannelIdFromCustomChannel(IYouTubeLiveServer server, string input)
+        internal async Task<(string? channelId, string? reason)> TryGetChannelIdFromCustomChannel(IYouTubeLiveServer server, string input)
         {
             var match1 = _regexCustomChannel.Match(input);
             if (match1.Success)
@@ -149,7 +160,7 @@ namespace YouTubeLiveSitePlugin
                     return (channelId, null);
                 }
             }
-            return (null, "");
+            return (null, null);
         }
         internal string ExtractChannelId(string input)
         {
@@ -164,17 +175,17 @@ namespace YouTubeLiveSitePlugin
         public async Task<IVidResult> GetVid(IYouTubeLiveServer server, string input)
         {
             if (string.IsNullOrEmpty(input)) throw new ArgumentNullException(nameof(input));
-            if (TryVid(input, out string vid))
+            if (TryVid(input, out var vid))
             {
-                return new VidResult { Vid = vid };
+                return new VidResult(vid);
             }
             else if (TryWatch(input, out vid))
             {
-                return new VidResult { Vid = vid };
+                return new VidResult(vid);
             }
             else if (TryStudio(input, out vid))
             {
-                return new VidResult { Vid = vid };
+                return new VidResult(vid);
             }
             else if (IsUser(input))
             {
@@ -185,7 +196,10 @@ namespace YouTubeLiveSitePlugin
             else if (IsCustomChannel(input))
             {
                 var (channelId, reason) = await TryGetChannelIdFromCustomChannel(server, input);
-                return await GetResultFromChannelId(server, channelId);
+                if (channelId != null)
+                {
+                    return await GetResultFromChannelId(server, channelId);
+                }
             }
             else if (IsChannel(input))
             {
@@ -203,7 +217,7 @@ namespace YouTubeLiveSitePlugin
             var vids = await GetVidsFromChannelId2(server, channelId);
             if (vids.Count == 1)
             {
-                return new VidResult { Vid = vids[0] };
+                return new VidResult(vids[0]);
             }
             else if (vids.Count == 0)
             {
@@ -211,7 +225,7 @@ namespace YouTubeLiveSitePlugin
             }
             else
             {
-                return new MultiVidsResult { Vids = vids };
+                return new MultiVidsResult(vids);
             }
         }
         internal async Task<List<string>> GetVidsFromChannelId2(IYouTubeLiveServer server, string channelId)
@@ -264,7 +278,7 @@ namespace YouTubeLiveSitePlugin
             {
                 var json = JsonConvert.DeserializeObject<Low.ChannelYtInitialData.RootObject>(ytInitialData);
                 var tabs = json.contents.twoColumnBrowseResultsRenderer.tabs;
-                Low.ChannelYtInitialData.Tab videosTab = null;
+                Low.ChannelYtInitialData.Tab? videosTab = null;
                 foreach (var tab in tabs)
                 {
                     if (tab.tabRenderer == null)

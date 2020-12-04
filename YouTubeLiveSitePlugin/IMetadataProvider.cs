@@ -11,14 +11,14 @@ namespace YouTubeLiveSitePlugin
 {
     abstract class IMetadataProvider
     {
-        protected EventHandler<IMetadata> metaReceived;
-        public event EventHandler<IMetadata> MetadataReceived
+        protected EventHandler<IMetadata>? metaReceived;
+        public event EventHandler<IMetadata>? MetadataReceived
         {
             add { metaReceived += value; }
             remove { metaReceived -= value; }
         }
-        public event EventHandler<InfoData> InfoReceived;
-        protected CancellationTokenSource _cts;
+        public event EventHandler<InfoData>? InfoReceived;
+        protected CancellationTokenSource? _cts;
         protected readonly ILogger _logger;
         public void Disconnect()
         {
@@ -29,15 +29,16 @@ namespace YouTubeLiveSitePlugin
         }
         protected void SendInfo(string message, InfoType type)
         {
-            InfoReceived?.Invoke(this, new InfoData { Comment = message, Type = type });
+            InfoReceived?.Invoke(this, new InfoData(message, type));
         }
         protected Metadata ActionsToMetadata(dynamic actions)
         {
             var metadata = new Metadata();
-            string like = null;
-            string dislike = null;
+            string? like = null;
+            string? dislike = null;
             foreach (var action in actions)
             {
+                if (action == null) continue;
                 if (action.ContainsKey("updateViewershipAction"))
                 {
                     dynamic re;
@@ -74,7 +75,7 @@ namespace YouTubeLiveSitePlugin
                 }
                 else if (action.ContainsKey("updateTitleAction"))
                 {
-                    string title;
+                    string? title;
                     if (action.updateTitleAction.title.ContainsKey("runs"))
                     {
                         title = action.updateTitleAction.title.runs[0].text;

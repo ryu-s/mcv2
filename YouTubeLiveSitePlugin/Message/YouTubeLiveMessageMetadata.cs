@@ -14,7 +14,7 @@ namespace YouTubeLiveSitePlugin
         public bool IsNgUser => false;
         public bool IsSiteNgUser => false;//TODO:IUserにIsSiteNgUserを追加する
         public bool IsFirstComment { get; }
-        public string SiteName { get; }
+        public string? SiteName { get; }
         public bool Is184 { get; }
         public bool IsVisible
         {
@@ -42,11 +42,11 @@ namespace YouTubeLiveSitePlugin
         }
         #region INotifyPropertyChanged
         [NonSerialized]
-        private System.ComponentModel.PropertyChangedEventHandler _propertyChanged;
+        private System.ComponentModel.PropertyChangedEventHandler? _propertyChanged;
         /// <summary>
         /// 
         /// </summary>
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged
+        public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged
         {
             add { _propertyChanged += value; }
             remove { _propertyChanged -= value; }

@@ -57,11 +57,11 @@ namespace YouTubeLiveSitePlugin
         private readonly Dictionary<string, int> _userCommentCountDict;
         private readonly SynchronizedCollection<string> _receivedCommentIds;
         private readonly ICommentProvider _cp;
-        ChatProvider _chatProvider;
+        ChatProvider? _chatProvider;
         DisconnectReason _disconnectReason;
 
-        public event EventHandler<IMessageContext2> MessageReceived;
-        public event EventHandler<IMetadata> MetadataUpdated;
+        public event EventHandler<IMessageContext2>? MessageReceived;
+        public event EventHandler<IMetadata>? MetadataUpdated;
         public event EventHandler Connected;
         public SitePluginId SiteContextGuid { get; set; }
         /// <summary>
@@ -144,8 +144,8 @@ namespace YouTubeLiveSitePlugin
             PrepareForPostingComments(liveChatHtml, ytInitialData);
 
             var tasks = new List<Task>();
-            Task activeCounterTask = null;
-            IActiveCounter<string> activeCounter = null;
+            Task? activeCounterTask = null;
+            IActiveCounter<string>? activeCounter = null;
             //if (_options.IsActiveCountEnabled)
             //{
             //    activeCounter = new ActiveCounter<string>()
@@ -161,8 +161,7 @@ namespace YouTubeLiveSitePlugin
             //    tasks.Add(activeCounterTask);
             //}
 
-            IMetadataProvider metaProvider = null;
-            var metaTask = CreateMetadataReceivingTask(ref metaProvider, browserType, vid, liveChatHtml);
+            var (metaTask, metaProvider) = CreateMetadataReceivingTask(browserType, vid, liveChatHtml);
             if (metaTask != null)
             {
                 tasks.Add(metaTask);
@@ -313,7 +312,7 @@ namespace YouTubeLiveSitePlugin
             }
         }
 
-        public event EventHandler LoggedInStateChanged;
+        public event EventHandler? LoggedInStateChanged;
         private bool _isLoggedIn;
         public bool IsLoggedIn
         {
@@ -349,7 +348,11 @@ namespace YouTubeLiveSitePlugin
                     var url = "https://www.youtube.com/service_ajax?name=sendLiveChatMessageEndpoint";
                     var res = await _server.PostAsync(url, data, _cc);
                     Debug.WriteLine(res);
-                    dynamic json = JsonConvert.DeserializeObject(res);
+                    dynamic? json = JsonConvert.DeserializeObject(res);
+                    if (json == null)
+                    {
+                        throw new SpecChangedException(res);
+                    }
                     //if (json.IsDefined("errors"))
                     //{
                     //    var k = string.Join("&", data.Select(kv => kv.Key + "=" + kv.Value));
@@ -444,64 +447,78 @@ namespace YouTubeLiveSitePlugin
             var context = new InfoMessageContext2(message, metadata);
             MessageReceived?.Invoke(this, context);
         }
-        protected virtual Task CreateMetadataReceivingTask(ref IMetadataProvider metaProvider, BrowserType browserType, string vid, string liveChatHtml)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="browserType"></param>
+        /// <param name="vid"></param>
+        /// <param name="liveChatHtml"></param>
+        /// <returns></returns>
+        /// <exception cref="SpecChangedException">live_chatからのytcfgの抜き出しに失敗した場合</exception>
+        protected virtual (Task?, IMetadataProvider) CreateMetadataReceivingTask(BrowserType browserType, string vid, string liveChatHtml)
         {
-            Task metaTask = null;
-            string ytCfg = null;
+            IMetadataProvider metaProvider;
+            string? ytCfg = null;
             try
             {
                 ytCfg = Tools.ExtractYtcfg(liveChatHtml);
             }
             catch (ParseException ex)
             {
-                _logger.LogException(ex, "live_chatからのytcfgの抜き出しに失敗", liveChatHtml);
+                throw new SpecChangedException(liveChatHtml, ex);
             }
-            if (!string.IsNullOrEmpty(ytCfg))
+            //"service_ajax?name=updatedMetadataEndpoint"はIEには対応していないらしく、400が返って来てしまう。
+            //そこで、IEの場合のみ旧版の"youtubei"を使うようにした。
+            if (browserType == BrowserType.IE)
             {
-                //"service_ajax?name=updatedMetadataEndpoint"はIEには対応していないらしく、400が返って来てしまう。
-                //そこで、IEの場合のみ旧版の"youtubei"を使うようにした。
-                if (browserType == BrowserType.IE)
-                {
-                    metaProvider = new MetaDataYoutubeiProvider(_server, _logger);
-                }
-                else
-                {
-                    metaProvider = new MetadataProvider(_server, _logger);
-                }
-                metaProvider.MetadataReceived += (s, e) =>
-                {
-                    MetadataUpdated?.Invoke(this, e);
-                };
-                metaProvider.InfoReceived += (s, e) =>
-                {
-                    SendInfo(e.Comment, e.Type);
-                };
-                metaTask = metaProvider.ReceiveAsync(ytCfg: ytCfg, vid: vid, cc: _cc);
+                metaProvider = new MetaDataYoutubeiProvider(_server, _logger);
             }
-
-            return metaTask;
+            else
+            {
+                metaProvider = new MetadataProvider(_server, _logger);
+            }
+            metaProvider.MetadataReceived += (s, e) =>
+            {
+                MetadataUpdated?.Invoke(this, e);
+            };
+            metaProvider.InfoReceived += (s, e) =>
+            {
+                SendInfo(e.Comment, e.Type);
+            };
+            var task = metaProvider.ReceiveAsync(ytCfg: ytCfg, vid: vid, cc: _cc);
+            return (task, metaProvider);
         }
         private void PrepareForPostingComments(string liveChatHtml, string ytInitialData)
         {
             var liveChatContext = Tools.GetLiveChatContext(liveChatHtml);
-            IsLoggedIn = liveChatContext.IsLoggedIn;
-            if (Tools.TryExtractSendButtonServiceEndpoint(ytInitialData, out string serviceEndPoint))
+            if (liveChatContext == null)
             {
-                try
-                {
-                    dynamic json = JsonConvert.DeserializeObject(serviceEndPoint);
-                    PostCommentContext = new PostCommentContext
-                    {
-                        ClientIdPrefix = (string)json.sendLiveChatMessageEndpoint.clientIdPrefix,
-                        SessionToken = (string)liveChatContext.XsrfToken,
-                        Sej = (string)serviceEndPoint,
-                    };
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogException(ex, "", $"serviceEndPoint={serviceEndPoint}");
-                }
+                throw new SpecChangedException(liveChatHtml);
             }
+            IsLoggedIn = liveChatContext.IsLoggedIn;
+            if (!Tools.TryExtractSendButtonServiceEndpoint(ytInitialData, out string? serviceEndPoint))
+            {
+                throw new SpecChangedException(ytInitialData);
+            }
+            try
+            {
+                dynamic? json = JsonConvert.DeserializeObject(serviceEndPoint);
+                if (json == null)
+                {
+                    throw new SpecChangedException(serviceEndPoint);
+                }
+                PostCommentContext = new PostCommentContext
+                {
+                    ClientIdPrefix = (string)json.sendLiveChatMessageEndpoint.clientIdPrefix,
+                    SessionToken = (string)liveChatContext.XsrfToken,
+                    Sej = (string)serviceEndPoint,
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogException(ex, "", $"serviceEndPoint={serviceEndPoint}");
+            }
+
         }
         private YouTubeLiveMessageContext2 CreateMessageContext(CommentData commentData, bool isInitialComment)
         {
@@ -564,8 +581,8 @@ namespace YouTubeLiveSitePlugin
         }
         private YouTubeLiveMessageMetadata2 CreateMetadata(IYouTubeLiveMessage message, bool isInitialComment)
         {
-            string userId;
-            IEnumerable<IMessagePart> name;
+            string? userId;
+            IEnumerable<IMessagePart>? name;
             string? nickname;
             if (message is IYouTubeLiveComment comment)
             {

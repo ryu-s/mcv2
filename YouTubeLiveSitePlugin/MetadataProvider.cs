@@ -17,8 +17,13 @@ namespace YouTubeLiveSitePlugin
 {
     internal class InfoData
     {
-        public string Comment { get; set; }
-        public InfoType Type { get; set; }
+        public string Comment { get; }
+        public InfoType Type { get; }
+        public InfoData(string comment, InfoType type)
+        {
+            Comment = comment;
+            Type = type;
+        }
     }
     /// <summary>
     /// youtubeiを使ってメタデータを取得するクラス
@@ -34,7 +39,11 @@ namespace YouTubeLiveSitePlugin
             string innerTubeKey;
             try
             {
-                dynamic ytCfgJson = JsonConvert.DeserializeObject(ytCfg);
+                dynamic? ytCfgJson = JsonConvert.DeserializeObject(ytCfg);
+                if (ytCfgJson == null)
+                {
+                    throw new ArgumentException(nameof(ytCfg));
+                }
                 innerTubeKey = ytCfgJson.INNERTUBE_API_KEY;
             }
             catch (Exception ex)
@@ -131,7 +140,11 @@ namespace YouTubeLiveSitePlugin
             string token;
             try
             {
-                dynamic ytCfgJson = JsonConvert.DeserializeObject(ytCfg);
+                dynamic? ytCfgJson = JsonConvert.DeserializeObject(ytCfg);
+                if (ytCfgJson == null)
+                {
+                    throw new ArgumentException(nameof(ytCfg));
+                }
                 token = ytCfgJson.XSRF_TOKEN;
             }
             catch (Exception ex)
@@ -160,9 +173,12 @@ namespace YouTubeLiveSitePlugin
                 try
                 {
                     var res = await GetMetadata(cc, url, encodedContinuation + encodedData);
-                    dynamic d = JsonConvert.DeserializeObject(res);
+                    dynamic? d = JsonConvert.DeserializeObject(res);
+                    if (d == null)
+                    {
+                        throw new SpecChangedException(res);
+                    }
                     string continuation;
-
                     if (!d.ContainsKey("code") || d.code != "SUCCESS")
                     {
                         if (res == "{\"errors\":[\"Invalid Request\"]}")

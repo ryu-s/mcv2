@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace YouTubeLiveSitePlugin.Low.GetLiveChat
 {
+#nullable disable
     public class Param
     {
         public string key { get; set; }
@@ -460,4 +461,5 @@ namespace YouTubeLiveSitePlugin.Low.GetLiveChat
         public string xsrf_token { get; set; }
         public Timing timing { get; set; }
     }
+#nullable enable
 }

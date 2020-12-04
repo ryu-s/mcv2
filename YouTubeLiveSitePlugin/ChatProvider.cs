@@ -16,15 +16,15 @@ namespace YouTubeLiveSitePlugin
 {
     class ChatProvider
     {
-        public event EventHandler<List<CommentData>> ActionsReceived;
-        public event EventHandler<InfoData> InfoReceived;
-        CancellationTokenSource _cts;
+        public event EventHandler<List<CommentData>>? ActionsReceived;
+        public event EventHandler<InfoData>? InfoReceived;
+        CancellationTokenSource? _cts;
         private readonly IYouTubeLiveServer _server;
         private readonly ILogger _logger;
         public int IntervalAfterWebException { get; set; } = 5000;
         private void SendInfo(string message, InfoType type)
         {
-            InfoReceived?.Invoke(this, new InfoData { Comment = message, Type = type });
+            InfoReceived?.Invoke(this, new InfoData(message, type));
         }
         public void Disconnect()
         {
@@ -48,7 +48,7 @@ namespace YouTubeLiveSitePlugin
             while (!_cts.IsCancellationRequested)
             {
                 var getLiveChatUrl = $"https://www.youtube.com/live_chat/get_live_chat?continuation={System.Web.HttpUtility.UrlEncode(continuation)}&pbj=1";
-                string getLiveChatJson = null;
+                string? getLiveChatJson = null;
                 try
                 {
                     var getLiveChatBytes = await _server.GetBytesAsync(getLiveChatUrl);
@@ -96,7 +96,7 @@ namespace YouTubeLiveSitePlugin
                 }
                 catch (ParseException ex)
                 {
-                    _logger.LogException(ex, "get_live_chatのパースに失敗", getLiveChatJson);
+                    _logger.LogException(ex, "get_live_chatのパースに失敗", getLiveChatJson ?? "");
                 }
                 catch (TaskCanceledException)
                 {
@@ -112,6 +112,7 @@ namespace YouTubeLiveSitePlugin
                     break;
                 }
             }
+            _cts = null;
         }
         public ChatProvider(IYouTubeLiveServer server, ILogger logger)
         {

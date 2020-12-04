@@ -24,11 +24,10 @@ namespace YouTubeLiveSitePlugin
 
         public override void LoadOptions(string path, IIo io)
         {
-            _siteOptions = new YouTubeLiveSiteOptions();
             try
             {
                 var s = io.ReadFile(path);
-
+                if (s == null) return;
                 _siteOptions.Deserialize(s);
             }
             catch (Exception ex)
@@ -66,6 +65,7 @@ namespace YouTubeLiveSitePlugin
         {
             _server = server;
             _logger = logger;
+            _siteOptions = new YouTubeLiveSiteOptions();
         }
     }
 }

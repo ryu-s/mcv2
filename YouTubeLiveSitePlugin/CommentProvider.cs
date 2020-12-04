@@ -46,16 +46,16 @@ namespace YouTubeLiveSitePlugin
                 CanDisconnectChanged?.Invoke(this, EventArgs.Empty);
             }
         }
-        public event EventHandler LoggedInStateChanged;
+        public event EventHandler? LoggedInStateChanged;
         public bool IsLoggedIn
         {
             get { return _connection != null ? _connection.IsLoggedIn : false; }
         }
-        public event EventHandler<IMessageContext2> MessageReceived;
-        public event EventHandler<IMetadata> MetadataUpdated;
-        public event EventHandler CanConnectChanged;
-        public event EventHandler CanDisconnectChanged;
-        public event EventHandler<ConnectedEventArgs> Connected;
+        public event EventHandler<IMessageContext2>? MessageReceived;
+        public event EventHandler<IMetadata>? MetadataUpdated;
+        public event EventHandler? CanConnectChanged;
+        public event EventHandler? CanDisconnectChanged;
+        public event EventHandler<ConnectedEventArgs>? Connected;
 
         CookieContainer _cc;
         private readonly IYouTubeLiveSiteOptions _siteOptions;
@@ -130,10 +130,10 @@ namespace YouTubeLiveSitePlugin
             }
             return cc;
         }
-        EachConnection _connection;
+        EachConnection? _connection;
         DateTime? _startedAt;
         System.Timers.Timer _elapsedTimer = new System.Timers.Timer();
-        public async Task ConnectAsync(string input, IBrowserProfile2 browserProfile)
+        public async Task ConnectAsync(string input, IBrowserProfile2? browserProfile)
         {
             if (string.IsNullOrEmpty(input))
             {
@@ -150,7 +150,7 @@ namespace YouTubeLiveSitePlugin
                 Title = "-",
                 TotalViewers = "-",
             });
-            string vid = null;
+            string? vid = null;
             bool isInputStoringNeeded = false;
             var resolver = new VidResolver();
             try
@@ -211,10 +211,10 @@ namespace YouTubeLiveSitePlugin
             var liveBroadcastDetails = Tools.ExtractLiveBroadcastDetailsFromLivePage(html);
             if (liveBroadcastDetails != null)
             {
-                dynamic d = Newtonsoft.Json.JsonConvert.DeserializeObject(liveBroadcastDetails);
-                if (d.ContainsKey("startTimestamp"))
+                dynamic? d = Newtonsoft.Json.JsonConvert.DeserializeObject(liveBroadcastDetails);
+                if (d != null && d!.ContainsKey("startTimestamp"))
                 {
-                    var startedStr = (string)d.startTimestamp;
+                    var startedStr = (string)d!.startTimestamp;
                     _startedAt = DateTime.Parse(startedStr);
                     _elapsedTimer.Interval = 500;
                     _elapsedTimer.Elapsed += (s, e) =>
@@ -260,7 +260,8 @@ namespace YouTubeLiveSitePlugin
 
             try
             {
-                var disconnectReason = await ReceiveConnectionAsync(_connection, browserProfile.Type, vid);
+                var browserType = browserProfile == null ? BrowserType.Unknown : browserProfile.Type;
+                var disconnectReason = await ReceiveConnectionAsync(_connection, browserType, vid);
                 switch (disconnectReason)
                 {
                     case DisconnectReason.Reload:
@@ -338,7 +339,7 @@ namespace YouTubeLiveSitePlugin
             return await _connection.PostCommentAsync(text);
         }
 
-        public async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile)
+        public async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2? browserProfile)
         {
             var currentUserInfo = new CurrentUserInfo();
             var cc = CreateCookieContainer(browserProfile);

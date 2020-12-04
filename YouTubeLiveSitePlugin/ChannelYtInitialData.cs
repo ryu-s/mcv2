@@ -9,6 +9,7 @@ using System.Diagnostics;
 namespace YouTubeLiveSitePlugin.Low.ChannelYtInitialData
 {
 #pragma warning disable IDE1006 // Naming Styles
+#nullable disable
     public class Param
     {
         public string key { get; set; }
@@ -2190,5 +2191,6 @@ namespace YouTubeLiveSitePlugin.Low.ChannelYtInitialData
         public Topbar topbar { get; set; }
         public Microformat microformat { get; set; }
     }
+#nullable enable
 #pragma warning restore IDE1006 // Naming Styles
 }

@@ -35,7 +35,6 @@ namespace YouTubeLiveSitePlugin
     {
         public string Url { get; }
         public string Html { get; }
-        public YtInitialDataNotFoundException() { }
         public YtInitialDataNotFoundException(string url, string html)
         {
             Url = url;
@@ -46,12 +45,18 @@ namespace YouTubeLiveSitePlugin
     public class ReloadException : Exception
     {
         public string Details { get; }
-        public ReloadException() { }
+        public ReloadException()
+        {
+            Details = "";
+        }
         public ReloadException(string message, string details) : base(message)
         {
             Details = details;
         }
-        public ReloadException(Exception innterException) : base("", innterException) { }
+        public ReloadException(Exception innterException) : base("", innterException)
+        {
+            Details = "";
+        }
     }
     [Serializable]
     public class ContinuationContentsNullException : Exception
@@ -95,6 +100,9 @@ namespace YouTubeLiveSitePlugin
         {
             Raw = raw;
         }
-        public SpecChangedException(string raw, Exception inner) : base("", inner) { }
+        public SpecChangedException(string raw, Exception inner) : base("", inner)
+        {
+            Raw = raw;
+        }
     }
 }

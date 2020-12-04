@@ -9,6 +9,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Text;
 using YouTubeLiveIF;
+using System.ComponentModel;
 
 namespace YouTubeLiveSitePlugin
 {
@@ -66,7 +67,7 @@ namespace YouTubeLiveSitePlugin
             }
             throw new NotImplementedException();
         }
-        public static bool TryExtractSendButtonServiceEndpoint(string ytInitialData, out string serviceEndPoint)
+        public static bool TryExtractSendButtonServiceEndpoint(string ytInitialData, out string? serviceEndPoint)
         {
             var arr = new[]
             {
@@ -80,7 +81,11 @@ namespace YouTubeLiveSitePlugin
                 "buttonRenderer",
                 "serviceEndpoint",
             };
-            var data = (JObject)JsonConvert.DeserializeObject(ytInitialData);
+            var data = (JObject?)JsonConvert.DeserializeObject(ytInitialData);
+            if (data == null)
+            {
+                throw new ArgumentException(ytInitialData);
+            }
             var temp = data[arr[0]];
             for (int i = 1; i < arr.Length; i++)
             {
@@ -96,7 +101,7 @@ namespace YouTubeLiveSitePlugin
             serviceEndPoint = temp.ToString();
             return true;
         }
-        public static bool TryGetVid(string input, out string vid)
+        public static bool TryGetVid(string input, out string? vid)
         {
             if (Regex.IsMatch(input, "^[^/?=:]+$"))
             {
@@ -138,7 +143,7 @@ namespace YouTubeLiveSitePlugin
         /// </summary>
         /// <param name="channelHtml"></param>
         /// <returns>成功したらYtInitialData,失敗したらnull</returns>
-        private static string ExtractYtInitialDataFromChannelHtmlInternal1(string channelHtml)
+        private static string? ExtractYtInitialDataFromChannelHtmlInternal1(string channelHtml)
         {
             //window["ytInitialData"] = JSON.parse("{\"responseContext\":{\"se
             var match = Regex.Match(channelHtml, "window\\[\"ytInitialData\"\\]\\s*=\\s*(.+?})(?:\"\\))?;", RegexOptions.Singleline);
@@ -163,7 +168,7 @@ namespace YouTubeLiveSitePlugin
             }
             return ytInitialData;
         }
-        private static string ExtractYtInitialDataFromChannelHtmlInternal2(string channelHtml)
+        private static string? ExtractYtInitialDataFromChannelHtmlInternal2(string channelHtml)
         {
             //2020/11/09 ttps://www.youtube.com/channel/CHANNEL_ID?view_as=subscriber のHTMLの仕様が通常のものと違った
             //<script nonce=\"orPyHr12z1j4Y/4tOnK12A\">var ytInitialData = {\"responseContext\":
@@ -194,7 +199,11 @@ namespace YouTubeLiveSitePlugin
         /// <returns></returns>
         public static (IContinuation continuation, ChatContinuation, List<CommentData> actions) ParseYtInitialData(string s)
         {
-            dynamic json = JsonConvert.DeserializeObject(s);
+            dynamic? json = JsonConvert.DeserializeObject(s);
+            if (json == null)
+            {
+                throw new ArgumentException(nameof(s));
+            }
             if (!json.ContainsKey("contents"))
             {
                 //"{\"responseContext\":{\"errors\":{\"error\":[{\"domain\":\"gdata.CoreErrorDomain\",\"code\":\"INVALID_VALUE\",\"debugInfo\":\"Error decrypting and parsing the live chat ID.\",\"externalErrorMessage\":\"不明なエラーです。\"}]},\"serviceTrackingParams\":[{\"service\":\"CSI\",\"params\":[{\"key\":\"GetLiveChat_rid\",\"value\":\"0x3365759ba77f978f\"},{\"key\":\"c\",\"value\":\"WEB\"},{\"key\":\"cver\",\"value\":\"2.20190529\"},{\"key\":\"yt_li\",\"value\":\"1\"}]},{\"service\":\"GFEEDBACK\",\"params\":[{\"key\":\"e\",\"value\":\"23720702,23736685,23744176,23750984,23751767,23752869,23755886,23755898,23759224,23766102,23767634,23771992,23785333,23788845,23793834,23794471,23799777,23804281,23804294,23805410,23806435,23808949,23809331,23810273,23811378,23811593,23812530,23812566,23813310,23813548,23813622,23813949,23814199,23814507,23815144,23815164,23815172,23815485,23815949,23817343,23817794,23817825,23818213,9407610,9441381,9449243,9471235\"},{\"key\":\"logged_in\",\"value\":\"1\"}]},{\"service\":\"GUIDED_HELP\",\"params\":[{\"key\":\"creator_channel_id\",\"value\":\"UCK6F1ecql0T_9hHGTw7heBA\"},{\"key\":\"logged_in\",\"value\":\"1\"}]},{\"service\":\"ECATCHER\",\"params\":[{\"key\":\"client.name\",\"value\":\"WEB\"},{\"key\":\"client.version\",\"value\":\"2.20190529\"},{\"key\":\"innertube.build.changelist\",\"value\":\"250485423\"},{\"key\":\"innertube.build.experiments.source_version\",\"value\":\"250547910\"},{\"key\":\"innertube.build.label\",\"value\":\"youtube.ytfe.innertube_20190528_7_RC1\"},{\"key\":\"innertube.build.timestamp\",\"value\":\"1559140061\"},{\"key\":\"innertube.build.variants.checksum\",\"value\":\"7e46d96e46a45788f840d135c2cf4890\"},{\"key\":\"innertube.run.job\",\"value\":\"ytfe-innertube-replica-only.ytfe\"}]}],\"webResponseContextExtensionData\":{\"ytConfigData\":{\"csn\":\"4wLwXOyiG5OPgAOH4LYI\",\"visitorData\":\"CgtpTXJTMXZJR3ZLayjjhcDnBQ%3D%3D\",\"sessionIndex\":1}}},\"trackingParams\":\"CAAQ0b4BIhMIrKDMwNTD4gIVkwdgCh0HsA0B\"}";
@@ -243,6 +252,7 @@ namespace YouTubeLiveSitePlugin
             {
                 foreach (var action in json.contents.liveChatRenderer.actions)
                 {
+                    if (action == null) continue;
                     try
                     {
                         if (action.ContainsKey("addChatItemAction"))
@@ -295,7 +305,7 @@ namespace YouTubeLiveSitePlugin
         /// </summary>
         /// <param name="ytPlayerConfig">ExtractYtPlayerConfig(string)の戻り値</param>
         /// <returns>{"isLiveNow":true,"startTimestamp":"2020-11-12T12:16:53+00:00"}</returns>
-        public static string ExtractLiveBroadcastDetails(string ytPlayerConfig)
+        public static string? ExtractLiveBroadcastDetails(string ytPlayerConfig)
         {
             if (string.IsNullOrEmpty(ytPlayerConfig)) return null;
             var match = Regex.Match(ytPlayerConfig, "\\\\\"liveBroadcastDetails\\\\\":({.+?})");
@@ -303,7 +313,7 @@ namespace YouTubeLiveSitePlugin
             return match.Groups[1].Value.Replace("\\\"", "\"");
         }
 
-        public static string ExtractYtPlayerConfig(string html)
+        public static string? ExtractYtPlayerConfig(string html)
         {
             var match = Regex.Match(html, "ytplayer\\.config\\s*=\\s*({.+?\"}});");
             if (!match.Success) return null;
@@ -356,7 +366,11 @@ namespace YouTubeLiveSitePlugin
         {
             try
             {
-                dynamic json = JsonConvert.DeserializeObject(getLiveChatJson);
+                dynamic? json = JsonConvert.DeserializeObject(getLiveChatJson);
+                if (json == null)
+                {
+                    throw new ArgumentException(nameof(getLiveChatJson));
+                }
                 if (!json.response.ContainsKey("continuationContents"))
                 {
                     throw new ContinuationContentsNullException();
@@ -412,6 +426,7 @@ namespace YouTubeLiveSitePlugin
                     var actions = json.response.continuationContents.liveChatContinuation.actions;
                     foreach (var action in actions)
                     {
+                        if (action == null) continue;
                         if (action.ContainsKey("addChatItemAction"))
                         {
                             Debug.WriteLine((string)action.addChatItemAction.ToString(Formatting.None));
@@ -515,6 +530,7 @@ namespace YouTubeLiveSitePlugin
                     {
                         foreach (var r in ren.message.runs)
                         {
+                            if (r == null) continue;
                             if (r.ContainsKey("text"))
                             {
                                 var text = (string)r.text;
@@ -556,6 +572,7 @@ namespace YouTubeLiveSitePlugin
                 {
                     foreach (var badge in ren.authorBadges)
                     {
+                        if (badge == null) continue;
                         if (badge.liveChatAuthorBadgeRenderer.ContainsKey("customThumbnail"))
                         {
                             var url = badge.liveChatAuthorBadgeRenderer.customThumbnail.thumbnails[0].url;
@@ -576,11 +593,12 @@ namespace YouTubeLiveSitePlugin
             }
             //info
             {
-                UserType userType = null;
+                UserType? userType = null;
                 if (ren.ContainsKey("authorBadges"))
                 {
                     foreach (var badge in ren.authorBadges)
                     {
+                        if (badge == null) continue;
                         if (badge.liveChatAuthorBadgeRenderer.ContainsKey("customThumbnail"))
                         {
                             var alt = (string)badge.liveChatAuthorBadgeRenderer.tooltip;
