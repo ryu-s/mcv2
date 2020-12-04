@@ -183,7 +183,7 @@ namespace mcv2.Model
             {
                 throw new InvalidOperationException("Site is null");
             }
-            await _host.ConnectAsync(ConnectionId, Input, Site, Browser);
+            await _host.ConnectAsync(ConnectionId, Input, Site, Browser).ConfigureAwait(false);
             IsConnected = false;
             _host.SetNotify(new NotifyConnectionStatusChanged(new ConnectionStatusDiff(ConnectionId)
             {

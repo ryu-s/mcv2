@@ -155,7 +155,7 @@ namespace YouTubeLiveSitePlugin
             var resolver = new VidResolver();
             try
             {
-                var result = await resolver.GetVid(_server, input);
+                var result = await resolver.GetVid(_server, input).ConfigureAwait(false);
                 if (result is MultiVidsResult multi)
                 {
                     SendInfo("このチャンネルでは複数のライブが配信中です。", InfoType.Notice);
@@ -207,7 +207,7 @@ namespace YouTubeLiveSitePlugin
             {
                 isInputStoringNeeded = true;
             }
-            var html = await _server.GetAsync($"https://www.youtube.com/watch?v={vid}");
+            var html = await _server.GetAsync($"https://www.youtube.com/watch?v={vid}").ConfigureAwait(false);
             var liveBroadcastDetails = Tools.ExtractLiveBroadcastDetailsFromLivePage(html);
             if (liveBroadcastDetails != null)
             {
@@ -261,7 +261,7 @@ namespace YouTubeLiveSitePlugin
             try
             {
                 var browserType = browserProfile == null ? BrowserType.Unknown : browserProfile.Type;
-                var disconnectReason = await ReceiveConnectionAsync(_connection, browserType, vid);
+                var disconnectReason = await ReceiveConnectionAsync(_connection, browserType, vid).ConfigureAwait(false);
                 switch (disconnectReason)
                 {
                     case DisconnectReason.Reload:
