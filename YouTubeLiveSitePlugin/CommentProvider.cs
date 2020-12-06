@@ -78,13 +78,9 @@ namespace YouTubeLiveSitePlugin
         {
             CanConnect = false;
             CanDisconnect = true;
-            _receivedCommentIds = CreateReicedCommentIdsCollection();
+            _receivedCommentIds.Clear();
             _disconnectedByUser = false;
             //_userCommentCountDict = new Dictionary<string, int>();
-        }
-        protected virtual SynchronizedCollection<string> CreateReicedCommentIdsCollection()
-        {
-            return new SynchronizedCollection<string>();
         }
         private static DateTime UnixTimeStampToDateTime(long unixTimeStamp)
         {
@@ -322,7 +318,7 @@ namespace YouTubeLiveSitePlugin
         }
 
 
-        SynchronizedCollection<string> _receivedCommentIds;
+        SynchronizedCollection<string> _receivedCommentIds=new SynchronizedCollection<string>();
         bool _disconnectedByUser;
         public void Disconnect()
         {
@@ -388,14 +384,15 @@ namespace YouTubeLiveSitePlugin
     }
     class PostCommentContext2
     {
-        public string InnerTubeContext { get; }
-        public string InnerTubeApiKey { get; }
 
-        public PostCommentContext2(string innerTubeContext, string innerTubeApiKey)
+        public PostCommentContext2(string payload, string hash)
         {
-            InnerTubeContext = innerTubeContext;
-            InnerTubeApiKey = innerTubeApiKey;
+            Payload = payload;
+            Hash = hash;
         }
+
+        public string Payload { get; }
+        public string Hash { get; }
     }
     class PostCommentContext
     {

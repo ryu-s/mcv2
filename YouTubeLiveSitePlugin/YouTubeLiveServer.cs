@@ -118,18 +118,16 @@ namespace YouTubeLiveSitePlugin
             return await message.Content.ReadAsByteArrayAsync();
         }
 
-        public async Task<string> PostJsonAsync(string url, string payload, CookieContainer cc)
+        public Task<HttpResponseMessage> PostJsonNoThrowAsync(string url, Dictionary<string, string>? headers, string payload, CookieContainer cc)
         {
-            var userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.2924.87 Safari/537.36";
             var options = new HttpOptions
             {
                 Url = url,
-                UserAgent = userAgent,
                 Cc = cc,
+                Headers = headers,
             };
             var content = new StringContent(payload, Encoding.UTF8, "application/json");
-            var ret = await PostAsync(options, content);
-            return ret;
+            return PostInternalNoThrowAsync(options, content);
         }
     }
 }

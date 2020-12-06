@@ -11,9 +11,171 @@ using System.Net.Http;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
+using System.Text;
+using System.Security.Cryptography;
+using System.Diagnostics.CodeAnalysis;
+using System.Security.AccessControl;
 
 namespace YouTubeLiveSitePlugin
 {
+    class YtInitialData
+    {
+        readonly dynamic _d;
+        public string GetDelegatedSessionId()
+        {
+            string s;
+            try
+            {
+                s = (string)_d.responseContext.webResponseContextExtensionData.ytConfigData.delegatedSessionId;
+            }
+            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException ex)
+            {
+                throw new SpecChangedException(Raw, ex);
+            }
+            return s;
+        }
+        public string GetClientIdPrefix()
+        {
+            string @params;
+            try
+            {
+                @params = (string)_d.contents.liveChatRenderer.actionPanel.liveChatMessageInputRenderer.sendButton.buttonRenderer.serviceEndpoint.sendLiveChatMessageEndpoint.clientIdPrefix;
+            }
+            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException ex)
+            {
+                throw new SpecChangedException(Raw, ex);
+            }
+            return @params;
+        }
+        public string Raw { get; }
+        public YtInitialData(string json)
+        {
+            Raw = json;
+            var d = JsonConvert.DeserializeObject(json);
+            if (d == null)
+            {
+                throw new ArgumentException();
+            }
+            _d = d;
+        }
+    }
+    class DataCreator
+    {
+        private readonly string _ytInitialData;
+        private readonly CookieContainer _cc;
+
+        private string GetDelegatedSessionId()
+        {
+            return _ytInitialDataT.GetDelegatedSessionId();
+        }
+        public string GetClientIdPrefix()
+        {
+            return _ytInitialDataT.GetClientIdPrefix();
+        }
+        private int _commentCounter = 0;
+        public void AddCommentCounter()
+        {
+            _commentCounter++;
+        }
+        public void ResetCommentCounter()
+        {
+            _commentCounter = 0;
+        }
+        private string GetClientVersion()
+        {
+            return "2.20201202.06.01";
+        }
+        public PostCommentContext2 Create(string message)
+        {
+            var context = "{\"context\":{\"client\":{\"clientName\":\"WEB\",\"clientVersion\":\"" + GetClientVersion() + "\"}}}";
+            dynamic? d = JsonConvert.DeserializeObject(context);
+            d.context.user =JsonConvert.DeserializeObject( "{\"onBehalfOfUser\":\"" + GetDelegatedSessionId() + "\"}");
+            d.@params = GetParams();
+            d.clientMessageId = GetClientIdPrefix() + _commentCounter;
+            d.richMessage = JsonConvert.DeserializeObject("{\"textSegments\":[{\"text\":\"" + message + "\"}]}");
+            var payload = (string)JsonConvert.SerializeObject(d, Formatting.None);
+            var hash = CreateHash();
+            //var url = GetUrl();
+            return new PostCommentContext2(payload, hash);
+        }
+        public bool IsLoggedIn()
+        {
+            //logged_inの値が1ならログイン済み
+            var match = Regex.Match(_ytInitialData, "{\"key\":\"logged_in\",\"value\":\"(\\d)\"}");
+            if (!match.Success)
+            {
+                throw new SpecChangedException(_ytInitialData);
+            }
+            var n = int.Parse(match.Groups[1].Value);
+            return n == 1;
+        }
+        public string GetParams()
+        {
+            dynamic? d = JsonConvert.DeserializeObject(_ytInitialData);
+            if (d == null)
+            {
+                throw new SpecChangedException(_ytInitialData);
+            }
+            string @params;
+            try
+            {
+                @params = (string)d.contents.liveChatRenderer.actionPanel.liveChatMessageInputRenderer.sendButton.buttonRenderer.serviceEndpoint.sendLiveChatMessageEndpoint.@params;
+            }
+            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException ex)
+            {
+                throw new SpecChangedException(_ytInitialData, ex);
+            }
+            return @params;
+        }
+        public string? GetSapiSid()
+        {
+            var cookies = Common.Utils.ExtractCookies(_cc);
+            var c = cookies.Find(cookie => cookie.Name == "SAPISID");
+            return c?.Value;
+        }
+        public virtual long GetCurrentUnixTime()
+        {
+            return Common.UnixTimeConverter.ToUnixTime(DateTime.Now);
+        }
+        private string ComputeSHA1(string s)
+        {
+            var bytes = Encoding.UTF8.GetBytes(s);
+            byte[] hashValue;
+            using (var crypto = new SHA1CryptoServiceProvider())
+            {
+                hashValue = crypto.ComputeHash(bytes);
+            }
+            var sb = new StringBuilder();
+            foreach (var b in hashValue)
+            {
+                sb.AppendFormat("{0:X2}", b);
+            }
+            return sb.ToString();
+        }
+        public string CreateHash()
+        {
+            var unixTime = GetCurrentUnixTime();
+            var sapiSid = GetSapiSid();
+            var origin = "https://www.youtube.com";
+            if (sapiSid == null)
+            {
+                throw new SpecChangedException();
+            }
+            var s = $"{unixTime} {sapiSid} {origin}";
+            var hash = ComputeSHA1(s).ToLower();
+            return $"{unixTime}_{hash}";
+        }
+        public DataCreator(string ytInitialData, string innerTubeApiLey, CookieContainer cc)
+        {
+            _ytInitialData = ytInitialData;
+            InnerTubeApiKey = innerTubeApiLey;
+            _cc = cc;
+            _ytInitialDataT = new YtInitialData(ytInitialData);
+        }
+        private readonly YtInitialData _ytInitialDataT;
+
+        public string InnerTubeApiKey { get; }
+    }
     /// <summary>
     /// 接続が切れた理由
     /// </summary>
@@ -325,15 +487,21 @@ namespace YouTubeLiveSitePlugin
                 LoggedInStateChanged?.Invoke(this, EventArgs.Empty);
             }
         }
-        bool CanPostComment => PostCommentContext != null;
+        bool CanPostComment => _postCommentCoodinator != null && _postCommentCoodinator.IsLoggedIn();
         protected virtual PostCommentContext2? PostCommentContext { get; set; }
         public async Task<bool> PostCommentAsync(string text)
         {
             if (!CanPostComment) return false;
-            var richMessage = "\"richMessage\":{\"textSegments\":[{\"text\":\"" + text + "\"}]}";
-            var payload = Tools.AddRichTextToInnerTubeContext(PostCommentContext!.InnerTubeContext, richMessage);
-            var url = "https://www.youtube.com/youtubei/v1/live_chat/send_message?key=" + PostCommentContext.InnerTubeApiKey;
-            var res = await _server.PostJsonAsync(url, payload, _cc);
+            var k = _postCommentCoodinator.Create(text);
+            var innerTubeApiKey = _postCommentCoodinator.InnerTubeApiKey;
+            var url = "https://www.youtube.com/youtubei/v1/live_chat/send_message?key=" + innerTubeApiKey;
+            var headers = new Dictionary<string, string>
+            {
+                {"Authorization",$"SAPISIDHASH {k.Hash}" },
+                {"Origin", "https://www.youtube.com" }
+            };
+            var res = await _server.PostJsonNoThrowAsync(url, headers, k.Payload, _cc);
+            var ret = await res.Content.ReadAsStringAsync();
             return true;
         }
         private void SendInfo(string v, InfoType error)
@@ -390,8 +558,10 @@ namespace YouTubeLiveSitePlugin
             var task = metaProvider.ReceiveAsync(ytCfg: ytCfg, vid: vid, cc: _cc);
             return (task, metaProvider);
         }
+        private DataCreator _postCommentCoodinator;
         private void PrepareForPostingComments(string liveChatHtml, string ytInitialData)
         {
+
             var innerTubeContext = Tools.GetInnerTubeContext(liveChatHtml);
             if (innerTubeContext == null)
             {
@@ -400,6 +570,7 @@ namespace YouTubeLiveSitePlugin
 
             var match = Regex.Match(liveChatHtml, "\"INNERTUBE_API_KEY\":\"([^\"]+)\"");
             var innerTubeApiKey = match.Groups[1].Value;
+            _postCommentCoodinator = new DataCreator(ytInitialData, innerTubeApiKey, _cc);
             PostCommentContext = new PostCommentContext2(innerTubeContext, innerTubeApiKey);
         }
         private YouTubeLiveMessageContext2 CreateMessageContext(CommentData commentData, bool isInitialComment)

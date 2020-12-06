@@ -1,0 +1,249 @@
+﻿{
+  "responseContext": {
+    "visitorData": "CgtyWUY0STU3Yy1Bbyjj2rP-BQ%3D%3D",
+    "serviceTrackingParams": [
+      {
+        "service": "CSI",
+        "params": [
+          {
+            "key": "SendLiveChatMessage_rid",
+            "value": "0x4f0efb3373fcc076"
+          },
+          {
+            "key": "c",
+            "value": "WEB"
+          },
+          {
+            "key": "cver",
+            "value": "2.20201202.06.01"
+          },
+          {
+            "key": "yt_li",
+            "value": "1"
+          }
+        ]
+      },
+      {
+        "service": "GFEEDBACK",
+        "params": [
+          {
+            "key": "e",
+            "value": "23744176,23788834,23804281,23836023,23839597,23856950,23857950,23868318,23882503,23884386,23890959,23895671,23911055,23915991,23918597,23932523,23934970,23940248,23942338,23942633,23944779,23946420,23948841,23950597,23951620,23961732,23968387,23969486,23970974,23971937,23973493,23977541,23977625,24631715,24631904,9449243"
+          },
+          {
+            "key": "logged_in",
+            "value": "1"
+          }
+        ]
+      },
+      {
+        "service": "GUIDED_HELP",
+        "params": [
+          {
+            "key": "logged_in",
+            "value": "1"
+          }
+        ]
+      },
+      {
+        "service": "ECATCHER",
+        "params": [
+          {
+            "key": "client.name",
+            "value": "WEB"
+          },
+          {
+            "key": "client.version",
+            "value": "2.20201202"
+          },
+          {
+            "key": "innertube.build.changelist",
+            "value": "345548600"
+          },
+          {
+            "key": "innertube.build.experiments.source_version",
+            "value": "345778033"
+          },
+          {
+            "key": "innertube.build.label",
+            "value": "youtube.ytfe.jserv_20201203_5_RC2"
+          },
+          {
+            "key": "innertube.build.timestamp",
+            "value": "1607038660"
+          },
+          {
+            "key": "innertube.build.variants.checksum",
+            "value": "5f8b6b91b316b46591044a3c96c76017"
+          },
+          {
+            "key": "innertube.run.job",
+            "value": "ytfe-jserv.ytfe"
+          }
+        ]
+      }
+    ],
+    "consistencyTokenJar": {
+      "encryptedTokenJarContents": "AGDxDeOdMZv9F2CzylrbDOK50XA1I0c_I9cfKw634RYp24Ou66Il4FEK_lS4rLA7jWPdVvY901Ceq41AUUURZZC3g3THao9QC-a2tA",
+      "expirationSeconds": "600"
+    },
+    "webResponseContextExtensionData": {
+      "hasDecorated": true
+    }
+  },
+  "actions": [
+    {
+      "addChatItemAction": {
+        "item": {
+          "liveChatTextMessageRenderer": {
+            "message": {
+              "runs": [
+                {
+                  "text": "acc"
+                }
+              ]
+            },
+            "authorName": {
+              "simpleText": "Ryu"
+            },
+            "authorPhoto": {
+              "thumbnails": [
+                {
+                  "url": "https://yt3.ggpht.com/ytc/AAUvwnhCj-qoFsmc8yZMpmIWbOd_oC7mbiD4bfIcsw=s32-c-k-c0xffffffff-no-rj-mo",
+                  "width": 32,
+                  "height": 32
+                },
+                {
+                  "url": "https://yt3.ggpht.com/ytc/AAUvwnhCj-qoFsmc8yZMpmIWbOd_oC7mbiD4bfIcsw=s64-c-k-c0xffffffff-no-rj-mo",
+                  "width": 64,
+                  "height": 64
+                }
+              ]
+            },
+            "contextMenuEndpoint": {
+              "clickTrackingParams": "IhMI4Z7Jicu57QIVE60NCh3aNwLq",
+              "commandMetadata": {
+                "webCommandMetadata": {
+                  "ignoreNavigation": true
+                }
+              },
+              "liveChatItemContextMenuEndpoint": {
+                "params": "Q2pzS09Rb2FRMUJ5ZEhwWmJreDFaVEJEUmxKUGRFUlJiMlF5YW1ORE5tY1NHME5NWldoNk5ISkRkV1V3UTBaU2EwTXhVVzlrZDJSUlMwWlJNQkFBR2pnS0RRb0xkR2hCVHpkeGFVY3paMjhxSndvWVZVTkRWVGRZTUdSRFVqVTNTakp1TUdaRFdISnBlVmRSRWd0MGFFRlBOM0ZwUnpObmJ5QUNLQVF5R2dvWVZVTkRWVGRZTUdSRFVqVTNTakp1TUdaRFdISnBlVmRS"
+              }
+            },
+            "id": "CjkKGkNQcnR6WW5MdWUwQ0ZST3REUW9kMmpjQzZnEhtDTGVoejRyQ3VlMENGUmtDMVFvZHdkUUtGUTA%3D",
+            "timestampUsec": "1607265634449146",
+            "authorBadges": [
+              {
+                "liveChatAuthorBadgeRenderer": {
+                  "icon": {
+                    "iconType": "OWNER"
+                  },
+                  "tooltip": "Owner",
+                  "accessibility": {
+                    "accessibilityData": {
+                      "label": "Owner"
+                    }
+                  }
+                }
+              }
+            ],
+            "authorExternalChannelId": "UCCU7X0dCR57J2n0fCXriyWQ",
+            "contextMenuAccessibility": {
+              "accessibilityData": {
+                "label": "Comment actions"
+              }
+            },
+            "inlineActionButtons": [
+              {
+                "buttonRenderer": {
+                  "style": "STYLE_DEFAULT",
+                  "size": "SIZE_DEFAULT",
+                  "isDisabled": false,
+                  "serviceEndpoint": {
+                    "clickTrackingParams": "CAIQ8FsYASITCOGeyYnLue0CFROtDQod2jcC6g==",
+                    "commandMetadata": {
+                      "webCommandMetadata": {
+                        "url": "/service_ajax",
+                        "sendPost": true,
+                        "apiUrl": "/youtubei/v1/live_chat/moderate"
+                      }
+                    },
+                    "moderateLiveChatEndpoint": {
+                      "params": "Q2pnS0RRb0xkR2hCVHpkeGFVY3paMjhxSndvWVZVTkRWVGRZTUdSRFVqVTNTakp1TUdaRFdISnBlVmRSRWd0MGFFRlBOM0ZwUnpObmJ4STlDanNLT1FvYVExQnlkSHBaYmt4MVpUQkRSbEpQZEVSUmIyUXlhbU5ETm1jU0cwTk1aV2g2TkhKRGRXVXdRMFpTYTBNeFVXOWtkMlJSUzBaUk1GQUNXQU0lM0Q="
+                    }
+                  },
+                  "icon": {
+                    "iconType": "DELETE"
+                  },
+                  "accessibility": {
+                    "label": "Remove"
+                  },
+                  "tooltip": "Remove",
+                  "trackingParams": "CAIQ8FsYASITCOGeyYnLue0CFROtDQod2jcC6g=="
+                }
+              },
+              {
+                "buttonRenderer": {
+                  "style": "STYLE_DEFAULT",
+                  "size": "SIZE_DEFAULT",
+                  "isDisabled": false,
+                  "serviceEndpoint": {
+                    "clickTrackingParams": "CAEQ8FsYAiITCOGeyYnLue0CFROtDQod2jcC6g==",
+                    "commandMetadata": {
+                      "webCommandMetadata": {
+                        "url": "/service_ajax",
+                        "sendPost": true,
+                        "apiUrl": "/youtubei/v1/live_chat/moderate"
+                      }
+                    },
+                    "moderateLiveChatEndpoint": {
+                      "params": "Q2pnS0RRb0xkR2hCVHpkeGFVY3paMjhxSndvWVZVTkRWVGRZTUdSRFVqVTNTakp1TUdaRFdISnBlVmRSRWd0MGFFRlBOM0ZwUnpObmJ6SVlDaFpEVlRkWU1HUkRValUzU2pKdU1HWkRXSEpwZVZkUlVBSllBdyUzRCUzRA=="
+                    }
+                  },
+                  "icon": {
+                    "iconType": "HOURGLASS"
+                  },
+                  "accessibility": {
+                    "label": "Put user in timeout"
+                  },
+                  "tooltip": "Put user in timeout",
+                  "trackingParams": "CAEQ8FsYAiITCOGeyYnLue0CFROtDQod2jcC6g=="
+                }
+              },
+              {
+                "buttonRenderer": {
+                  "style": "STYLE_DEFAULT",
+                  "size": "SIZE_DEFAULT",
+                  "isDisabled": false,
+                  "serviceEndpoint": {
+                    "clickTrackingParams": "CAAQ8FsYAyITCOGeyYnLue0CFROtDQod2jcC6g==",
+                    "commandMetadata": {
+                      "webCommandMetadata": {
+                        "url": "/service_ajax",
+                        "sendPost": true,
+                        "apiUrl": "/youtubei/v1/live_chat/moderate"
+                      }
+                    },
+                    "moderateLiveChatEndpoint": {
+                      "params": "Q2pnS0RRb0xkR2hCVHpkeGFVY3paMjhxSndvWVZVTkRWVGRZTUdSRFVqVTNTakp1TUdaRFdISnBlVmRSRWd0MGFFRlBOM0ZwUnpObmJ5SVlDaFpEVlRkWU1HUkRValUzU2pKdU1HWkRXSEpwZVZkUlVBSllBdyUzRCUzRA=="
+                    }
+                  },
+                  "icon": {
+                    "iconType": "REMOVE_CIRCLE"
+                  },
+                  "accessibility": {
+                    "label": "Hide user on this channel"
+                  },
+                  "tooltip": "Hide user on this channel",
+                  "trackingParams": "CAAQ8FsYAyITCOGeyYnLue0CFROtDQod2jcC6g=="
+                }
+              }
+            ]
+          }
+        },
+        "clientId": "CLehz4rCue0CFRkC1QodwdQKFQ0"
+      }
+    }
+  ]
+}

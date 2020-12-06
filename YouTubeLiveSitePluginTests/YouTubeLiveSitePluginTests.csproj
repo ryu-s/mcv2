@@ -69,7 +69,10 @@
     <None Update="SampleData\LivePage_ytplayerconfig.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="SampleData\YtInitialData.txt">
+    <None Update="SampleData\YtInitialData_loggedin.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SampleData\YtInitialData_notloggedin.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="SampleData\ytPlayerConfig.txt">

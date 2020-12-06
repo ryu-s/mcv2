@@ -104,5 +104,15 @@ namespace YouTubeLiveSitePlugin
         {
             Raw = raw;
         }
+
+        public SpecChangedException()
+        {
+            Raw = "";
+        }
+
+        protected SpecChangedException(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -33,6 +36,45 @@ namespace Common
         {
             var argb = color.ToString();
             return argb;
+        }
+        /// <summary>
+        /// CookieContainerから全てのCookieを取り出す
+        /// </summary>
+        /// <param name="container"></param>
+        /// <returns></returns>
+        public static List<Cookie> ExtractCookies(CookieContainer container)
+        {
+            var cookies = new List<Cookie>();
+
+            var table = (Hashtable?)container.GetType().InvokeMember("m_domainTable",
+                                                                    BindingFlags.NonPublic |
+                                                                    BindingFlags.GetField |
+                                                                    BindingFlags.Instance,
+                                                                    null,
+                                                                    container,
+                                                                    Array.Empty<object>());
+
+            foreach (var key in table!.Keys)
+            {
+                if (!(key is string domain))
+                    continue;
+
+                if (domain.StartsWith("."))
+                    domain = domain[1..];
+
+                var address = string.Format("http://{0}/", domain);
+
+                if (Uri.TryCreate(address, UriKind.RelativeOrAbsolute, out Uri? uri) == false)
+                    continue;
+
+                foreach (Cookie? cookie in container.GetCookies(uri))
+                {
+                    if (cookie == null) continue;
+                    cookies.Add(cookie);
+                }
+            }
+
+            return cookies;
         }
     }
 }
