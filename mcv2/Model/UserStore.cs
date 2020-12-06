@@ -82,7 +82,7 @@ namespace mcv2.Model
                         CreateTable(connection, tableName);
                     }
                     var command = connection.CreateCommand();
-                    command.CommandText = $"SELECT id,json FROM {tableName}";
+                    command.CommandText = $"SELECT id,siteid,json FROM {tableName}";
 
                     using (var reader = command.ExecuteReader())
                     {
