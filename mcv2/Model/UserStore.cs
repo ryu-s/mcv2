@@ -113,10 +113,15 @@ namespace mcv2.Model
         {
             //SELECT name FROM sqlite_master WHERE type='table' AND name='beispiel';
             var command = connection.CreateCommand();
-            command.CommandText = $"CREATE TABLE {tableName} (id TEXT,siteid Text, json TEXT)";
+            command.CommandText = $"CREATE TABLE {tableName} (id TEXT,siteid Text, json TEXT, PRIMARY KEY (id,siteid))";
             command.ExecuteNonQuery();
         }
-
+        private void DeleteTable(SqliteConnection connection, string tableName)
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = $"DROP TABLE {tableName}";
+            command.ExecuteNonQuery();
+        }
         private bool ExistTable(SqliteConnection connection, string tableName)
         {
             var command = connection.CreateCommand();
@@ -146,10 +151,11 @@ namespace mcv2.Model
                 using (var connection = new SqliteConnection(connectionString))
                 {
                     connection.Open();
-                    if (!ExistTable(connection, tableName))
+                    if (ExistTable(connection, tableName))
                     {
-                        CreateTable(connection, tableName);
+                        DeleteTable(connection, tableName);
                     }
+                    CreateTable(connection, tableName);
                     using (var transaction = connection.BeginTransaction())
                     {
                         foreach (var (siteId, user) in users)
