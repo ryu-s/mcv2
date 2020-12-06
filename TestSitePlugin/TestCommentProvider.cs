@@ -1,4 +1,5 @@
 ﻿using Common;
+using mcv2;
 using ryu_s.BrowserCookie;
 using SitePlugin;
 using SitePluginCommon;
@@ -152,6 +153,11 @@ namespace TestSitePlugin
         }
 
         public void SetMessage(string raw)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task PostCommentAsync(ICommentDataToPost dataToPost)
         {
             throw new NotImplementedException();
         }

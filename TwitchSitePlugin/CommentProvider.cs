@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using SitePluginCommon;
+using mcv2;
 
 namespace TwitchSitePlugin
 {
@@ -514,6 +515,11 @@ namespace TwitchSitePlugin
                 await Init();
             }
             await ProcessMessage(raw);
+        }
+
+        public Task PostCommentAsync(ICommentDataToPost dataToPost)
+        {
+            throw new NotImplementedException();
         }
     }
     class CommentData : ICommentData

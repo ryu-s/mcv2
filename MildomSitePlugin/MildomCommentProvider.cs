@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using SitePluginCommon.AutoReconnection;
 using System.Collections.Generic;
 using System.Linq;
-
+using mcv2;
 namespace MildomSitePlugin
 {
     interface IMyUserInfo
@@ -333,6 +333,10 @@ namespace MildomSitePlugin
         }
 
         public override Task PostCommentAsync(string text)
+        {
+            throw new NotImplementedException();
+        }
+        public override Task PostCommentAsync(ICommentDataToPost dataToPost)
         {
             throw new NotImplementedException();
         }

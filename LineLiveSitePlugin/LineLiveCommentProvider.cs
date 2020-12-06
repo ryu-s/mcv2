@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
 using SitePluginCommon;
-
+using mcv2;
 namespace LineLiveSitePlugin
 {
     internal class LineLiveCommentProvider : ICommentProvider
@@ -572,6 +572,11 @@ namespace LineLiveSitePlugin
         }
 
         public void SetMessage(string raw)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task PostCommentAsync(ICommentDataToPost dataToPost)
         {
             throw new NotImplementedException();
         }

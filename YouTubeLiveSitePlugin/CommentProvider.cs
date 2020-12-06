@@ -16,6 +16,7 @@ using System.Net.Http;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
+using mcv2;
 
 namespace YouTubeLiveSitePlugin
 {
@@ -338,7 +339,14 @@ namespace YouTubeLiveSitePlugin
             if (_connection == null) return false;
             return await _connection.PostCommentAsync(text);
         }
-
+        public async Task PostCommentAsync(ICommentDataToPost dataToPost)
+        {
+            if (!(dataToPost is IYouTubeLiveCommentDataToPost ytCommentDataToPost))
+            {
+                return;
+            }
+            var _ = await PostCommentAsync(ytCommentDataToPost.Message);
+        }
         public async Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2? browserProfile)
         {
             var currentUserInfo = new CurrentUserInfo();

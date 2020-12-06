@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Input;
 using System.Net;
+using mcv2;
 
 namespace SitePlugin
 {
@@ -31,8 +32,9 @@ namespace SitePlugin
         //TODO:どのアカウントでログインしているのかConnectionViewに表示したい
         //Task<IMyInfo> GetMyInfo(IBrowserProfile browserProfile);
         //IUser GetUser(string userId);
-
+        [Obsolete("use PostCommentAsync(ICommentDataToPost)")]
         Task PostCommentAsync(string text);
+        Task PostCommentAsync(ICommentDataToPost dataToPost);
 
         //bool IsLoggedIn { get; }
 

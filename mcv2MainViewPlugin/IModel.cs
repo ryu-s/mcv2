@@ -20,7 +20,7 @@ namespace mcv2.MainViewPlugin
         Task<(string? version, string? url)> GetLatestVersionAsync();
         Task RequestUpdateCoreAsync(string latestVersionUrl);
         SiteType GetSiteType(SitePluginId siteId);
-        ConnectionId GetCurrentConnection();
+        ConnectionId? GetCurrentConnection();
         void SetCurrentConnection(ConnectionId connectionId);
         Task PostCommentAsync(ICommentDataToPost commentData);
         void RemoveSelectedConnection();

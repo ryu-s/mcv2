@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using YouTubeLiveSitePlugin;
 
 namespace mcv2.MainViewPlugin
 {
@@ -46,18 +47,20 @@ namespace mcv2.MainViewPlugin
         }
         private void PostComment()
         {
-            _host.PostCommentAsync(new YouTubeLiveCommentDataToPost
-            {
-            });
+            _host.PostCommentAsync(new YouTubeLiveCommentDataToPost(Comment));
         }
         //ログイン状況を照会する
     }
-    public interface IYouTubeLiveCommentDataToPost : ICommentDataToPost
-    {
+    //public interface IYouTubeLiveCommentDataToPost : ICommentDataToPost
+    //{
 
-    }
+    //}
     class YouTubeLiveCommentDataToPost : IYouTubeLiveCommentDataToPost
     {
-        public string Message { get; set; }
+        public string Message { get; }
+        public YouTubeLiveCommentDataToPost(string message)
+        {
+            Message = message;
+        }
     }
 }

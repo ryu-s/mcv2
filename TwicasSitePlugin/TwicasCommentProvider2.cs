@@ -10,7 +10,7 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
-
+using mcv2;
 namespace TwicasSitePlugin
 {
     class TwicasCommentProvider2 : CommentProviderBase2
@@ -277,6 +277,11 @@ namespace TwicasSitePlugin
         }
 
         public override void SetMessage(string raw)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task PostCommentAsync(ICommentDataToPost dataToPost)
         {
             throw new NotImplementedException();
         }

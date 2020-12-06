@@ -266,7 +266,7 @@ namespace mcv2.Model
             switch (req)
             {
                 case RequestPostCommentAsync reqPostComment:
-
+                    await _sitePluginManager.PostCommentAsync(reqPostComment.ConnectionId, reqPostComment.DataToPost);
                     break;
                 case RequestUpdateCoreAsync reqUpdateCore:
                     {

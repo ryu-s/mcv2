@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
+using mcv2;
 
 namespace BigoSitePlugin
 {
@@ -539,6 +540,11 @@ namespace BigoSitePlugin
         public void SetMessage(string raw)
         {
 
+        }
+
+        public Task PostCommentAsync(ICommentDataToPost dataToPost)
+        {
+            throw new NotImplementedException();
         }
 
         public SitePluginId SiteContextGuid { get; set; }

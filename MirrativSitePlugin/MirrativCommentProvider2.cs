@@ -6,6 +6,8 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using SitePluginCommon.AutoReconnection;
+using mcv2;
+
 namespace MirrativSitePlugin
 {
     class MirrativCommentProvider33 : CommentProviderBase2
@@ -263,6 +265,10 @@ namespace MirrativSitePlugin
         }
 
         public override Task PostCommentAsync(string text)
+        {
+            throw new NotImplementedException();
+        }
+        public override Task PostCommentAsync(ICommentDataToPost dataToPost)
         {
             throw new NotImplementedException();
         }

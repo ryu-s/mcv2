@@ -1,4 +1,5 @@
-﻿using System;
+﻿using mcv2;
+using System;
 using System.Threading.Tasks;
 
 namespace SitePlugin
@@ -53,11 +54,6 @@ namespace SitePlugin
     /// 配信サイト毎の設定値
     /// </summary>
     public interface ISiteOptions { }
-    /// <summary>
-    /// コメントを投稿する時に必要な情報
-    /// コメントの文字以外ある？もしかしたらstringで良いかも
-    /// </summary>
-    public interface ICommentDataToPost { }
     /// <summary>
     /// SitePluginの本体
     /// </summary>

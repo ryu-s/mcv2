@@ -1,4 +1,5 @@
 ﻿using Common;
+using mcv2;
 using ryu_s.BrowserCookie;
 using SitePlugin;
 using System;
@@ -83,6 +84,7 @@ namespace SitePluginCommon
         public abstract void Disconnect();
 
         public abstract Task PostCommentAsync(string text);
+        public abstract Task PostCommentAsync(ICommentDataToPost dataToPost);
 
         public abstract Task<ICurrentUserInfo> GetCurrentUserInfo(IBrowserProfile2 browserProfile);
         protected virtual void BeforeConnect()

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using SitePluginCommon;
 using SitePluginCommon.AutoReconnector;
+using mcv2;
 
 namespace ShowRoomSitePlugin
 {
@@ -231,6 +232,11 @@ namespace ShowRoomSitePlugin
         }
 
         public override void SetMessage(string raw)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task PostCommentAsync(ICommentDataToPost dataToPost)
         {
             throw new NotImplementedException();
         }

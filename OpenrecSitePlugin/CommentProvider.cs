@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Concurrent;
 using SitePluginCommon;
+using mcv2;
 
 namespace OpenrecSitePlugin
 {
@@ -573,6 +574,11 @@ namespace OpenrecSitePlugin
         }
 
         public void SetMessage(string raw)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task PostCommentAsync(ICommentDataToPost dataToPost)
         {
             throw new NotImplementedException();
         }

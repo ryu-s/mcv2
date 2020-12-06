@@ -478,6 +478,14 @@ namespace mcv2
     public class RequestPostCommentAsync : IRequestAsync
     {
         public RequestId Id { get; } = new RequestId();
+        public ConnectionId ConnectionId { get; }
+        public ICommentDataToPost DataToPost { get; }
+
+        public RequestPostCommentAsync(ConnectionId connectionId, ICommentDataToPost dataToPost)
+        {
+            ConnectionId = connectionId;
+            DataToPost = dataToPost;
+        }
     }
     public class GetSiteType : IRequest
     {

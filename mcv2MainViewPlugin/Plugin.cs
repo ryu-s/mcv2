@@ -391,14 +391,18 @@ namespace mcv2.MainViewPlugin
         }
         Task IModel.PostCommentAsync(ICommentDataToPost commentData)
         {
-            return Host.SetRequestAsync(Id, new RequestPostCommentAsync());
+            if (_currentConnectionId == null)
+            {
+                throw new BugException($"{_currentConnectionId}がnullの時はコメント投稿できない");
+            }
+            return Host.SetRequestAsync(Id, new RequestPostCommentAsync(_currentConnectionId, commentData));
         }
         public Task SendRequestAsync(IRequestAsync req)
         {
             return Host.SetRequestAsync(Id, req);
         }
-        ConnectionId _currentConnectionId;
-        ConnectionId IModel.GetCurrentConnection()
+        ConnectionId? _currentConnectionId;
+        ConnectionId? IModel.GetCurrentConnection()
         {
             return _currentConnectionId;
         }

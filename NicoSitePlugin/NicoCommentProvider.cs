@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Text;
 using SitePluginCommon;
 using System.Collections.Concurrent;
+using mcv2;
 
 namespace NicoSitePlugin
 {
@@ -260,6 +261,11 @@ namespace NicoSitePlugin
                 return;
             }
             _internal.SetMessage(raw);
+        }
+
+        public Task PostCommentAsync(ICommentDataToPost dataToPost)
+        {
+            throw new NotImplementedException();
         }
 
         public SitePluginId SiteContextGuid { get; set; }

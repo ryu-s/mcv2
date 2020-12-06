@@ -13,7 +13,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using mcv2;
 namespace PeriscopeSitePlugin
 {
     enum UrlType
@@ -499,6 +499,11 @@ namespace PeriscopeSitePlugin
         }
 
         public override void SetMessage(string raw)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task PostCommentAsync(ICommentDataToPost dataToPost)
         {
             throw new NotImplementedException();
         }

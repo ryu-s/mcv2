@@ -1,4 +1,5 @@
-﻿using SitePlugin;
+﻿using mcv2;
+using SitePlugin;
 using System;
 using System.Collections.Generic;
 using YouTubeLiveIF;
@@ -48,8 +49,8 @@ namespace YouTubeLiveSitePlugin
         string UserId { get; }
         string PurchaseAmount { get; }
     }
-    public interface IYouTubeLiveCommentDataToPost
+    public interface IYouTubeLiveCommentDataToPost : ICommentDataToPost
     {
-        string Comment { get; }
+        string Message { get; }
     }
 }

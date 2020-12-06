@@ -79,6 +79,7 @@ namespace mcv2.Model
         List<(SitePluginId, string displayName)> Sites();
         Task<ICurrentUserInfo> GetLoggedInUserName(ConnectionId connectionId, SitePluginId sitePluginId, IBrowserProfile2? browserProfile);
         SitePluginId? GetValidSite(string input);
+        Task PostCommentAsync(ConnectionId connectionId, ICommentDataToPost dataToPost);
     }
     class SitePluginManager : ISitePluginManager
     {
@@ -262,6 +263,15 @@ namespace mcv2.Model
                 }
             }
             return null;
+        }
+        public async Task PostCommentAsync(ConnectionId connectionId, ICommentDataToPost dataToPost)
+        {
+            var cp = GetCommentProvider(connectionId);
+            if (cp == null)
+            {
+                throw new BugException();
+            }
+            await cp.PostCommentAsync(dataToPost);
         }
     }
 }
