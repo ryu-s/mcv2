@@ -198,7 +198,7 @@ namespace mcv2YoyakuPlugin
                     break;
                 case NotifyUserChanged userChanged:
                     {
-                        var siteGuid = userChanged.SiteContextGuid;
+                        var siteGuid = userChanged.SiteId;
                         var userId = userChanged.UserId;
                         var name = userChanged.Name.ToText();
                         var nickname = userChanged.Nickname;

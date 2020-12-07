@@ -192,7 +192,7 @@ namespace mcv2.MainViewPlugin
                     AddUser(userAdded.SiteContextGuid, userAdded.UserId);
                     break;
                 case NotifyUserChanged userChanged:
-                    ChangeUser(userChanged.SiteContextGuid, userChanged.UserId, userChanged.Name, userChanged.Nickname, userChanged.IsNgUser, userChanged.IsSiteNgUser);
+                    ChangeUser(userChanged.SiteId, userChanged.UserId, userChanged.Name, userChanged.Nickname, userChanged.IsNgUser, userChanged.IsSiteNgUser);
                     break;
                 case NotifyCloseApp _:
                     var optionsStr = _options.Serialize();

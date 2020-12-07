@@ -389,20 +389,36 @@ namespace mcv2
             User = user;
         }
     }
-    public class RequestChangeUserStatus : IRequest
+    public class RequestChangeUserStatus : IRequest, IMcvUserDiff
     {
-        public SitePluginId SiteContextGuid { get; }
+        public SitePluginId SiteId { get; }
         public string UserId { get; }
 
         public RequestChangeUserStatus(SitePluginId siteContextGuid, string userId)
         {
-            SiteContextGuid = siteContextGuid;
+            SiteId = siteContextGuid;
             UserId = userId;
+        }
+        public RequestChangeUserStatus(IMcvUserDiff diff)
+        {
+            //警告回避のためにnullableじゃない値は手動でセットする。
+            SiteId = diff.SiteId;
+            UserId = diff.UserId;
+
+            //他の項目はリフレクションでセット。
+            var props = diff.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            foreach (var prop in props)
+            {
+                if (prop.Name == nameof(SiteId)) continue;
+                if (prop.Name == nameof(UserId)) continue;
+                prop.SetValue(this, prop.GetValue(diff));
+            }
         }
         public RequestId Id { get; } = new RequestId();
         public bool? IsNgUser { get; set; }
         public bool? IsSiteNgUser { get; set; }
         public string? Nickname { get; set; }
+        public IEnumerable<IMessagePart>? Name { get; set; }
     }
     #endregion //User
 

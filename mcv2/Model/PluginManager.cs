@@ -123,13 +123,16 @@ namespace mcv2.Model
             {
                 throw new BugException();
             }
-            foreach (var (siteId, displayName) in resSites.Sites)
+            if (resSites.Sites != null)
             {
-                plugin.SetNotify(new NotifySiteAdded
+                foreach (var (siteId, displayName) in resSites.Sites)
                 {
-                    SiteId = siteId,
-                    SiteName = displayName,
-                });
+                    plugin.SetNotify(new NotifySiteAdded
+                    {
+                        SiteId = siteId,
+                        SiteName = displayName,
+                    });
+                }
             }
 
             PluginAdded?.Invoke(this, plugin);

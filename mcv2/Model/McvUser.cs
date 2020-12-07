@@ -7,6 +7,7 @@ namespace mcv2.Model
 {
     public class McvUser : IMcvUser
     {
+        public SitePluginId SiteId { get; }
         public System.Guid Guid { get; }
         public string? Nickname { get; set; }
         public string Id { get; }
@@ -17,14 +18,16 @@ namespace mcv2.Model
         /// 
         /// </summary>
         /// <param name="userId">ユーザーIDが無いサイトはユーザー名をこれに充てる</param>
-        public McvUser(string userId)
+        public McvUser(SitePluginId siteId, string userId)
         {
+            SiteId = siteId;
             Guid = Guid.NewGuid();
             Id = userId;
         }
         [Newtonsoft.Json.JsonConstructor]
-        private McvUser(Guid guid, string id)
+        private McvUser(SitePluginId siteId, Guid guid, string id)
         {
+            SiteId = siteId;
             Guid = guid;
             Id = id;
         }
@@ -45,6 +48,26 @@ namespace mcv2.Model
         public static bool HasChanged(McvUser user)
         {
             return user.Nickname != null || user.IsNgUser || user.IsSiteNgUser;
+        }
+
+        public void Update(IMcvUserDiff diff)
+        {
+            if (diff.Nickname != null)
+            {
+                Nickname = diff.Nickname;
+            }
+            if (diff.Name != null)
+            {
+                Name = diff.Name;
+            }
+            if (diff.IsNgUser != null)
+            {
+                IsNgUser = diff.IsNgUser.Value;
+            }
+            if (diff.IsSiteNgUser != null)
+            {
+                IsSiteNgUser = diff.IsSiteNgUser.Value;
+            }
         }
     }
 }

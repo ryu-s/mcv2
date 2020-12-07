@@ -15,6 +15,21 @@ using System.Threading.Tasks;
 
 namespace mcv2.Model
 {
+    class UserDiff : IMcvUserDiff
+    {
+        public SitePluginId SiteId { get; }
+        public string UserId { get; }
+        public IEnumerable<IMessagePart>? Name { get; set; }
+        public string? Nickname { get; set; }
+        public bool? IsNgUser { get; set; }
+        public bool? IsSiteNgUser { get; set; }
+
+        public UserDiff(SitePluginId sitePluginId, string userId)
+        {
+            SiteId = sitePluginId;
+            UserId = userId;
+        }
+    }
     class EmptyBrowserProfile : IBrowserProfile2
     {
         public Guid Id { get; } = new Guid("0F63097E-0226-447E-B009-AF1DBB40C98C");
@@ -204,33 +219,8 @@ namespace mcv2.Model
                     break;
                 case RequestChangeUserStatus reqChangeUserStatus:
                     {
-                        var user = GetUser(reqChangeUserStatus.SiteContextGuid, reqChangeUserStatus.UserId);
-                        var changed = false;//変更があったか
-                        if (reqChangeUserStatus.Nickname != null && user.Nickname != reqChangeUserStatus.Nickname)
-                        {
-                            user.Nickname = reqChangeUserStatus.Nickname;
-                            changed = true;
-                        }
-                        if (reqChangeUserStatus.IsNgUser.HasValue && user.IsNgUser != reqChangeUserStatus.IsNgUser.Value)
-                        {
-                            user.IsNgUser = reqChangeUserStatus.IsNgUser.Value;
-                            changed = true;
-                        }
-                        if (reqChangeUserStatus.IsSiteNgUser.HasValue && user.IsSiteNgUser != reqChangeUserStatus.IsSiteNgUser.Value)
-                        {
-                            user.IsSiteNgUser = reqChangeUserStatus.IsSiteNgUser.Value;
-                            changed = true;
-                        }
-                        //TODO:変更があったら通知したい。
-                        if (changed)
-                        {
-                            _pluginManager.SetNotify(new NotifyUserChanged(reqChangeUserStatus.SiteContextGuid, reqChangeUserStatus.UserId)
-                            {
-                                Nickname = reqChangeUserStatus.Nickname,
-                                IsNgUser = reqChangeUserStatus.IsNgUser,
-                                IsSiteNgUser = reqChangeUserStatus.IsSiteNgUser,
-                            });
-                        }
+                        var user = GetUser(reqChangeUserStatus.SiteId, reqChangeUserStatus.UserId);
+                        UpdateUser(user, reqChangeUserStatus);
                     }
                     break;
                 case RequestAppClose close:
@@ -402,7 +392,7 @@ namespace mcv2.Model
         /// <param name="siteGuid"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        private McvUser GetUser(SitePluginId siteGuid, string userId)
+        private McvUser? GetUser(SitePluginId siteGuid, string userId)
         {
             if (string.IsNullOrEmpty(userId))
             {
@@ -411,7 +401,7 @@ namespace mcv2.Model
             McvUser user;
             if (!_userStore.Exists(siteGuid, userId))
             {
-                user = new McvUser(userId);
+                user = new McvUser(siteGuid, userId);
                 _userStore.AddUser(siteGuid, user);
                 //_pluginManager.SetNotify(new NotifyUserAdded(siteGuid, userId));
             }
@@ -421,21 +411,59 @@ namespace mcv2.Model
             }
             return user;
         }
+        /// <summary>
+        /// ユーザーの現在の状態と変更要求を比較して、本当に変化する部分を取得する
+        /// 現在の状態と同値の要求を弾くのが目的
+        /// </summary>
+        /// <param name="user">ユーザーの現在の状態</param>
+        /// <param name="changeRequest">変更要求</param>
+        /// <returns></returns>
+        public static IMcvUserDiff GetUserDiff(IMcvUser user, IMcvUserDiff changeRequest)
+        {
+            //TODO:IMcvUserの項目に変更があった場合に対応し忘れる可能性があるからリフレクションを使って実装したい。
+            var ret = new UserDiff(user.SiteId, user.Id);
+            if (changeRequest.Nickname != null && user.Nickname != changeRequest.Nickname)
+            {
+                ret.Nickname = changeRequest.Nickname;
+            }
+            if (changeRequest.Name != null && user.Name != changeRequest.Name)
+            {
+                ret.Name = changeRequest.Name;
+            }
+            if (changeRequest.IsNgUser != null && user.IsNgUser != changeRequest.IsNgUser)
+            {
+                ret.IsNgUser = changeRequest.IsNgUser;
+            }
+            if (changeRequest.IsSiteNgUser != null && user.IsSiteNgUser != changeRequest.IsSiteNgUser)
+            {
+                ret.IsSiteNgUser = changeRequest.IsSiteNgUser;
+            }
+            return ret;
+        }
+        /// <summary>
+        /// ユーザー情報を更新し、変更をプラグインに通知する
+        /// </summary>
+        /// <param name="user">対象のユーザー</param>
+        /// <param name="changeRequest">変更要求</param>
+        private void UpdateUser(IMcvUser user, IMcvUserDiff changeRequest)
+        {
+            var diff = GetUserDiff(user, changeRequest);
+            user.Update(diff);
+            _pluginManager.SetNotify(new NotifyUserChanged(diff));
+        }
         private void OnMessageReceived(ConnectionId connectionId, ISiteMessage message, IMessageMetadata2 metadata)
         {
             var siteGuid = metadata.SiteContextGuid;
             var userId = metadata.UserId;
 
             var user = GetUser(siteGuid, userId);
-            //2020/09/07
-            //message.UserNameみたいにできれば良いけど、現状は難しい。
-            //userはSitePluginで作成するのがベスト？
-            //とりあえずmetadataにUserNameを持たせることにする。
-            //ただ、今はSitePluginにあまり変更を加えたくないからmetadata.User.Nameから取ることにする。
-            //変更通知も出さないといけない。
             if (user != null)
             {
-                user.Name = metadata.UserName;
+                UpdateUser(user, new UserDiff(siteGuid, userId)
+                {
+                    Name = metadata.UserName,
+                    Nickname = metadata.NewNickname,
+                });
             }
             _pluginManager.SetNotify(new NotifyMessageReceived(connectionId, message, metadata, user));
         }

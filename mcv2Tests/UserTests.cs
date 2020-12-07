@@ -12,14 +12,43 @@ using System.Threading.Tasks;
 
 namespace mcv2Tests
 {
+    class TestPlugin : IMcvPluginV1
+    {
+        public event EventHandler<INotify>? NotifyReceived;
+        public PluginId Id { get; } = new PluginId();
+        public IPluginHost Host { get; set; }
+        public string Name { get; } = "";
+
+        public void OnClosing()
+        {
+        }
+
+        public void OnLoaded()
+        {
+        }
+
+        public void SetNotify(INotify notify)
+        {
+            NotifyReceived?.Invoke(this, notify);
+        }
+
+        public void SetResponse(IResponse res)
+        {
+        }
+
+        public void ShowSettingView()
+        {
+        }
+    }
     [TestFixture]
     class UserTests
     {
         [Test]
         public void UserSerializeDeserializeTest()
         {
+            var siteId = new SitePluginId(Guid.NewGuid());
             var userId = "abc";
-            var user = new McvUser(userId)
+            var user = new McvUser(siteId, userId)
             {
                 IsNgUser = true,
                 IsSiteNgUser = true,
@@ -48,77 +77,98 @@ namespace mcv2Tests
             Assert.AreEqual(user.Name, deserialized.Name);
             Assert.AreEqual(user.Nickname, deserialized.Nickname);
         }
-        [Test]
-        public void ニックネームを変更する()
+        private Model _model;
+        private TestPlugin _testPlugin;
+        [SetUp]
+        public void Setup()
         {
             var sitePluginManager = new Mock<ISitePluginManager>().Object;
             var userStore = new TestUserStore();
             var loggerMock = new Mock<ILogger>();
             var ioMock = new Mock<IIo>();
             var optionsMock = new Mock<ICoreOptions>();
-            var model = new Model(new PluginManager(), sitePluginManager, userStore, loggerMock.Object, ioMock.Object, optionsMock.Object);
+            _testPlugin = new TestPlugin();
+            var pluginManager = new PluginManager();
+            _model = new Model(pluginManager, sitePluginManager, userStore, loggerMock.Object, ioMock.Object, optionsMock.Object);
+            pluginManager.AddPlugin(_model, _testPlugin);
+        }
+        [Test]
+        public void ユーザー情報を変更したら通知が来るか()
+        {
+            //Arrange
+            var siteId = new SitePluginId(Guid.NewGuid());
+            var userId = "userid";
+            var newNick = "abc";
+            var b = false;
+            _testPlugin.NotifyReceived += (s, e) =>
+            {
+                if (e is NotifyUserChanged changed && changed.Nickname == newNick)
+                {
+                    b = true;
+                }
+            };
+
+            //Act
+            _model.SetRequest(_testPlugin.Id, new RequestChangeUserStatus(siteId, userId)
+            {
+                Nickname = newNick,
+            });
+
+            //Assert
+            Assert.IsTrue(b);
+        }
+        [Test]
+        public void ニックネームを変更する()
+        {
             var siteGuid = new SitePluginId(new Guid());
             var userId = "userid";
-            var res = model.GetData(new RequestUser(siteGuid, userId)) as ResponseUser;
+            var res = _model.GetData(new RequestUser(siteGuid, userId)) as ResponseUser;
 
             Assert.IsNotNull(res);
-            Assert.IsNull(res.User.Nickname);
+            Assert.IsNull(res!.User.Nickname);//ニックネームが設定されていない事を確認
 
-            model.SetRequest(new PluginId(), new RequestChangeUserStatus(siteGuid, userId)
+            //Arrange
+            _model.SetRequest(new PluginId(), new RequestChangeUserStatus(siteGuid, userId)
             {
                 Nickname = "nick",
             });
 
-            var res2 = model.GetData(new RequestUser(siteGuid, userId)) as ResponseUser;
-            Assert.AreEqual("nick", res2.User.Nickname);
+            //Assert
+            var res2 = _model.GetData(new RequestUser(siteGuid, userId)) as ResponseUser;
+            Assert.IsNotNull(res2);
+            Assert.AreEqual("nick", res2!.User.Nickname);
         }
         [Test]
         public void NGユーザーにする()
         {
-            var sitePluginManager = new Mock<ISitePluginManager>().Object;
-            var userStore = new TestUserStore();
-            var loggerMock = new Mock<ILogger>();
-            var ioMock = new Mock<IIo>();
-            var optionsMock = new Mock<ICoreOptions>();
-            var model = new Model(new PluginManager(), sitePluginManager, userStore, loggerMock.Object, ioMock.Object, optionsMock.Object);
             var siteGuid = new SitePluginId(new Guid());
             var userId = "userid";
-            var res = model.GetData(new RequestUser(siteGuid, userId)) as ResponseUser;
 
-            Assert.IsNotNull(res);
-            Assert.IsFalse(res.User.IsNgUser);
-
-            model.SetRequest(new PluginId(), new RequestChangeUserStatus(siteGuid, userId)
+            //Arrange
+            _model.SetRequest(new PluginId(), new RequestChangeUserStatus(siteGuid, userId)
             {
                 IsNgUser = true,
             });
 
-            var res2 = model.GetData(new RequestUser(siteGuid, userId)) as ResponseUser;
+            //Assert
+            var res2 = (ResponseUser)_model.GetData(new RequestUser(siteGuid, userId));
             Assert.IsTrue(res2.User.IsNgUser);
         }
         [Test]
         public void サイトNGユーザーにする()
         {
-            var sitePluginManager = new Mock<ISitePluginManager>().Object;
-            var userStore = new TestUserStore();
-            var loggerMock = new Mock<ILogger>();
-            var ioMock = new Mock<IIo>();
-            var optionsMock = new Mock<ICoreOptions>();
-            var model = new Model(new PluginManager(), sitePluginManager, userStore, loggerMock.Object, ioMock.Object, optionsMock.Object);
             var siteGuid = new SitePluginId(new Guid());
             var userId = "userid";
-            var res = model.GetData(new RequestUser(siteGuid, userId)) as ResponseUser;
 
-            Assert.IsNotNull(res);
-            Assert.IsFalse(res.User.IsSiteNgUser);
-
-            model.SetRequest(new PluginId(), new RequestChangeUserStatus(siteGuid, userId)
+            //Arrange
+            _model.SetRequest(new PluginId(), new RequestChangeUserStatus(siteGuid, userId)
             {
                 IsSiteNgUser = true,
             });
 
-            var res2 = model.GetData(new RequestUser(siteGuid, userId)) as ResponseUser;
-            Assert.IsTrue(res2.User.IsSiteNgUser);
+            //Assert
+            var res = (ResponseUser)_model.GetData(new RequestUser(siteGuid, userId));
+            Assert.IsTrue(res.User.IsSiteNgUser);
         }
     }
 }

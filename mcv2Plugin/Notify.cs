@@ -36,9 +36,9 @@ namespace mcv2
             }
         }
     }
-    public class NotifyUserChanged : INotify
+    public class NotifyUserChanged : INotify, IMcvUserDiff
     {
-        public SitePluginId SiteContextGuid { get; }
+        public SitePluginId SiteId { get; }
         public string UserId { get; }
         public IEnumerable<IMessagePart>? Name { get; set; }
         public string? Nickname { get; set; }
@@ -46,8 +46,25 @@ namespace mcv2
         public bool? IsSiteNgUser { get; set; }
         public NotifyUserChanged(SitePluginId siteContextGuid, string userId)
         {
-            SiteContextGuid = siteContextGuid;
+            SiteId = siteContextGuid;
             UserId = userId;
+        }
+        public NotifyUserChanged(IMcvUserDiff diff)
+        {
+            //警告回避のためにnullableじゃない値は手動でセットする。
+            SiteId = diff.SiteId;
+            UserId = diff.UserId;
+
+            //他の項目はリフレクションでセット。
+            var props = diff.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            foreach (var prop in props)
+            {
+                if (prop.Name == nameof(SiteId)) continue;
+                if (prop.Name == nameof(UserId)) continue;
+                var myProp = this.GetType().GetProperty(prop.Name);
+                if (myProp == null) continue;
+                myProp.SetValue(this, prop.GetValue(diff));
+            }
         }
         public override string? ToString()
         {

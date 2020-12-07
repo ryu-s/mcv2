@@ -236,7 +236,7 @@ namespace mcv2.Model
             McvUser user;
             if (Exists(siteGuid, userId))
             {
-                user = new McvUser(userId);
+                user = new McvUser(siteGuid, userId);
                 AddUser(siteGuid, user);
             }
             else
