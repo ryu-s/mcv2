@@ -22,6 +22,7 @@ namespace mcv2.MainViewPlugin
             if (!dict.TryGetValue(userId, out var user))
             {
                 user = new UserViewModel(siteContextGuid, userId, _options, _host);
+                dict.Add(userId, user);
             }
             return user;
         }

@@ -159,7 +159,6 @@ namespace mcv2.MainViewPlugin
                 case NotifyMessageReceived messageReceived:
                     try
                     {
-                        //TODO:Userがnullの場合にも対応しないと。
                         UserViewModel? user;
                         if (messageReceived.User == null)
                         {
@@ -168,8 +167,6 @@ namespace mcv2.MainViewPlugin
                         else
                         {
                             user = _userStore.GetOrCreateUser(messageReceived.Metadata.SiteContextGuid, messageReceived.User.Id);
-                            user.Nickname = messageReceived.User.Nickname;
-                            user.UsernameItems = messageReceived.User.Name;
                         }
                         _dispatcher.Invoke(() =>
                         {
@@ -316,6 +313,7 @@ namespace mcv2.MainViewPlugin
         private void AddUser(SitePluginId siteContextGuid, string userId)
         {
             var user = _userStore.GetOrCreateUser(siteContextGuid, userId);
+            _vm.AddUser(user);
         }
 
         UserViewModel IModel.GetUser(SitePluginId siteContextGuid, string userId)

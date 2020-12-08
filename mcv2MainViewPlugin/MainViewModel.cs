@@ -40,6 +40,7 @@ namespace mcv2.MainViewPlugin
         public ObservableCollection<MetadataViewModel> MetaCollection { get; } = new ObservableCollection<MetadataViewModel>();
         public ObservableCollection<ConnectionViewModel> Connections { get; } = new ObservableCollection<ConnectionViewModel>();
         public ObservableCollection<PluginMenuItemViewModel> PluginMenuItemCollection { get; } = new ObservableCollection<PluginMenuItemViewModel>();
+        public ObservableCollection<UserViewModel> Users { get; } = new ObservableCollection<UserViewModel>();
         public MainViewModel()
             : base(new DynamicOptionsTest())
         {
@@ -514,7 +515,10 @@ namespace mcv2.MainViewPlugin
             var req = new RequestAddConnection();
             SendRequest(req);
         }
-
+        internal void AddUser(UserViewModel user)
+        {
+            Users.Add(user);
+        }
         internal void AddMessage(ConnectionId connectionId, ISiteMessage message, IMessageMetadata2 metadata, UserViewModel? user)
         {
             var connVm = _connDict[connectionId];
