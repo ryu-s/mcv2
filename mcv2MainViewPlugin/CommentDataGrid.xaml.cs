@@ -151,7 +151,7 @@ namespace mcv2.MainViewPlugin
             var oldExtentHeight = e.ExtentHeight - e.ExtentHeightChange;
             var oldVerticalOffset = e.VerticalOffset - e.VerticalChange;
             var oldViewportHeight = e.ViewportHeight - e.ViewportHeightChange;
-            if (oldVerticalOffset + oldViewportHeight + 5 >= oldExtentHeight)
+            if (oldVerticalOffset + oldViewportHeight  >= oldExtentHeight)
             {
                 //this.ScrollIntoView(this.Items[this.Items.Count - 1]);
                 //ScrollViewer scrollViewer;
@@ -167,7 +167,7 @@ namespace mcv2.MainViewPlugin
                 //{
                 //    return;
                 //}
-                if (sender is DataGrid dataGrid)
+                if (sender is DataGrid dataGrid && dataGrid.Items.Count > 0)
                 {
                     var lastItem = dataGrid.Items[dataGrid.Items.Count - 1];
                     dataGrid.ScrollIntoView(lastItem);
