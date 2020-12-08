@@ -8,5 +8,6 @@ namespace mcv2TestPlugin
     {
         void PostComment(ConnectionId connectionId, ISiteMessage message, IMessageMetadata2 metadata);
         void SetRequest(IRequest req);
+        IResponse GetData(IRequest req);
     }
 }

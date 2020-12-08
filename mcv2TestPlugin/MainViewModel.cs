@@ -201,11 +201,116 @@ namespace mcv2TestPlugin
             }
         }
     }
+    class UserViewModel : ViewModelBase
+    {
+        private readonly IPluginMain _host;
+        public string Id { get; }
+        public SitePluginId SiteId { get; }
+        public string? Nickname
+        {
+            get
+            {
+                var res = (ResponseUser)_host.GetData(new RequestUser(SiteId, Id));
+                return res.User.Nickname;
+            }
+            set
+            {
+                _host.SetRequest(new RequestChangeUserStatus(SiteId, Id)
+                {
+                    Nickname = value,
+                });
+                RaisePropertyChanged();
+            }
+        }
+        public IEnumerable<IMessagePart> Name
+        {
+            get
+            {
+                var res = (ResponseUser)_host.GetData(new RequestUser(SiteId, Id));
+                return res.User.Name;
+            }
+            set
+            {
+                _host.SetRequest(new RequestChangeUserStatus(SiteId, Id)
+                {
+                    Name = value,
+                });
+                RaisePropertyChanged();
+            }
+        }
+        public bool IsNgUser
+        {
+            get
+            {
+                var res = (ResponseUser)_host.GetData(new RequestUser(SiteId, Id));
+                return res.User.IsNgUser;
+            }
+            set
+            {
+                _host.SetRequest(new RequestChangeUserStatus(SiteId, Id)
+                {
+                    IsNgUser = value,
+                });
+                RaisePropertyChanged();
+            }
+        }
+        public bool IsSiteNgUser
+        {
+            get
+            {
+                var res = (ResponseUser)_host.GetData(new RequestUser(SiteId, Id));
+                return res.User.IsSiteNgUser;
+            }
+            set
+            {
+                _host.SetRequest(new RequestChangeUserStatus(SiteId, Id)
+                {
+                    IsSiteNgUser = value,
+                });
+                RaisePropertyChanged();
+            }
+        }
+        public UserViewModel(SitePluginId siteId, string userId, IPluginMain host)
+        {
+            Id = userId;
+            SiteId = siteId;
+
+            //Nickname = mcvUser.Nickname;
+            _host = host;
+        }
+    }
     class MainViewModel : ViewModelBase
     {
         private readonly IPluginMain _pluginMain;
         private ConnectionViewModel? _selectedConnection;
-
+        public ObservableCollection<UserViewModel> Users { get; } = new ObservableCollection<UserViewModel>();
+        private Dictionary<(SitePluginId, string), UserViewModel> _userDict = new Dictionary<(SitePluginId, string), UserViewModel>();
+        public void AddUser(IMcvUser mcvUser)
+        {
+            var user = new UserViewModel(mcvUser.SiteId, mcvUser.Id, _pluginMain);
+            _userDict.Add((mcvUser.SiteId, mcvUser.Id), user);
+            Users.Add(user);
+        }
+        public void ChangeUser(IMcvUserDiff diff)
+        {
+            var user = _userDict[(diff.SiteId, diff.UserId)];
+            if (diff.Nickname != null)
+            {
+                user.Nickname = diff.Nickname;
+            }
+            if (diff.Name != null)
+            {
+                user.Name = diff.Name;
+            }
+            if (diff.IsNgUser != null)
+            {
+                user.IsNgUser = diff.IsNgUser.Value;
+            }
+            if (diff.IsSiteNgUser != null)
+            {
+                user.IsSiteNgUser = diff.IsSiteNgUser.Value;
+            }
+        }
         public ConnectionViewModel? SelectedConnection
         {
             get

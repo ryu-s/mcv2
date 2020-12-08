@@ -38,6 +38,13 @@ namespace mcv2TestPlugin
                 case NotifyConnectionStatusChanged connChanged:
                     _vm.ChangeConnectionName(connChanged.ConnectionId, connChanged.Name, connChanged.Site);
                     break;
+                case NotifyUserAdded userAdded:
+                    var userStatus = (ResponseUser)Host.GetData(new RequestUser(userAdded.SiteContextGuid, userAdded.UserId));
+                    _vm.AddUser(userStatus.User);
+                    break;
+                case NotifyUserChanged userChanged:
+                    _vm.ChangeUser(userChanged);
+                    break;
             }
         }
 
@@ -83,6 +90,10 @@ namespace mcv2TestPlugin
         public void SetRequest(IRequest req)
         {
             Host.SetRequest(Id, req);
+        }
+        public IResponse GetData(IRequest req)
+        {
+            return Host.GetData(req);
         }
     }
 }
