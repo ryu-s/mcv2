@@ -219,7 +219,7 @@ namespace mcv2.Model
                     break;
                 case RequestChangeUserStatus reqChangeUserStatus:
                     {
-                        var user = GetUser(reqChangeUserStatus.SiteId, reqChangeUserStatus.UserId);
+                        var user = GetOrCreateUser(reqChangeUserStatus.SiteId, reqChangeUserStatus.UserId);
                         UpdateUser(user, reqChangeUserStatus);
                     }
                     break;
@@ -392,12 +392,8 @@ namespace mcv2.Model
         /// <param name="siteGuid"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        private McvUser? GetUser(SitePluginId siteGuid, string userId)
+        private McvUser GetOrCreateUser(SitePluginId siteGuid, string userId)
         {
-            if (string.IsNullOrEmpty(userId))
-            {
-                return null;
-            }
             McvUser user;
             if (!_userStore.Exists(siteGuid, userId))
             {
@@ -456,7 +452,7 @@ namespace mcv2.Model
             var siteGuid = metadata.SiteContextGuid;
             var userId = metadata.UserId;
 
-            var user = GetUser(siteGuid, userId);
+            var user = GetOrCreateUser(siteGuid, userId);
             if (user != null)
             {
                 UpdateUser(user, new UserDiff(siteGuid, userId)
@@ -598,7 +594,7 @@ namespace mcv2.Model
                     res = new ResponseMainViewPosition(reqMainViewPos.Id, x, y);
                     break;
                 case RequestUser reqUser:
-                    var user = GetUser(reqUser.SiteGuid, reqUser.UserId);
+                    var user = GetOrCreateUser(reqUser.SiteGuid, reqUser.UserId);
                     res = new ResponseUser(reqUser.Id, user);
                     break;
                 case GetSiteType reqSiteType:
